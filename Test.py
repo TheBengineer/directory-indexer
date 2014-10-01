@@ -25,22 +25,21 @@ class Directory(object):
 #main = Directory("M:\\Drawings")
 #main.search()
 
-
-f = open("C:\\Users\\boh01\\Documents\\allfilesinM"+datetime.datetime.now().strftime("%Y-%m-%d %H:%M")+".csv",'w')
-lasttime = datetime.date(2014,8,8)
-print lasttime
+fpath = "C:\\Users\\boh01\\Documents\\allfilesinM"+datetime.datetime.now().strftime("%Y-%m-%d %H.%M")+".csv"
+print fpath
+f = open(fpath,'w')
+lasttime = time.mktime(datetime.date(2014,8,8).timetuple())
 once = 1
 matches = []
 lastroot = ""
 for root, dirnames, filenames in os.walk("M:\\Drawings"):
-    print dirnames
     for dir in dirnames:
-        print time.time()-os.path.getmtime(root+"\\"+dir)
-        if os.path.getmtime(root+"\\"+dir) < time.time():
+        if os.path.getmtime(root+"\\"+dir) < lasttime:
             dirnames.remove(dir)
-    print dirnames
+    print "Directories to look at:",dirnames
     for filename in filenames:
         matches.append((root, filename))
+        print (root, filename)
         f.write("\""+root +"\",\""+ filename+"\"\n")
         if root != lastroot:
             print time.ctime(os.path.getmtime(root)), root
