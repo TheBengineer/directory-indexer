@@ -15,18 +15,28 @@ class Directory(object):
         self.dirClasses = {}
         self.timeUpdated = timeUpdated
         self.DirectoryDictionary = DirDict
-        self.root = self.path[:self.path.rfind("\\")]
-        tmp = self.root.split("\\")
+        self.root = self.path
         self.scanned = 0
-        if not tmp in self.DirectoryDictionary.keys():
+        if self.path.rfind("\\") > 0:
+            self.root = self.path[:self.path.rfind("\\")]
+            tmp = self.path.split("\\")
+            paths = []
             for i in range(len(tmp)):
-                dpath = ""
-                for j in range(i):
-                    dpath += tmp[j]+"\\"
-                if dpath != "":
-                    if not dpath in self.DirectoryDictionary.keys():
-                        self.DirectoryDictionary[dpath] = Directory(dpath,self.timeUpdated,self.DirectoryDictionary)
-        self.DirectoryDictionary[self.root].dirClasses[self.path] = self # linking
+                dpath = tmp[0]
+                for j in range(1,i+1):
+                    dpath += "\\"+tmp[j]
+                paths.append(dpath)
+            for i in paths:
+                if not i in  self.DirectoryDictionary.keys():
+                    print i, "is not in", self.DirectoryDictionary.keys()
+                    self.DirectoryDictionary[i] = Directory(i,self.timeUpdated,self.DirectoryDictionary)
+            try:
+                self.DirectoryDictionary[self.root].dirClasses[self.path] = self # linking
+            except KeyError:
+                print "Assuming",self.root,"to be the global root"
+                print self.DirectoryDictionary.keys()
+        else:
+            print "Assuming",self.root,"to be the global root becaseu there are no slashes"
     def printFiles(self):
         if self.scanned == 0:
             self.update()
