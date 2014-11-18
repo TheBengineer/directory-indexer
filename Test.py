@@ -22,6 +22,23 @@ class Directory(object):
             print self.path,"\\",self.folder
             self.dirClasses.append(Directory(os.path.join(self.path,self.folder)))
 
+
+DirectoryDictionary = {}
+
+pathToCSV = "H:\\Projects\\Monster\\DB_2.csv"
+
+import csv
+with open(pathToCSV , 'rb') as csvfile:
+    spamreader = csv.reader(csvfile, delimiter=',', quotechar="'")
+    print spamreader.next()
+    print spamreader.next()
+    for row in spamreader:
+        path = row[0]
+        file = row[1]
+
+
+raw_input()
+
 #main = Directory("M:\\Drawings")
 #main.search()
 
