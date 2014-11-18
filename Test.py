@@ -8,13 +8,13 @@ import os, time,datetime
 
 
 class Directory(object):
-    path = ""
-    files = []
-    directories = []
-    dirClasses = []
+
     def __init__(self, path):
         self.path = path
-        self.search()
+        self.files = []
+        self.directories = []
+        self.dirClasses = []
+        #self.search()
     def search(self):
         for (self.path2, self.directories , self.files) in os.walk(self.path):
             break
@@ -25,19 +25,29 @@ class Directory(object):
 
 DirectoryDictionary = {}
 
+
 pathToCSV = "H:\\Projects\\Monster\\DB_2.csv"
 
 import csv
+
 with open(pathToCSV , 'rb') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=',', quotechar="'")
-    print spamreader.next()
-    print spamreader.next()
+    daterow = spamreader.next()
     for row in spamreader:
-        path = row[0]
-        file = row[1]
+        if spamreader.line_num%1000 == 0:
+            print spamreader.line_num
+        try:
+            path = row[0]
+            file = row[1]
+            if path in DirectoryDictionary:
+                DirectoryDictionary[path].files.append(file)
+            else:
+                DirectoryDictionary[path] = Directory(path)
+        except:
+            print Exception
 
 
-raw_input()
+raw_input("All done")
 
 #main = Directory("M:\\Drawings")
 #main.search()
