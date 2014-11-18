@@ -17,6 +17,7 @@ class Directory(object):
         self.DirectoryDictionary = DirDict
         self.root = self.path[:self.path.rfind("\\")]
         tmp = self.root.split("\\")
+        self.scanned = 0
         if not tmp in self.DirectoryDictionary.keys():
             for i in range(len(tmp)):
                 dpath = ""
@@ -32,20 +33,32 @@ class Directory(object):
             print self.path,"\\",self.folder
             self.dirClasses.append(Directory(os.path.join(self.path,self.folder)))
     def printFiles(self):
+        if self.scanned == 0:
+            self.update()
         for i in self.files:
             print self.path+"\\"+i
     def writeFiles(self,file):
+        if self.scanned == 0:
+            self.update()
         for i in self.files:
             file.write(self.path+","+i+"\n")
     def markLower(self):
-         for i in self.dirClasses:
-             self.dirClasses[i].markLower()
+        for i in self.dirClasses:
+            self.dirClasses[i].markLower()
+        self.scanned = 1
+    def delLower(self):
+        for i in self.dirClasses:
+            self.dirClasses[i].delLower()
+        self.dirClasses = {}
+        del self.DirectoryDictionary[self.path]
+
     def update(self):
         if os.path.isdir(self.path):
-            #print datetime.date.fromtimestamp(os.path.getmtime(self.path)), self.path
+            print datetime.date.fromtimestamp(os.path.getmtime(self.path)), self.path
             pass
         else:
-            print self.path
+            self.markLower()
+        self.scanned = 1
 
 
 rootDIR = "M:\\Drawings"
@@ -75,7 +88,8 @@ with open(pathToCSV , 'rb') as csvfile:
         except:
             print Exception
 
-print DirectoryDictionary[DirectoryDictionary.keys()[1]].printFiles()
+
+DirectoryDictionary[rootDIR].update()
 
 
 raw_input("All done")
