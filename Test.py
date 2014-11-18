@@ -58,6 +58,7 @@ class Directory(object):
             if datetime.datetime.fromtimestamp(os.path.getmtime(self.path)) > self.timeUpdated:
                 #Needs an update
                 print "Updating",self.path
+                print self.dirClasses
                 for i in self.dirClasses:
                     self.dirClasses[i].update()
                 (pathS, directoriesS , filesS) = (0,0,0)
