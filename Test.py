@@ -16,10 +16,21 @@ class Directory(object):
         self.timeUpdated = timeUpdated
         self.DirectoryDictionary = DirDict
         self.root = self.path[:self.path.rfind("\\")]
-        try:
-            self.DirectoryDictionary[self.root].dirClasses[self.path] = self # Link this back up the tree
-        except KeyError:
-            print "Apperently", self.path,"is the root directory"
+        print self.path
+        print self.root
+        tmp = self.root.split("\\")
+        for i in range(len(tmp)):
+            dpath = ""
+            for j in range(i):
+                dpath += tmp[j]+"\\"
+            print dpath
+            if not dpath in self.DirectoryDictionary.keys():
+                self.DirectoryDictionary[dpath] = Directory(dpath,self.timeUpdated,self.DirectoryDictionary)
+        #while not self.root in self.DirectoryDictionary.keys():
+        #    tmp = tmp[:tmp.rfind("\\")]
+
+        #else:
+        #    self.DirectoryDictionary[self.root].dirClasses[self.path] = self # Link this back up the tree
         #self.search()
     def search(self):
         for (self.path2, self.directories , self.files) in os.walk(self.path):
