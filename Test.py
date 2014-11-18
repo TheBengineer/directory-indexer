@@ -57,13 +57,9 @@ class Directory(object):
 
     def update(self):
         if os.path.isdir(self.path):
-            print datetime.datetime.fromtimestamp(os.path.getmtime(self.path)) ,"asdfasdf", self.timeUpdated
             if datetime.datetime.fromtimestamp(os.path.getmtime(self.path)) > self.timeUpdated:
                 #Needs an update
                 print "Updating",self.path
-                print self.dirClasses
-                for i in self.dirClasses:
-                    self.dirClasses[i].update()
                 (pathS, directoriesS , filesS) = (0,0,0)
                 for (pathS, directoriesS , filesS) in os.walk(self.path):
                     break
@@ -72,26 +68,33 @@ class Directory(object):
                 if directoriesS:
                     self.directories = directoriesS
                 for folder in self.directories:
-                    fullfolder = self.root+"\\"+folder
-                    self.DirectoryDictionary[fullfolder] = Directory(fullfolder,datetime.datetime.fromtimestamp(time.time()),self.DirectoryDictionary)
+                    fullfolder = self.path+"\\"+folder
+                    if not fullfolder in self.dirClasses.keys():
+                        tmpDir = Directory(fullfolder,datetime.datetime(1900,1,1),self.DirectoryDictionary)
+                        self.DirectoryDictionary[fullfolder] = tmpDir
+                        self.dirClasses[fullfolder] = tmpDir
+                for i in self.dirClasses:
+                    self.dirClasses[i].update()
             else:
+                print "Path is all up to  date:", self.path
                 self.markLower()
         else:
+            print "Detected deleted path:", self.path
             self.delLower()
         self.scanned = 1
         self.timeUpdated = datetime.date.fromtimestamp(time.time())
 
 
-rootDIR = "M:\\Drawings"
+rootDIR = "C:\\Projects"
 
 DirectoryDictionary = {}
-DirectoryDictionary[rootDIR] = Directory(rootDIR,datetime.datetime(1900,1,1),DirectoryDictionary)
+DirectoryDictionary[rootDIR] = Directory(rootDIR,datetime.datetime(1990,1,1),DirectoryDictionary)
 
 
 pathToCSV = "H:\\Projects\\Monster\\DB_2.csv"
 
 import csv
-
+"""
 with open(pathToCSV , 'rb') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=',', quotechar="'")
     daterow = spamreader.next()
@@ -108,34 +111,9 @@ with open(pathToCSV , 'rb') as csvfile:
                 DirectoryDictionary[path] = Directory(path,timeUpdated,DirectoryDictionary)
         except:
             print "Here",Exception
-
+"""
 
 DirectoryDictionary[rootDIR].update()
 
 
 raw_input("All done")
-
-#main = Directory("M:\\Drawings")
-#main.search()
-
-fpath = "C:\\Users\\boh01\\Documents\\allfilesinM"+datetime.datetime.now().strftime("%Y-%m-%d %H.%M")+".csv"
-print fpath
-f = open(fpath,'w')
-lasttime = time.mktime(datetime.date(2014,8,8).timetuple())
-once = 1
-matches = []
-lastroot = ""
-for root, dirnames, filenames in os.walk("M:\\Drawings"):
-    for dir in dirnames:
-        if os.path.getmtime(root+"\\"+dir) < lasttime:
-            dirnames.remove(dir)
-    print "Directories to look at:",dirnames
-    for filename in filenames:
-        matches.append((root, filename))
-        print (root, filename)
-        f.write("\""+root +"\",\""+ filename+"\"\n")
-        if root != lastroot:
-            print time.ctime(os.path.getmtime(root)), root
-        lastroot = root
-        
-f.close()
