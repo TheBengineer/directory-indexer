@@ -47,10 +47,10 @@ class Directory(object):
             self.dirClasses[i].markLower()
         self.scanned = 1
     def delLower(self):
-        for i in self.dirClasses:
-            self.dirClasses[i].delLower()
+        #for i in self.dirClasses:
+        #    self.dirClasses[i].delLower()
         self.dirClasses = {}
-        del self.DirectoryDictionary[self.path]
+        #del self.DirectoryDictionary[self.path]
 
     def update(self):
         if os.path.isdir(self.path):
