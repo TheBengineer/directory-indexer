@@ -8,12 +8,12 @@ import os, time,datetime
 
 
 class Directory(object):
-
-    def __init__(self, path):
+    def __init__(self, path,timeUpdated):
         self.path = path
         self.files = []
         self.directories = []
         self.dirClasses = []
+        self.timeUpdated = timeUpdated
         #self.search()
     def search(self):
         for (self.path2, self.directories , self.files) in os.walk(self.path):
@@ -21,6 +21,13 @@ class Directory(object):
         for self.folder in self.directories:
             print self.path,"\\",self.folder
             self.dirClasses.append(Directory(os.path.join(self.path,self.folder)))
+    def printFiles(self):
+        for i in self.files:
+            print self.path+"\\"+i
+    def writeFiles(self,file):
+        for i in self.files:
+            file.write(self.path+","+i+"\n")
+
 
 
 DirectoryDictionary = {}
@@ -33,6 +40,7 @@ import csv
 with open(pathToCSV , 'rb') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=',', quotechar="'")
     daterow = spamreader.next()
+    timeUpdated = date_object = datetime.datetime(daterow[1],daterow[2],daterow[3])
     for row in spamreader:
         if spamreader.line_num%1000 == 0:
             print spamreader.line_num
@@ -42,9 +50,11 @@ with open(pathToCSV , 'rb') as csvfile:
             if path in DirectoryDictionary:
                 DirectoryDictionary[path].files.append(file)
             else:
-                DirectoryDictionary[path] = Directory(path)
+                DirectoryDictionary[path] = Directory(path,timeUpdated)
         except:
             print Exception
+
+print DirectoryDictionary[DirectoryDictionary.keys()[1]].printFiles()
 
 
 raw_input("All done")
