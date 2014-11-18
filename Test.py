@@ -17,7 +17,6 @@ class Directory(object):
         self.DirectoryDictionary = DirDict
         self.root = self.path[:self.path.rfind("\\")]
         tmp = self.root.split("\\")
-        self.update()
         if not tmp in self.DirectoryDictionary.keys():
             for i in range(len(tmp)):
                 dpath = ""
@@ -42,7 +41,11 @@ class Directory(object):
          for i in self.dirClasses:
              self.dirClasses[i].markLower()
     def update(self):
-        print os.path.getmtime(self.path)
+        if os.path.isdir(self.path):
+            #print datetime.date.fromtimestamp(os.path.getmtime(self.path)), self.path
+            pass
+        else:
+            print self.path
 
 
 rootDIR = "M:\\Drawings"
