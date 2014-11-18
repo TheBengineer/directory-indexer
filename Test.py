@@ -54,8 +54,12 @@ class Directory(object):
 
     def update(self):
         if os.path.isdir(self.path):
-            if datetime.date.fromtimestamp(os.path.getmtime(self.path)) > self.timeUpdated:
+            print datetime.datetime.fromtimestamp(os.path.getmtime(self.path)) ,"asdfasdf", self.timeUpdated
+            if datetime.datetime.fromtimestamp(os.path.getmtime(self.path)) > self.timeUpdated:
                 #Needs an update
+                print "Updating",self.path
+                for i in self.dirClasses:
+                    self.dirClasses[i].update()
                 (pathS, directoriesS , filesS) = (0,0,0)
                 for (pathS, directoriesS , filesS) in os.walk(self.path):
                     break
@@ -65,7 +69,7 @@ class Directory(object):
                     self.directories = directoriesS
                 for folder in self.directories:
                     fullfolder = self.root+"\\"+folder
-                    self.DirectoryDictionary[fullfolder] = Directory(fullfolder,datetime.date.fromtimestamp(time.time()),self.DirectoryDictionary)
+                    self.DirectoryDictionary[fullfolder] = Directory(fullfolder,datetime.datetime.fromtimestamp(time.time()),self.DirectoryDictionary)
             else:
                 self.markLower()
         else:
@@ -99,7 +103,7 @@ with open(pathToCSV , 'rb') as csvfile:
             else:
                 DirectoryDictionary[path] = Directory(path,timeUpdated,DirectoryDictionary)
         except:
-            print Exception
+            print "Here",Exception
 
 
 DirectoryDictionary[rootDIR].update()
