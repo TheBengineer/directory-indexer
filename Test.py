@@ -15,7 +15,11 @@ class Directory(object):
         self.dirClasses = {}
         self.timeUpdated = timeUpdated
         self.DirectoryDictionary = DirDict
-        self.DirectoryDictionary[self.path].dirClasses[self.path] = self # Link this back up the tree
+        self.root = self.path[:self.path.rfind("\\")]
+        try:
+            self.DirectoryDictionary[self.root].dirClasses[self.path] = self # Link this back up the tree
+        except KeyError:
+            print "Apperently", self.path,"is the root directory"
         #self.search()
     def search(self):
         for (self.path2, self.directories , self.files) in os.walk(self.path):
@@ -31,10 +35,10 @@ class Directory(object):
             file.write(self.path+","+i+"\n")
 
 
-rootDIR = "M:\Drawings"
+rootDIR = "M:\\Drawings"
 
 DirectoryDictionary = {}
-DirectoryDictionary[rootDIR] = Directory(rootDIR,datetime.datetime(1900,1,1))
+DirectoryDictionary[rootDIR] = Directory(rootDIR,datetime.datetime(1900,1,1),DirectoryDictionary)
 
 
 pathToCSV = "H:\\Projects\\Monster\\DB_2.csv"
@@ -44,7 +48,7 @@ import csv
 with open(pathToCSV , 'rb') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=',', quotechar="'")
     daterow = spamreader.next()
-    timeUpdated = date_object = datetime.datetime(daterow[1],daterow[2],daterow[3])
+    timeUpdated = date_object = datetime.datetime(int(daterow[1]),int(daterow[2]),int(daterow[3]))
     for row in spamreader:
         if spamreader.line_num%1000 == 0:
             print spamreader.line_num
@@ -54,7 +58,7 @@ with open(pathToCSV , 'rb') as csvfile:
             if path in DirectoryDictionary:
                 DirectoryDictionary[path].files.append(file)
             else:
-                DirectoryDictionary[path] = Directory(path,timeUpdated)
+                DirectoryDictionary[path] = Directory(path,timeUpdated,DirectoryDictionary)
         except:
             print Exception
 
