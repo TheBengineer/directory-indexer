@@ -54,11 +54,24 @@ class Directory(object):
 
     def update(self):
         if os.path.isdir(self.path):
-            print datetime.date.fromtimestamp(os.path.getmtime(self.path)), self.path
-            pass
+            if datetime.date.fromtimestamp(os.path.getmtime(self.path)) > self.timeUpdated:
+                #Needs an update
+                (pathS, directoriesS , filesS) = (0,0,0)
+                for (pathS, directoriesS , filesS) in os.walk(self.path):
+                    break
+                if filesS:
+                    self.files = filesS
+                if directoriesS:
+                    self.directories = directoriesS
+                for folder in self.directories:
+                    fullfolder = self.root+"\\"+folder
+                    self.DirectoryDictionary[fullfolder] = Directory(fullfolder,datetime.date.fromtimestamp(time.time()),self.DirectoryDictionary)
+            else:
+                self.markLower()
         else:
             self.delLower()
         self.scanned = 1
+        self.timeUpdated = datetime.date.fromtimestamp(time.time())
 
 
 rootDIR = "M:\\Drawings"
