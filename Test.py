@@ -57,7 +57,7 @@ class Directory(object):
             print datetime.date.fromtimestamp(os.path.getmtime(self.path)), self.path
             pass
         else:
-            self.markLower()
+            self.delLower()
         self.scanned = 1
 
 
