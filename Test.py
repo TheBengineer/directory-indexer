@@ -8,12 +8,14 @@ import os, time,datetime
 
 
 class Directory(object):
-    def __init__(self, path,timeUpdated):
+    def __init__(self, path,timeUpdated,DirDict):
         self.path = path
         self.files = []
         self.directories = []
-        self.dirClasses = []
+        self.dirClasses = {}
         self.timeUpdated = timeUpdated
+        self.DirectoryDictionary = DirDict
+        self.DirectoryDictionary[self.path].dirClasses[self.path] = self # Link this back up the tree
         #self.search()
     def search(self):
         for (self.path2, self.directories , self.files) in os.walk(self.path):
@@ -29,8 +31,10 @@ class Directory(object):
             file.write(self.path+","+i+"\n")
 
 
+rootDIR = "M:\Drawings"
 
 DirectoryDictionary = {}
+DirectoryDictionary[rootDIR] = Directory(rootDIR,datetime.datetime(1900,1,1))
 
 
 pathToCSV = "H:\\Projects\\Monster\\DB_2.csv"
