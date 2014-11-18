@@ -40,11 +40,15 @@ class Directory(object):
             self.update()
         for i in self.files:
             print self.path+"\\"+i
+        for i in self.dirClasses:
+            self.dirClasses[i].printFiles()
     def writeFiles(self,file):
         if self.scanned == 0:
             self.update()
         for i in self.files:
             file.write(self.path+","+i+"\n")
+        for i in self.dirClasses:
+            self.dirClasses[i].writeFiles()
     def markLower(self):
         for i in self.dirClasses:
             self.dirClasses[i].markLower()
@@ -115,5 +119,8 @@ with open(pathToCSV , 'rb') as csvfile:
 
 DirectoryDictionary[rootDIR].update()
 
+f = open("C:\Users\boh01\Downloads\allfiles.csv")
+DirectoryDictionary[rootDIR].writeFiles(f)
+f.close()
 
 raw_input("All done")
