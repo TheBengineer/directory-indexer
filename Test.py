@@ -17,6 +17,7 @@ class Directory(object):
         self.DirectoryDictionary = DirDict
         self.root = self.path[:self.path.rfind("\\")]
         tmp = self.root.split("\\")
+        self.update()
         if not tmp in self.DirectoryDictionary.keys():
             for i in range(len(tmp)):
                 dpath = ""
@@ -25,12 +26,6 @@ class Directory(object):
                 if dpath != "":
                     if not dpath in self.DirectoryDictionary.keys():
                         self.DirectoryDictionary[dpath] = Directory(dpath,self.timeUpdated,self.DirectoryDictionary)
-        #while not self.root in self.DirectoryDictionary.keys():
-        #    tmp = tmp[:tmp.rfind("\\")]
-
-        #else:
-        #    self.DirectoryDictionary[self.root].dirClasses[self.path] = self # Link this back up the tree
-        #self.search()
     def search(self):
         for (self.path2, self.directories , self.files) in os.walk(self.path):
             break
@@ -43,6 +38,11 @@ class Directory(object):
     def writeFiles(self,file):
         for i in self.files:
             file.write(self.path+","+i+"\n")
+    def markLower(self):
+         for i in self.dirClasses:
+             self.dirClasses[i].markLower()
+    def update(self):
+        print os.path.getmtime(self.path)
 
 
 rootDIR = "M:\\Drawings"
