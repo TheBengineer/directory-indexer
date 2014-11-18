@@ -26,12 +26,7 @@ class Directory(object):
                 if dpath != "":
                     if not dpath in self.DirectoryDictionary.keys():
                         self.DirectoryDictionary[dpath] = Directory(dpath,self.timeUpdated,self.DirectoryDictionary)
-    def search(self):
-        for (self.path2, self.directories , self.files) in os.walk(self.path):
-            break
-        for self.folder in self.directories:
-            print self.path,"\\",self.folder
-            self.dirClasses.append(Directory(os.path.join(self.path,self.folder)))
+        self.DirectoryDictionary[self.root].dirClasses[self.path] = self # linking
     def printFiles(self):
         if self.scanned == 0:
             self.update()
