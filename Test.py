@@ -48,7 +48,7 @@ class Directory(object):
         for i in self.files:
             file.write(self.path+","+i+"\n")
         for i in self.dirClasses:
-            self.dirClasses[i].writeFiles()
+            self.dirClasses[i].writeFiles(file)
     def markLower(self):
         for i in self.dirClasses:
             self.dirClasses[i].markLower()
@@ -89,7 +89,7 @@ class Directory(object):
         self.timeUpdated = datetime.date.fromtimestamp(time.time())
 
 
-rootDIR = "C:\\Projects"
+rootDIR = "M:\\Drawings"
 
 DirectoryDictionary = {}
 DirectoryDictionary[rootDIR] = Directory(rootDIR,datetime.datetime(1990,1,1),DirectoryDictionary)
@@ -119,7 +119,7 @@ with open(pathToCSV , 'rb') as csvfile:
 
 DirectoryDictionary[rootDIR].update()
 
-f = open("C:\Users\boh01\Downloads\allfiles.csv")
+f = open("C:\\Users\\boh01\\Downloads\\allfiles.csv","w")
 DirectoryDictionary[rootDIR].writeFiles(f)
 f.close()
 
