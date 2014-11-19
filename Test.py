@@ -46,7 +46,7 @@ class Directory(object):
         if self.scanned == 0:
             self.update()
         for i in self.files:
-            file.write(self.path+","+i+"\n")
+            file.write("\""+self.path+"\",\""+i+"\"\n")
         for i in self.dirClasses:
             self.dirClasses[i].writeFiles(file)
     def markLower(self):
@@ -80,7 +80,7 @@ class Directory(object):
                 for i in self.dirClasses:
                     self.dirClasses[i].update()
             else:
-                print "Path is all up to  date:", self.path
+                print "Path is all up to date:", self.path
                 self.markLower()
         else:
             print "Detected deleted path:", self.path
@@ -125,6 +125,8 @@ st = "Python Datetime"
 for i in dt:
     st += ","+str(i)
 st += "\n"
+
+print "Writing database."
 f.write(st)
 
 DirectoryDictionary[rootDIR].writeFiles(f)
