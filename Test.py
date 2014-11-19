@@ -45,9 +45,12 @@ class Directory(object):
     def writeFiles(self,file):
         if self.scanned == 0:
             self.update()
+        self.files.sort()
         for i in self.files:
             file.write("\""+self.path+"\",\""+i+"\"\n")
-        for i in self.dirClasses:
+        sortedKeys = self.dirClasses.keys()
+        sortedKeys.sort()
+        for i in sortedKeys:
             self.dirClasses[i].writeFiles(file)
     def markLower(self):
         for i in self.dirClasses:
@@ -107,8 +110,8 @@ with open(pathToCSV , 'rb') as csvfile:
         if spamreader.line_num%1000 == 0:
             print spamreader.line_num
         try:
-            path = row[0]
-            file = row[1]
+            path = row[0].strip("\"")
+            file = row[1].strip("\"")
             if path in DirectoryDictionary:
                 DirectoryDictionary[path].files.append(file)
             else:
