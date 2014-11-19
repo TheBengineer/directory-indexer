@@ -5,7 +5,7 @@ import fnmatch
 
 import os, time,datetime
 
-
+startTime = time.time()
 
 class Directory(object):
     def __init__(self, path,timeUpdated,DirDict):
@@ -95,10 +95,10 @@ DirectoryDictionary = {}
 DirectoryDictionary[rootDIR] = Directory(rootDIR,datetime.datetime(1990,1,1),DirectoryDictionary)
 
 
-pathToCSV = "H:\\Projects\\Monster\\DB_2.csv"
+pathToCSV = "H:\\Projects\\Monster\\DB.csv"
 
 import csv
-"""
+print "Importing old Database"
 with open(pathToCSV , 'rb') as csvfile:
     spamreader = csv.reader(csvfile, delimiter=',', quotechar="'")
     daterow = spamreader.next()
@@ -115,12 +115,19 @@ with open(pathToCSV , 'rb') as csvfile:
                 DirectoryDictionary[path] = Directory(path,timeUpdated,DirectoryDictionary)
         except:
             print "Here",Exception
-"""
+
 
 DirectoryDictionary[rootDIR].update()
 
-f = open("C:\\Users\\boh01\\Downloads\\allfiles.csv","w")
+f = open("C:\\Users\\boh01\\Downloads\\allfiles2.csv","w")
+dt = datetime.datetime.now().timetuple()
+st = "Python Datetime"
+for i in dt:
+    st += ","+str(i)
+st += "\n"
+f.write(st)
+
 DirectoryDictionary[rootDIR].writeFiles(f)
 f.close()
 
-raw_input("All done")
+raw_input("Completed in "+str((time.time()-startTime)/60)+" Minutes")
