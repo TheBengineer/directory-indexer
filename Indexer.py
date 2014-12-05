@@ -123,7 +123,7 @@ def importOldScan(oldScanFile,tmpDirectoryDictionary):
 
 FolderToScan = "C:\\Projects" # CHANGE this to whatever you want to. Just remember to use double slashes
 
-pathToOutputCSV = "C:\\Projects\\DB.csv" # CHANGE this to where the output file will live.
+pathToOutputCSV = "DB.csv" # Will be placed next to the python file. Probably best to not run from network drive.
 
 if not os.path.isdir(FolderToScan):
     print "Cannot access the folder to be scanned. Please fix this near the bottom of the source file."
