@@ -106,7 +106,7 @@ def importOldScan(oldScanFile,tmpDirectoryDictionary):
             timeUpdated = date_object = datetime.datetime(int(daterow[1]), int(daterow[2]), int(daterow[3]))
             for row in spamreader:
                 if spamreader.line_num%1000 == 0:
-                    print spamreader.line_num
+                    print "reading line:", spamreader.line_num
                 try:
                     path = row[0].strip("\"")
                     file = row[1].strip("\"")
