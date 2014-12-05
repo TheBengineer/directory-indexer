@@ -95,13 +95,13 @@ class Directory(object):
         self.timeUpdated = datetime.date.fromtimestamp(time.time())
 
 
-def importOldScan(oldScanFile,dirToScan):
+def importOldScan(oldScanFile,tmpDirectoryDictionary):
     import csv
-    tmpDirectoryDictionary = {}
-    tmpDirectoryDictionary[dirToScan] = Directory(dirToScan, datetime.datetime(1990, 1, 1), tmpDirectoryDictionary)
     print "Importing old Database"
+    opened = 0
     with open(oldScanFile, 'rb') as csvfile:
-        spamreader = csv.reader(csvfile, delimiter=',', quotechar="'")
+        opened = 1
+        spamreader = csv.reader(csvfile, delimiter=',', quotechar="\"")
         daterow = spamreader.next()
         timeUpdated = date_object = datetime.datetime(int(daterow[1]), int(daterow[2]), int(daterow[3]))
         for row in spamreader:
@@ -116,29 +116,37 @@ def importOldScan(oldScanFile,dirToScan):
                     tmpDirectoryDictionary[path] = Directory(path, timeUpdated, tmpDirectoryDictionary)
             except:
                 print "Here", Exception
-    return tmpDirectoryDictionary
+    if not opened:
+        print "Could not read existing database. Scanning from scratch."
 
 
 
 
 
 
-FolderToScan = "M:\\Drawings"
+FolderToScan = "M:\\Drawings" # Change this to whatever you want to. Just remember to use double slashes
 
-pathToCSV = "H:\\Projects\\Monster\\DB.csv"
-
-
+pathToOutputCSV = "C:\\Monster\\DB.csv" # Where the output file will live.
 
 
-DirectoryDictionary[rootDIR].update()
+DirectoryDictionary = {}
+DirectoryDictionary[FolderToScan] = Directory(FolderToScan, datetime.datetime(1990, 1, 1),DirectoryDictionary)
+# Above plants a seed at the base of the folder tree. Any folders made before the date will not be scanned
+
+importOldScan(pathToOutputCSV,DirectoryDictionary) # populate memory with already scanned files.
+
+DirectoryDictionary[FolderToScan].update() # Go. Scan. Be Free.
+
+
 
 f = open("C:\\Users\\boh01\\Downloads\\allfiles2.csv","w")
+
 dt = datetime.datetime.now().timetuple()
 st = "Python Datetime"
 for i in dt:
     st += ","+str(i)
 st += "\n"
-
+file.write(st)
 print "Writing database."
 f.write(st)
 
