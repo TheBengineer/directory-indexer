@@ -121,10 +121,21 @@ def importOldScan(oldScanFile,tmpDirectoryDictionary):
 
 
 
-FolderToScan = "M:\\Drawings" # CHANGE this to whatever you want to. Just remember to use double slashes
+FolderToScan = "C:\\Projects" # CHANGE this to whatever you want to. Just remember to use double slashes
 
-pathToOutputCSV = "C:\\Monster\\DB.csv" # CHANGE this to where the output file will live.
+pathToOutputCSV = "C:\\DB.csv" # CHANGE this to where the output file will live.
 
+if not os.path.isdir(FolderToScan):
+    print "Cannot access the folder to be scanned. Please fix this near the bottom of the source file."
+    raw_input("Press enter to exit")
+    exit()
+
+if not os.path.isfile(pathToOutputCSV):
+    print "Cannot find an existing database. Get ready for hours of scanning."
+    if not os.path.isdir(os.path.split(pathToOutputCSV)[0]):
+        print "Cannot even find the folder for the output file to be placed. This means the scan will not be saved."
+        raw_input("Press enter to exit")
+        exit()
 
 
 startTime = time.time() # Write down time for later
@@ -136,25 +147,37 @@ DirectoryDictionary[FolderToScan] = Directory(FolderToScan, datetime.datetime(19
 
 importOldScan(pathToOutputCSV,DirectoryDictionary) # populate memory with already scanned files.
 
-shutil.move(pathToOutputCSV, pathToOutputCSV+".backup") # Move old database to a backup location
-
-DirectoryDictionary[FolderToScan].update() # Go. Scan. Be Free.
 
 
 try:
-    f = open(pathToOutputCSV,"w")
-    dt = datetime.datetime.now().timetuple()
-    st = "Python Datetime"
-    for i in dt:
-        st += ","+str(i)
-    st += "\n"
-    print "Writing database."
-    f.write(st)
-    DirectoryDictionary[FolderToScan].writeFiles(f)
-    f.close()
+    shutil.move(pathToOutputCSV, pathToOutputCSV+".backup") # Move old database to a backup location
+    print "Output file backed up."
 except IOError:
     print "Cannot create output file. This is bad. Scan will not be saved."
     raw_input("Press enter to exit, and then go create the directory, fix the file. etc.")
+
+DirectoryDictionary[FolderToScan].update() # Go. Scan. Be Free.
+
+FolderToScan = "asdfasdf"
+
+filewritten = 0
+
+while filewritten == 0:
+    try:
+        f = open(pathToOutputCSV,"w")
+        dt = datetime.datetime.now().timetuple()
+        st = "Python Datetime"
+        for i in dt:
+            st += ","+str(i)
+        st += "\n"
+        print "Writing database."
+        f.write(st)
+        DirectoryDictionary[FolderToScan].writeFiles(f)
+        f.close()
+        filewritten = 1
+    except IOError:
+        print "Something broke. Cannot open output file. Please type a new path for the output file"
+        pathToOutputCSV = raw_input("Path:")
 
 
 
