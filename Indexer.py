@@ -98,7 +98,7 @@ class Directory(object):
 
 def importOldScan(oldScanFile,tmpDirectoryDictionary):
     import csv
-    print "Importing old Database"
+    print "Attempting to import old Database"
     try:
         with open(oldScanFile, 'rb') as csvfile:
             spamreader = csv.reader(csvfile, delimiter=',', quotechar="\"")
@@ -152,9 +152,16 @@ importOldScan(pathToOutputCSV,DirectoryDictionary) # populate memory with alread
 try:
     shutil.move(pathToOutputCSV, pathToOutputCSV+".backup") # Move old database to a backup location
     print "Output file backed up."
-except IOError:
+except:
+    print "Output file not backed up. File may not exist, permissions, etc. This might be a problem later"
+
+try:
+    with open(pathToOutputCSV,"w"):
+        print "Output file opened."
+except:
     print "Cannot create output file. This is bad. Scan will not be saved."
-    raw_input("Press enter to exit, and then go create the directory, fix the file. etc.")
+    raw_input("Press enter to exit, and then go create the directory, fix the file path. etc. ")
+    exit()
 
 DirectoryDictionary[FolderToScan].update() # Go. Scan. Be Free.
 
