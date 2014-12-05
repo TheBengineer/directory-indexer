@@ -1,9 +1,10 @@
 
 import fnmatch
+import shutil
 
 import os, time,datetime
 
-startTime = time.time()
+
 
 
 class Directory(object):
@@ -43,16 +44,16 @@ class Directory(object):
         for i in self.dirClasses:
             self.dirClasses[i].printFiles()
 
-    def writeFiles(self, file):
+    def writeFiles(self, mfile):
         if self.scanned == 0:
             self.update()
         self.files.sort()
         for i in self.files:
-            file.write("\""+self.path+"\",\""+i+"\"\n")
+            mfile.write("\""+self.path+"\",\""+i+"\"\n")
         sortedKeys = self.dirClasses.keys()
         sortedKeys.sort()
         for i in sortedKeys:
-            self.dirClasses[i].writeFiles(file)
+            self.dirClasses[i].writeFiles(mfile)
 
     def markLower(self):
         for i in self.dirClasses:
@@ -98,35 +99,35 @@ class Directory(object):
 def importOldScan(oldScanFile,tmpDirectoryDictionary):
     import csv
     print "Importing old Database"
-    opened = 0
-    with open(oldScanFile, 'rb') as csvfile:
-        opened = 1
-        spamreader = csv.reader(csvfile, delimiter=',', quotechar="\"")
-        daterow = spamreader.next()
-        timeUpdated = date_object = datetime.datetime(int(daterow[1]), int(daterow[2]), int(daterow[3]))
-        for row in spamreader:
-            if spamreader.line_num%1000 == 0:
-                print spamreader.line_num
-            try:
-                path = row[0].strip("\"")
-                file = row[1].strip("\"")
-                if path in tmpDirectoryDictionary:
-                    tmpDirectoryDictionary[path].files.append(file)
-                else:
-                    tmpDirectoryDictionary[path] = Directory(path, timeUpdated, tmpDirectoryDictionary)
-            except:
-                print "Here", Exception
-    if not opened:
+    try:
+        with open(oldScanFile, 'rb') as csvfile:
+            spamreader = csv.reader(csvfile, delimiter=',', quotechar="\"")
+            daterow = spamreader.next()
+            timeUpdated = date_object = datetime.datetime(int(daterow[1]), int(daterow[2]), int(daterow[3]))
+            for row in spamreader:
+                if spamreader.line_num%1000 == 0:
+                    print spamreader.line_num
+                try:
+                    path = row[0].strip("\"")
+                    file = row[1].strip("\"")
+                    if path in tmpDirectoryDictionary:
+                        tmpDirectoryDictionary[path].files.append(file)
+                    else:
+                        tmpDirectoryDictionary[path] = Directory(path, timeUpdated, tmpDirectoryDictionary)
+                except:
+                    print "Here", Exception
+    except IOError:
         print "Could not read existing database. Scanning from scratch."
 
 
 
+FolderToScan = "M:\\Drawings" # CHANGE this to whatever you want to. Just remember to use double slashes
+
+pathToOutputCSV = "C:\\Monster\\DB.csv" # CHANGE this to where the output file will live.
 
 
 
-FolderToScan = "M:\\Drawings" # Change this to whatever you want to. Just remember to use double slashes
-
-pathToOutputCSV = "C:\\Monster\\DB.csv" # Where the output file will live.
+startTime = time.time() # Write down time for later
 
 
 DirectoryDictionary = {}
@@ -135,22 +136,29 @@ DirectoryDictionary[FolderToScan] = Directory(FolderToScan, datetime.datetime(19
 
 importOldScan(pathToOutputCSV,DirectoryDictionary) # populate memory with already scanned files.
 
+shutil.move(pathToOutputCSV, pathToOutputCSV+".backup") # Move old database to a backup location
+
 DirectoryDictionary[FolderToScan].update() # Go. Scan. Be Free.
 
 
+try:
+    f = open(pathToOutputCSV,"w")
+    dt = datetime.datetime.now().timetuple()
+    st = "Python Datetime"
+    for i in dt:
+        st += ","+str(i)
+    st += "\n"
+    print "Writing database."
+    f.write(st)
+    DirectoryDictionary[FolderToScan].writeFiles(f)
+    f.close()
+except IOError:
+    print "Cannot create output file. This is bad. Scan will not be saved."
+    raw_input("Press enter to exit, and then go create the directory, fix the file. etc.")
 
-f = open("C:\\Users\\boh01\\Downloads\\allfiles2.csv","w")
 
-dt = datetime.datetime.now().timetuple()
-st = "Python Datetime"
-for i in dt:
-    st += ","+str(i)
-st += "\n"
-file.write(st)
-print "Writing database."
-f.write(st)
 
-DirectoryDictionary[rootDIR].writeFiles(f)
-f.close()
+
+
 
 raw_input("Completed in "+str((time.time()-startTime)/60)+" Minutes")
