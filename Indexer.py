@@ -2,8 +2,11 @@
 import fnmatch
 import shutil
 
-import os, time,datetime
+import os, time,datetime, sys
 import sqlite3
+
+import gc
+gc.disable()
 
 
 
@@ -17,21 +20,21 @@ class Directory(object):
         self.DirectoryDictionary = DirDict
         self.root = self.path
         self.scanned = 0
-        if self.path.rfind("\\") > 0:
+        if "\\" in self.path:
             self.root = self.path[:self.path.rfind("\\")]
-            tmp = self.root.split("\\")
+            tmp_root = self.root
             paths = []
-            for i in range(len(tmp)):
-                dpath = tmp[0]
-                for j in range(1,i+1):
-                    dpath += "\\"+tmp[j]
-                paths.append(dpath)
+            while "\\" in tmp_root:
+                if tmp_root not in DirDict:
+                    paths.append(tmp_root)
+                    tmp_root = tmp_root[:tmp_root.rfind("\\")]
+                else:
+                    break
             for i in paths:
-                if not i in  self.DirectoryDictionary.keys():
-                    self.DirectoryDictionary[i] = Directory(i,self.timeUpdated,self.DirectoryDictionary)
-            try:
-                self.DirectoryDictionary[self.root].dirClasses[self.path] = self # linking
-            except KeyError:
+                DirDict[i] = Directory(i,self.timeUpdated,DirDict)
+            if self.root in DirDict:
+                DirDict[self.root].dirClasses[self.path] = self # linking
+            else:
                 print "Assuming", self.root, "to be the global root"
         else:
             print "Assuming", self.root, "to be the global root because there are no slashes"
@@ -80,7 +83,7 @@ class Directory(object):
                     self.directories = directoriesS
                 for folder in self.directories:
                     fullfolder = os.path.join(self.path, folder)
-                    if fullfolder not in self.dirClasses.keys():
+                    if fullfolder not in self.dirClasses:
                         tmpDir = Directory(fullfolder, datetime.datetime(1900, 1, 1), self.DirectoryDictionary)
                         self.DirectoryDictionary[fullfolder] = tmpDir
                         self.dirClasses[fullfolder] = tmpDir
@@ -105,25 +108,38 @@ def importOldScan(oldScanFile,tmpDirectoryDictionary):
             daterow = spamreader.next()
             timeUpdated = date_object = datetime.datetime(int(daterow[1]), int(daterow[2]), int(daterow[3]))
             for row in spamreader:
-                if spamreader.line_num%1000 == 0:
+                if spamreader.line_num%10000 == 0:
                     print "reading line:", spamreader.line_num
-                try:
-                    path = row[0].strip("\"")
-                    file = row[1].strip("\"")
-                    if path in tmpDirectoryDictionary:
-                        tmpDirectoryDictionary[path].files.append(file)
-                    else:
-                        tmpDirectoryDictionary[path] = Directory(path, timeUpdated, tmpDirectoryDictionary)
-                except:
-                    print "Here", Exception
+                path = row[0].strip("\"")
+                mfile = row[1].strip("\"")
+                if path not in tmpDirectoryDictionary:
+                    tmpDirectoryDictionary[path] = Directory(path, timeUpdated, tmpDirectoryDictionary)
+                    tmpDirectoryDictionary[path].files.append(mfile)
+                else:
+                    tmpDirectoryDictionary[path].files.append(mfile)
+##                try:
+##                    path = row[0].strip("\"")
+##                    mfile = row[1].strip("\"")
+##                    tmpDirectoryDictionary[path].files.append(mfile)
+##                    tmpDirectoryDictionary[path] = Directory(path, timeUpdated, tmpDirectoryDictionary)
+##                except KeyError:
+##                    tmpDirectoryDictionary[path] = Directory(path, timeUpdated, tmpDirectoryDictionary)
+##                    tmpDirectoryDictionary[path].files.append(mfile)
+##                except Exception as e:
+##                    exc_type, exc_obj, exc_tb = sys.exc_info()
+##                    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
+##                    print exc_type, fname, exc_tb.tb_lineno
     except IOError:
         print "Could not read existing database. Scanning from scratch."
+        print oldScanFile
 
 
 
 FolderToScan = "M:\\Drawings" # CHANGE this to whatever you want to. Just remember to use double slashes
 
-pathToOutputCSV = "DB.csv" # Will be placed next to the python file. Probably best to not run from network drive.
+db_folder = "C:\\Projects"#os.getcwd()
+db_file = "DB.csv" # Will be placed next to the python file. Probably best to not run from network drive.
+pathToOutputCSV = os.path.join(db_folder, db_file)
 
 if not os.path.isdir(FolderToScan):
     print "Cannot access the folder to be scanned. Please fix this near the bottom of the source file."
@@ -134,6 +150,7 @@ if not os.path.isfile(pathToOutputCSV):
     print "Cannot find an existing database. Get ready for hours of scanning."
     if not os.path.isdir(os.path.split(pathToOutputCSV)[0]):
         print "Cannot even find the folder for the output file to be placed. This means the scan will not be saved."
+        print pathToOutputCSV
         raw_input("Press enter to exit")
         exit()
 
@@ -159,7 +176,7 @@ try:
     with open(pathToOutputCSV,"w"):
         print "Output file opened."
 except:
-    print "Cannot create output file. This is bad. Scan will not be saved."
+    print "Cannot create output file"+pathToOutputCSV+"This is bad. Scan will not be saved."
     raw_input("Press enter to exit, and then go create the directory, fix the file path. etc. ")
     exit()
 
