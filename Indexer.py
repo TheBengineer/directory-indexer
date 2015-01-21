@@ -11,7 +11,20 @@ gc.disable()
 
 
 class Directory(object):
+    """
+    This class holds a directory in memory, all the files it has, and a dictionary of the directories it has under it.
+    """
     def __init__(self, path, timeUpdated, DirDict):
+        """
+
+        :param path: This parameter is the file system path that this directory represents
+        :type path: str
+        :param timeUpdated: The time that the directory was scanned (eg: now)
+        :type timeUpdated: time.time
+        :param DirDict: The massive dictionary holding ALL directory classes
+        :type DirDict: dict of Directory
+        :return: Does not return anything
+        """
         self.path = path
         self.files = []
         self.directories = []
