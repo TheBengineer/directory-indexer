@@ -14,7 +14,7 @@ if __name__ == '__main__':
     last_update_date = datetime.datetime(1990, 1, 1)
     pathToOutputCSV = os.path.join(db_folder, db_file)
 
-    update_pool = ThreadPool(1)
+    update_pool = ThreadPool(10)
 
     # TODO need to create a config file
 

@@ -134,7 +134,6 @@ class Directory(object):
                 if recursive:
                     for i in self.dirClasses:
                         thread_pool.apply_async(self.dirClasses[i].update(thread_pool))
-                        print thread_pool
             else:
                 print "Path is all up to date:", self.path
                 self.markLower()
@@ -159,8 +158,12 @@ def importOldScan(oldScanFile,tmpDirectoryDictionary):
     try:
         with open(oldScanFile, 'rb') as csvfile:
             spamreader = csv.reader(csvfile, delimiter=',', quotechar="\"")
-            daterow = spamreader.next()
-            time_updated = datetime.datetime(int(daterow[1]), int(daterow[2]), int(daterow[3]))
+            try:
+                daterow = spamreader.next()
+                time_updated = datetime.datetime(int(daterow[1]), int(daterow[2]), int(daterow[3]))
+            except StopIteration:
+                print "Existing database file is empty."
+                return
             for row in spamreader:
                 if spamreader.line_num%10000 == 0:
                     print "reading line:", spamreader.line_num
