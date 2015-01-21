@@ -117,18 +117,6 @@ def importOldScan(oldScanFile,tmpDirectoryDictionary):
                     tmpDirectoryDictionary[path].files.append(mfile)
                 else:
                     tmpDirectoryDictionary[path].files.append(mfile)
-##                try:
-##                    path = row[0].strip("\"")
-##                    mfile = row[1].strip("\"")
-##                    tmpDirectoryDictionary[path].files.append(mfile)
-##                    tmpDirectoryDictionary[path] = Directory(path, timeUpdated, tmpDirectoryDictionary)
-##                except KeyError:
-##                    tmpDirectoryDictionary[path] = Directory(path, timeUpdated, tmpDirectoryDictionary)
-##                    tmpDirectoryDictionary[path].files.append(mfile)
-##                except Exception as e:
-##                    exc_type, exc_obj, exc_tb = sys.exc_info()
-##                    fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-##                    print exc_type, fname, exc_tb.tb_lineno
     except IOError:
         print "Could not read existing database. Scanning from scratch."
         print oldScanFile
