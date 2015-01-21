@@ -1,46 +1,35 @@
-__author__ = 'boh01'
+__author__ = 'Wild_Doogy'
 
 from Indexer import *
+import datetime
 
 if __name__ == '__main__':
-    if len(sys.argv) == 1:
-        print "defaults: Port 8000, username:password = admin:root\nhttp:\\\\localhost:8000"
-        key = base64.b64encode("admin:root")
-    elif len(sys.argv) < 3:
-        print "usage SimpleAuthServer.py [port] [username:password]"
-        sys.exit()
-    else:
-        key = base64.b64encode(sys.argv[2])
-    test()
-
-
-
     FolderToScan = "M:\\Drawings" # CHANGE this to whatever you want to. Just remember to use double slashes
+    db_folder = "C:\\Projects"#os.getcwd()
+    db_file = "DB.csv" # Will be placed next to the python file. Probably best to not run from network drive.
+    last_update_date = datetime.datetime(1990, 1, 1)
+    pathToOutputCSV = os.path.join(db_folder, db_file)
 
-db_folder = "C:\\Projects"#os.getcwd()
-db_file = "DB.csv" # Will be placed next to the python file. Probably best to not run from network drive.
-pathToOutputCSV = os.path.join(db_folder, db_file)
+    # TODO need to create a config file
 
-if not os.path.isdir(FolderToScan):
-    print "Cannot access the folder to be scanned. Please fix this near the bottom of the source file."
-    raw_input("Press enter to exit")
-    exit()
-
-if not os.path.isfile(pathToOutputCSV):
-    print "Cannot find an existing database. Get ready for hours of scanning."
-    if not os.path.isdir(os.path.split(pathToOutputCSV)[0]):
-        print "Cannot even find the folder for the output file to be placed. This means the scan will not be saved."
-        print pathToOutputCSV
+    if not os.path.isdir(FolderToScan):  # Make sure the folder exists
+        print "Cannot access the folder to be scanned. Please fix this near the bottom of the source file."
         raw_input("Press enter to exit")
         exit()
 
+    if not os.path.isfile(pathToOutputCSV):  # Make sure the output database can be created
+        print "Cannot find an existing database. Get ready for hours of scanning."
+        if not os.path.isdir(os.path.split(pathToOutputCSV)[0]):
+            print "Cannot even find the folder for the output file to be placed. This means the scan will not be saved."
+            print pathToOutputCSV
+            raw_input("Press enter to exit")
+            exit()
 
-startTime = time.time() # Write down time for later
+    startTime = time.time() # Write down time for later
 
-
-DirectoryDictionary = {}
-DirectoryDictionary[FolderToScan] = Directory(FolderToScan, datetime.datetime(1990, 1, 1),DirectoryDictionary)
-# Above plants a seed at the base of the folder tree. Any folders made before the date will not be scanned
+    DirectoryDictionary = {}
+    DirectoryDictionary[FolderToScan] = Directory(FolderToScan, last_update_date ,DirectoryDictionary)
+    # Above plants a seed at the base of the folder tree. Any folders made before the date will not be scanned
 
 importOldScan(pathToOutputCSV,DirectoryDictionary) # populate memory with already scanned files.
 

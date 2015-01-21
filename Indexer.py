@@ -1,11 +1,7 @@
-
-import fnmatch
-import shutil
-
-import os, time,datetime, sys
-import sqlite3
-
+__author__ = 'Wild_Doogy'
+import os, time,datetime
 import gc
+
 gc.disable()
 
 
@@ -19,7 +15,7 @@ class Directory(object):
 
         :param path: This parameter is the file system path that this directory represents
         :type path: str
-        :param timeUpdated: The time that the directory was scanned (eg: now)
+        :param timeUpdated: The time the directory was last scanned. If the folder was modified after this, update will rescan
         :type timeUpdated: time.time
         :param DirDict: The massive dictionary holding ALL directory classes
         :type DirDict: dict of Directory
