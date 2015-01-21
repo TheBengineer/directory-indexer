@@ -52,15 +52,22 @@ class Directory(object):
         else:
             print "Assuming", self.root, "to be the global root because there are no slashes"
 
-    def printFiles(self):
+    def printFiles(self, recursive=True):
+        """
+        This function prints the files of this folder, and all subfolders recursively depending on the flag
+        :param recursive: If this is true, then all files are printed recursively. Defaults to true
+        :type recursive: bool
+        :return: Does not return anything
+        """
         if self.scanned == 0:
             self.update()
         for i in self.files:
             print self.path+"\\"+i
-        for i in self.dirClasses:
-            self.dirClasses[i].printFiles()
+        if recursive:
+            for i in self.dirClasses:
+                self.dirClasses[i].printFiles()
 
-    def writeFiles(self, mfile):
+    def writeFiles(self, mfile, recursive=True):
         if self.scanned == 0:
             self.update()
         self.files.sort()
@@ -82,7 +89,7 @@ class Directory(object):
         self.dirClasses = {}
         # del self.DirectoryDictionary[self.path]
 
-    def update(self):
+    def update(self, recursive=True):
         if os.path.isdir(self.path):
             if datetime.datetime.fromtimestamp(os.path.getmtime(self.path)) > self.timeUpdated:
                 # Needs an update
