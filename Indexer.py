@@ -2,6 +2,8 @@ __author__ = 'Wild_Doogy'
 import os, time,datetime
 import gc
 
+
+
 gc.disable()
 
 
@@ -102,9 +104,11 @@ class Directory(object):
         self.dirClasses = {}
         # del self.DirectoryDictionary[self.path]
 
-    def update(self, recursive=True):
+    def update(self, thread_pool, recursive=True):
         """
         Where the real magic happens. This is used to refresh the files and folder in a directory. Recursive by default.
+        :param thread_pool: A threaded pool to parallelize the update function
+        :type thread_pool: multiprocessing.Pool
         :param recursive: Flag for recursion
         :type recursive: bool
         :return: Does not return anything.
@@ -128,7 +132,7 @@ class Directory(object):
                         self.dirClasses[fullfolder] = tmpDir
                 if recursive:
                     for i in self.dirClasses:
-                        self.dirClasses[i].update()
+                        self.dirClasses[i].update(thread_pool)
             else:
                 print "Path is all up to date:", self.path
                 self.markLower()

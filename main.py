@@ -3,12 +3,18 @@ __author__ = 'Wild_Doogy'
 from Indexer import *
 import datetime, shutil
 
+from multiprocessing import Pool
+from multiprocessing.dummy import Pool as ThreadPool
+
+
 if __name__ == '__main__':
     FolderToScan = "M:\\Drawings" # CHANGE this to whatever you want to. Just remember to use double slashes
     db_folder = "C:\\Projects"#os.getcwd()
     db_file = "DB.csv" # Will be placed next to the python file. Probably best to not run from network drive.
     last_update_date = datetime.datetime(1990, 1, 1)
     pathToOutputCSV = os.path.join(db_folder, db_file)
+
+    update_pool = ThreadPool(1)
 
     # TODO need to create a config file
 
@@ -28,6 +34,7 @@ if __name__ == '__main__':
     startTime = time.time() # Write down time for later
 
     DirectoryDictionary = {}
+    """ :type DirectoryDictionary: dict of Directory"""
     DirectoryDictionary[FolderToScan] = Directory(FolderToScan, last_update_date ,DirectoryDictionary)
     # Above plants a seed at the base of the folder tree. Any folders created before the date will not be scanned
 
@@ -47,8 +54,10 @@ if __name__ == '__main__':
         raw_input("Press enter to exit, and then go create the directory, fix the file path. etc. ")
         exit()
 
-    DirectoryDictionary[FolderToScan].update() # Go. Scan. Be Free.
+    DirectoryDictionary[FolderToScan].update(update_pool) # Go. Scan. Be Free.
 
+    update_pool.close()
+    update_pool.join()
 
     filewritten = 0
 
