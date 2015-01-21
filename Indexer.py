@@ -149,7 +149,8 @@ def importOldScan(oldScanFile,tmpDirectoryDictionary):
     :param oldScanFile: The path to the .csv file
     :type oldScanFile: str
     :param tmpDirectoryDictionary: A dictionary to hold all the imported Directory classes
-    :return:
+    :type tmpDirectoryDictionary: dict of Directory
+    :return: Does not return anything.
     """
     import csv
     print "Attempting to import old Database"
