@@ -107,6 +107,12 @@ class Directory(object):
         # del self.DirectoryDictionary[self.path]
 
     def update(self, recursive=True):
+        """
+        Where the real magic happens. This is used to refresh the files and folder in a directory. Recursive by default.
+        :param recursive: Flag for recursion
+        :type recursive: bool
+        :return: Does not return anything.
+        """
         if os.path.isdir(self.path):
             if datetime.datetime.fromtimestamp(os.path.getmtime(self.path)) > self.timeUpdated:
                 # Needs an update
@@ -124,8 +130,9 @@ class Directory(object):
                         tmpDir = Directory(fullfolder, datetime.datetime(1900, 1, 1), self.DirectoryDictionary)
                         self.DirectoryDictionary[fullfolder] = tmpDir
                         self.dirClasses[fullfolder] = tmpDir
-                for i in self.dirClasses:
-                    self.dirClasses[i].update()
+                if recursive:
+                    for i in self.dirClasses:
+                        self.dirClasses[i].update()
             else:
                 print "Path is all up to date:", self.path
                 self.markLower()
