@@ -54,7 +54,7 @@ class Directory(object):
 
     def printFiles(self, recursive=True):
         """
-        This function prints the files of this folder, and all subfolders recursively depending on the flag
+        Prints the files of this folder, and all subfolders recursively depending on the flag
         :param recursive: If this is true, then all files are printed recursively. Defaults to true
         :type recursive: bool
         :return: Does not return anything
@@ -68,6 +68,14 @@ class Directory(object):
                 self.dirClasses[i].printFiles()
 
     def writeFiles(self, mfile, recursive=True):
+        """
+        Writes the files in this directory to the provided FILE object. Recursive can be turned off.
+        :param mfile: A FILE object where the files names will be written in CSV format
+        :type mfile: file
+        :param recursive: Flag for recursion
+        :type recursive: bool
+        :return: does not return anything
+        """
         if self.scanned == 0:
             self.update()
         self.files.sort()
@@ -75,8 +83,9 @@ class Directory(object):
             mfile.write("\""+self.path+"\",\""+i+"\"\n")
         sortedKeys = self.dirClasses.keys()
         sortedKeys.sort()
-        for i in sortedKeys:
-            self.dirClasses[i].writeFiles(mfile)
+        if recursive:
+            for i in sortedKeys:
+               self.dirClasses[i].writeFiles(mfile)
 
     def markLower(self):
         for i in self.dirClasses:
