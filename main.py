@@ -1,7 +1,7 @@
 __author__ = 'Wild_Doogy'
 
 from Indexer import *
-import datetime
+import datetime, shutil
 
 if __name__ == '__main__':
     FolderToScan = "M:\\Drawings" # CHANGE this to whatever you want to. Just remember to use double slashes
@@ -29,51 +29,44 @@ if __name__ == '__main__':
 
     DirectoryDictionary = {}
     DirectoryDictionary[FolderToScan] = Directory(FolderToScan, last_update_date ,DirectoryDictionary)
-    # Above plants a seed at the base of the folder tree. Any folders made before the date will not be scanned
+    # Above plants a seed at the base of the folder tree. Any folders created before the date will not be scanned
 
-importOldScan(pathToOutputCSV,DirectoryDictionary) # populate memory with already scanned files.
+    importOldScan(pathToOutputCSV,DirectoryDictionary) # populate memory with already scanned files.
 
-
-
-try:
-    shutil.move(pathToOutputCSV, pathToOutputCSV+".backup") # Move old database to a backup location
-    print "Output file backed up."
-except:
-    print "Output file not backed up. File may not exist, permissions, etc. This might be a problem later"
-
-try:
-    with open(pathToOutputCSV,"w"):
-        print "Output file opened."
-except:
-    print "Cannot create output file"+pathToOutputCSV+"This is bad. Scan will not be saved."
-    raw_input("Press enter to exit, and then go create the directory, fix the file path. etc. ")
-    exit()
-
-DirectoryDictionary[FolderToScan].update() # Go. Scan. Be Free.
-
-
-filewritten = 0
-
-while filewritten == 0:
     try:
-        f = open(pathToOutputCSV,"w")
-        dt = datetime.datetime.now().timetuple()
-        st = "Python Datetime"
-        for i in dt:
-            st += ","+str(i)
-        st += "\n"
-        print "Writing database."
-        f.write(st)
-        DirectoryDictionary[FolderToScan].writeFiles(f)
-        f.close()
-        filewritten = 1
-    except IOError:
-        print "Something broke. Cannot open output file. Please type a new path for the output file"
-        pathToOutputCSV = raw_input("Path:")
+        shutil.move(pathToOutputCSV, pathToOutputCSV+".backup") # Move old database to a backup location
+        print "Output file backed up."
+    except:
+        print "Output file not backed up. File may not exist, permissions, etc. This might be a problem later"
+
+    try:
+        with open(pathToOutputCSV,"w"):
+            print "Output file opened."
+    except:
+        print "Cannot create output file"+pathToOutputCSV+"This is bad. Scan will not be saved."
+        raw_input("Press enter to exit, and then go create the directory, fix the file path. etc. ")
+        exit()
+
+    DirectoryDictionary[FolderToScan].update() # Go. Scan. Be Free.
 
 
+    filewritten = 0
 
+    while filewritten == 0: # Failsafe to write the folder.
+        try:
+            f = open(pathToOutputCSV,"w")
+            dt = datetime.datetime.now().timetuple()
+            st = "Python Datetime"
+            for i in dt:
+                st += ","+str(i)
+            st += "\n"
+            print "Writing database."
+            f.write(st)
+            DirectoryDictionary[FolderToScan].writeFiles(f)
+            f.close()
+            filewritten = 1
+        except IOError:
+            print "Something broke. Cannot open output file. Please type a new path for the output file"
+            pathToOutputCSV = raw_input("Path:")
 
-
-
-raw_input("Completed in "+str((time.time()-startTime)/60)+" Minutes")
+    raw_input("Completed in "+str((time.time()-startTime)/60)+" Minutes")
