@@ -2,7 +2,7 @@ __author__ = 'Wild_Doogy'
 import os, time,datetime
 import gc
 
-
+from multiprocessing import Pool
 
 gc.disable()
 
@@ -108,11 +108,12 @@ class Directory(object):
         """
         Where the real magic happens. This is used to refresh the files and folder in a directory. Recursive by default.
         :param thread_pool: A threaded pool to parallelize the update function
-        :type thread_pool: multiprocessing.Pool
+        :type thread_pool: Pool
         :param recursive: Flag for recursion
         :type recursive: bool
         :return: Does not return anything.
         """
+
         if os.path.isdir(self.path):
             if datetime.datetime.fromtimestamp(os.path.getmtime(self.path)) > self.timeUpdated:
                 # Needs an update
@@ -132,7 +133,8 @@ class Directory(object):
                         self.dirClasses[fullfolder] = tmpDir
                 if recursive:
                     for i in self.dirClasses:
-                        self.dirClasses[i].update(thread_pool)
+                        thread_pool.apply_async(self.dirClasses[i].update(thread_pool))
+                        print thread_pool
             else:
                 print "Path is all up to date:", self.path
                 self.markLower()
@@ -158,14 +160,14 @@ def importOldScan(oldScanFile,tmpDirectoryDictionary):
         with open(oldScanFile, 'rb') as csvfile:
             spamreader = csv.reader(csvfile, delimiter=',', quotechar="\"")
             daterow = spamreader.next()
-            timeUpdated = date_object = datetime.datetime(int(daterow[1]), int(daterow[2]), int(daterow[3]))
+            time_updated = datetime.datetime(int(daterow[1]), int(daterow[2]), int(daterow[3]))
             for row in spamreader:
                 if spamreader.line_num%10000 == 0:
                     print "reading line:", spamreader.line_num
                 path = row[0].strip("\"")
                 mfile = row[1].strip("\"")
                 if path not in tmpDirectoryDictionary:
-                    tmpDirectoryDictionary[path] = Directory(path, timeUpdated, tmpDirectoryDictionary)
+                    tmpDirectoryDictionary[path] = Directory(path, time_updated, tmpDirectoryDictionary)
                     tmpDirectoryDictionary[path].files.append(mfile)
                 else:
                     tmpDirectoryDictionary[path].files.append(mfile)
