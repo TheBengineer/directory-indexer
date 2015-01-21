@@ -88,12 +88,20 @@ class Directory(object):
                self.dirClasses[i].writeFiles(mfile)
 
     def markLower(self):
+        """
+        Marks directory and subdirectories scanned. Usually used when a directory has not been updated
+        :return: Does not return anything
+        """
         for i in self.dirClasses:
             self.dirClasses[i].markLower()
         self.scanned = 1
 
     def delLower(self):
-        # for i in self.dirClasses:
+        """
+        Breaks the links associating this class with it's subdirectories. This is used when a folder does not exist.
+        :return: Does not return anything
+        """
+        # for i in self.dirClasses:  # No need to go recursive. only break reference
         #    self.dirClasses[i].delLower()
         self.dirClasses = {}
         # del self.DirectoryDictionary[self.path]
