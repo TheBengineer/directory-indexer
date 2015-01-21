@@ -144,6 +144,13 @@ class Directory(object):
 
 
 def importOldScan(oldScanFile,tmpDirectoryDictionary):
+    """
+    Used to import a .csv file generated from the last scan.
+    :param oldScanFile: The path to the .csv file
+    :type oldScanFile: str
+    :param tmpDirectoryDictionary: A dictionary to hold all the imported Directory classes
+    :return:
+    """
     import csv
     print "Attempting to import old Database"
     try:
