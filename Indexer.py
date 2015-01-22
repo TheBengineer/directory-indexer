@@ -63,7 +63,7 @@ class Directory(object):
             print self.path+"\\"+i
         if recursive:
             for i in self.dirClasses:
-                self.dirClasses[i].printFiles()
+                self.dirClasses[i].printFiles(thread_pool)
 
     def writeFiles(self, mfile, thread_pool, recursive=True):
         """
@@ -75,7 +75,7 @@ class Directory(object):
         :return: does not return anything
         """
         if self.scanned == 0:
-            self.update()
+            self.update(thread_pool)
         self.files.sort()
         for i in self.files:
             mfile.write("\""+self.path+"\",\""+i+"\"\n")
@@ -83,7 +83,7 @@ class Directory(object):
         sortedKeys.sort()
         if recursive:
             for i in sortedKeys:
-               self.dirClasses[i].writeFiles(mfile)
+               self.dirClasses[i].writeFiles(mfile, thread_pool)
 
     def markLower(self):
         """
