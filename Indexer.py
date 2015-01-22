@@ -65,7 +65,7 @@ class Directory(object):
             for i in self.dirClasses:
                 self.dirClasses[i].printFiles()
 
-    def writeFiles(self, mfile, recursive=True):
+    def writeFiles(self, mfile, thread_pool, recursive=True):
         """
         Writes the files in this directory to the provided FILE object. Recursive can be turned off.
         :param mfile: A FILE object where the files names will be written in CSV format

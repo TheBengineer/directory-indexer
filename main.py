@@ -71,7 +71,7 @@ if __name__ == '__main__':
             st += "\n"
             print "Writing database."
             f.write(st)
-            DirectoryDictionary[FolderToScan].writeFiles(f)
+            DirectoryDictionary[FolderToScan].writeFiles(f, update_pool)
             f.close()
             filewritten = 1
         except IOError:
