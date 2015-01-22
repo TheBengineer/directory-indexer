@@ -6,6 +6,8 @@ import datetime, shutil
 from multiprocessing import Pool
 from multiprocessing.dummy import Pool as ThreadPool
 
+from threading import Lock
+
 
 if __name__ == '__main__':
     FolderToScan = "M:\\Drawings" # CHANGE this to whatever you want to. Just remember to use double slashes
@@ -14,7 +16,12 @@ if __name__ == '__main__':
     last_update_date = datetime.datetime(1990, 1, 1)
     pathToOutputCSV = os.path.join(db_folder, db_file)
 
-    update_pool = ThreadPool(10)
+    number_of_threads = 10
+    update_pool = ThreadPool(number_of_threads)
+    update_pool.thread_count = 0
+    update_pool.thread_lock = Lock()
+
+
 
     # TODO need to create a config file
 
@@ -55,7 +62,10 @@ if __name__ == '__main__':
         exit()
 
     DirectoryDictionary[FolderToScan].update(update_pool) # Go. Scan. Be Free.
-
+    update_pool.thread_count = 1
+    time.sleep(.1)
+    while update_pool.thread_count >= 0:
+        time.sleep(.1)
     update_pool.close()
     update_pool.join()
 
