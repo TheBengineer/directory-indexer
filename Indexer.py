@@ -133,7 +133,7 @@ class Directory(object):
                         self.dirClasses[fullfolder] = tmpDir
                 if recursive:
                     for i in self.dirClasses:
-                        thread_pool.apply_async(self.dirClasses[i].update, thread_pool)
+                        thread_pool.apply_async(self.dirClasses[i].update, (self, thread_pool))
             else:
                 print "Path is all up to date:", self.path
                 self.markLower()
