@@ -5,6 +5,7 @@ import gc
 from multiprocessing import Pool
 import Queue
 
+
 gc.disable()
 
 
@@ -118,6 +119,7 @@ class Directory(object):
         :return: Does not return anything.
 
         """
+        import  scandir as myScandir
         thread_pool.thread_lock.acquire()
         thread_pool.thread_count += 1
         thread_pool.thread_lock.release()
@@ -126,7 +128,7 @@ class Directory(object):
                 # Needs an update
                 thread_pool.messages.put("Updating "+str(self.path))
                 (pathS, directoriesS , filesS) = (0,0,0)
-                for (pathS, directoriesS, filesS) in os.walk(self.path):
+                for (pathS, directoriesS, filesS) in myScandir.walk(self.path):
                     break
                 if filesS:
                     self.files = filesS
