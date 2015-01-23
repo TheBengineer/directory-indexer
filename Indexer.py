@@ -134,9 +134,14 @@ class Directory(object):
                         tmpDir = Directory(fullfolder, datetime.datetime(1900, 1, 1), self.DirectoryDictionary)
                         self.DirectoryDictionary[fullfolder] = tmpDir
                         self.dirClasses[fullfolder] = tmpDir
+
                 if recursive:
                     for i in self.dirClasses:
-                        thread_pool.apply_async(self.dirClasses[i].update, (self, thread_pool))
+                        print "Here1"
+                        try:
+                            thread_pool.apply_async(self.dirClasses[i].update, (self, thread_pool))
+                        except Exception as e:
+                            print "Here2", e.message, e.args
             else:
                 print "Path is all up to date:", self.path
                 self.markLower()
