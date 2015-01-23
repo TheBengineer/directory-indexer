@@ -2,6 +2,7 @@ __author__ = 'Wild_Doogy'
 
 from Indexer import *
 import datetime, shutil
+import Queue
 
 from multiprocessing import Pool
 from multiprocessing.dummy import Pool as ThreadPool
@@ -20,6 +21,7 @@ if __name__ == '__main__':
     update_pool = ThreadPool(number_of_threads)
     update_pool.thread_count = 0
     update_pool.thread_lock = Lock()
+    update_pool.messages = Queue.Queue()
 
 
 
@@ -62,10 +64,12 @@ if __name__ == '__main__':
         exit()
 
     update_pool.apply_async(DirectoryDictionary[FolderToScan].update, args=(update_pool,))# Go. Scan. Be Free.
-    update_pool.thread_count = 1
     time.sleep(.1)
     while update_pool.thread_count >= 0:
+        while update_pool.messages.not_empty:
+            print "[]",update_pool.messages.get()
         time.sleep(.1)
+
     update_pool.close()
     update_pool.join()
 

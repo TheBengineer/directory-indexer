@@ -3,6 +3,7 @@ import os, time,datetime
 import gc
 
 from multiprocessing import Pool
+import Queue
 
 gc.disable()
 
@@ -109,9 +110,12 @@ class Directory(object):
         Where the real magic happens. This is used to refresh the files and folder in a directory. Recursive by default.
         :param thread_pool: A threaded pool to parallelize the update function
         :type thread_pool: Pool
+        :type thread_pool.thread_lock: multiprocessing.Pool
+        :type thread_pool.messages: Queue.Queue
         :param recursive: Flag for recursion
         :type recursive: bool
         :return: Does not return anything.
+
         """
         #thread_pool.thread_lock.acquire()
         #thread_pool.thread_count += 1
@@ -120,7 +124,7 @@ class Directory(object):
         if os.path.isdir(self.path):
             if datetime.datetime.fromtimestamp(os.path.getmtime(self.path)) > self.timeUpdated:
                 # Needs an update
-                print "Updating",self.path
+                thread_pool.messages.put("Updating "+str(self.path))
                 (pathS, directoriesS , filesS) = (0,0,0)
                 for (pathS, directoriesS, filesS) in os.walk(self.path):
                     break
@@ -137,16 +141,12 @@ class Directory(object):
 
                 if recursive:
                     for i in self.dirClasses:
-                        print "Here1"
-                        try:
-                            thread_pool.apply_async(self.dirClasses[i].update, args=(thread_pool,))
-                        except Exception as e:
-                            print "Here2", e.message, e.args
+                        thread_pool.apply_async(self.dirClasses[i].update, args=(thread_pool,))
             else:
-                print "Path is all up to date:", self.path
+                thread_pool.messages.put("Path is all up to date: "+str(self.path))
                 self.markLower()
         else:
-            print "Detected deleted path:", self.path
+            thread_pool.messages.put("Detected deleted path: "+str(self.path))
             self.delLower()
         self.scanned = 1
         self.timeUpdated = datetime.date.fromtimestamp(time.time())
