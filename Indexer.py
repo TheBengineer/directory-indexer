@@ -112,15 +112,15 @@ class Directory(object):
         :type thread_pool: Pool
         :type thread_pool.thread_lock: multiprocessing.Pool
         :type thread_pool.messages: Queue.Queue
+        :type thread_pool.thread_count: int
         :param recursive: Flag for recursion
         :type recursive: bool
         :return: Does not return anything.
 
         """
-        #thread_pool.thread_lock.acquire()
-        #thread_pool.thread_count += 1
-        #print thread_pool.thread_count
-        #thread_pool.thread_lock.release()
+        thread_pool.thread_lock.acquire()
+        thread_pool.thread_count += 1
+        thread_pool.thread_lock.release()
         if os.path.isdir(self.path):
             if datetime.datetime.fromtimestamp(os.path.getmtime(self.path)) > self.timeUpdated:
                 # Needs an update
@@ -150,10 +150,9 @@ class Directory(object):
             self.delLower()
         self.scanned = 1
         self.timeUpdated = datetime.date.fromtimestamp(time.time())
-        #thread_pool.thread_lock.acquire()
-        #thread_pool.thread_count -= 1
-        #print thread_pool.thread_count
-        #thread_pool.thread_lock.release()
+        thread_pool.thread_lock.acquire()
+        thread_pool.thread_count -= 1
+        thread_pool.thread_lock.release()
 
 
 

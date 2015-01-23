@@ -11,18 +11,18 @@ from threading import Lock
 
 
 if __name__ == '__main__':
-    FolderToScan = "M:\\Drawings" # CHANGE this to whatever you want to. Just remember to use double slashes
+    #FolderToScan = "M:\\Drawings" # CHANGE this to whatever you want to. Just remember to use double slashes
+    FolderToScan = "O:\\Technical_Support\\Admin\\Customer_Support_Engineering\\PCN_Listing"
     db_folder = "C:\\Projects"#os.getcwd()
     db_file = "DB.csv" # Will be placed next to the python file. Probably best to not run from network drive.
     last_update_date = datetime.datetime(1990, 1, 1)
     pathToOutputCSV = os.path.join(db_folder, db_file)
 
-    number_of_threads = 10
+    number_of_threads = 16
     update_pool = ThreadPool(number_of_threads)
     update_pool.thread_count = 0
     update_pool.thread_lock = Lock()
     update_pool.messages = Queue.Queue()
-
 
 
     # TODO need to create a config file
@@ -64,10 +64,10 @@ if __name__ == '__main__':
         exit()
 
     update_pool.apply_async(DirectoryDictionary[FolderToScan].update, args=(update_pool,))# Go. Scan. Be Free.
-    time.sleep(.1)
-    while update_pool.thread_count >= 0:
-        while update_pool.messages.not_empty:
-            print "[]",update_pool.messages.get()
+    time.sleep(.3)
+    while update_pool.thread_count > 0:
+        while not update_pool.messages.empty():
+            print update_pool.messages.get()
         time.sleep(.1)
 
     update_pool.close()
