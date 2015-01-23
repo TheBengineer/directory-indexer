@@ -139,7 +139,7 @@ class Directory(object):
                     for i in self.dirClasses:
                         print "Here1"
                         try:
-                            thread_pool.apply_async(self.dirClasses[i].update, (self, thread_pool))
+                            thread_pool.apply_async(self.dirClasses[i].update, args=(thread_pool,))
                         except Exception as e:
                             print "Here2", e.message, e.args
             else:

@@ -61,7 +61,7 @@ if __name__ == '__main__':
         raw_input("Press enter to exit, and then go create the directory, fix the file path. etc. ")
         exit()
 
-    DirectoryDictionary[FolderToScan].update(update_pool) # Go. Scan. Be Free.
+    update_pool.apply_async(DirectoryDictionary[FolderToScan].update, args=(update_pool,))# Go. Scan. Be Free.
     update_pool.thread_count = 1
     time.sleep(.1)
     while update_pool.thread_count >= 0:
