@@ -5,6 +5,7 @@ from threading import Thread
 from threading import Lock
 import cPickle
 import time
+import datetime
 import os
 
 
@@ -23,6 +24,7 @@ class DirectoryDB(Thread):
         self.lock.acquire()
         self.file_path = file_path
         self.DB = lite.connect(self.file_path, check_same_thread=False)
+        self.DB.text_factory = str
         self.DB_cursor = self.DB.cursor()
         self.lock.release()
         self.create_table()
@@ -36,13 +38,13 @@ class DirectoryDB(Thread):
         """
 
     def create_table(self):
-        create_updates = "CREATE TABLE files " \
-                         "(path TEXT, filename TEXT, CONSTRAINT unq UNIQUE (path, filename) );"
+        create_table = "CREATE TABLE files " \
+                         "(path TEXT, filename TEXT, scan_time TIMESTAMP, CONSTRAINT unq UNIQUE (path, filename));"
         self.lock.acquire()
         tables = self.DB_cursor.execute("SELECT name FROM sqlite_master"
                                         " WHERE type='table' AND name='files';").fetchall()
         if tables == []:
-            self.DB_cursor.execute(create_updates)
+            self.DB_cursor.execute(create_table)
         self.lock.release()
 
     def add_file(self, file_path):
@@ -75,8 +77,8 @@ class DirectoryDB(Thread):
             self.local_lock.acquire()
             if len(self.files_to_add):
                 for path, filename in self.files_to_add:
-                    query = "INSERT OR REPLACE INTO files (path, filename) VALUES(\"{path}\",  \"{filename}\"" \
-                    " );".format(path=path, filename=filename)
+                    query = "INSERT OR REPLACE INTO files (path, filename, scan_time) VALUES(\"{path}\", " \
+                            " \"{filename}\", \"{time}\");".format(path=path, filename=filename, time=datetime.datetime.now())
                     self.lock.acquire()
                     try:
                         self.DB_cursor.execute(query)
@@ -103,7 +105,7 @@ class DirectoryDB(Thread):
             self.local_lock.release()
             self.writeout()
             # TODO is 30 seconds a good time for the database to be written to?
-            time.sleep(1)
+            time.sleep(.1)
 
 
     def get_folders(self, filename):
@@ -118,3 +120,11 @@ class DirectoryDB(Thread):
         self.lock.acquire()
         self.DB.commit()
         self.lock.release()
+
+    def dump(self):
+        query = "SELECT path, filename, scan_time FROM files;"
+        self.lock.acquire()
+        self.DB_cursor.execute(query)
+        data = self.DB_cursor.fetchall()
+        self.lock.release()
+        return data

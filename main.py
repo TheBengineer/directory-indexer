@@ -50,10 +50,12 @@ if __name__ == '__main__':
     DirectoryDictionary[FolderToScan] = Directory(FolderToScan, last_update_date, DirectoryDictionary)
     # Above plants a seed at the base of the folder tree. Any folders created before the date will not be scanned
 
-    importOldScan(pathToOutputCSV, DirectoryDictionary)  # populate memory with already scanned files.
+    #importOldScan(pathToOutputCSV, DirectoryDictionary)  # populate memory with already scanned files.
+    importOldScanFromDB(DB, DirectoryDictionary)  # populate memory with already scanned files.
+
 
     print "Writing to DB"
-    DirectoryDictionary[FolderToScan].writeFilesDB(DB, "asdf")
+    DirectoryDictionary[FolderToScan].writeFilesDB(DB)
     print "Done"
 
 
