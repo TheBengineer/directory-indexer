@@ -132,7 +132,6 @@ class Directory(object):
                     break
                 if filesS:
                     self.files = filesS
-                    se
                 if directoriesS:
                     self.directories = directoriesS
                 for folder in self.directories:
@@ -174,11 +173,9 @@ class Directory(object):
         self.files.sort()
         for i in self.files:
             DB.add_file(i)
-        sortedKeys = self.dirClasses.keys()
-        sortedKeys.sort()
         if recursive:
-            for i in sortedKeys:
-               self.dirClasses[i].writeFiles(DB, thread_pool)
+            for i in self.dirClasses:
+               i.writeFiles(DB, thread_pool)
 
 
 def importOldScan(oldScanFile,tmpDirectoryDictionary):

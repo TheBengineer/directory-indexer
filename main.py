@@ -51,6 +51,9 @@ if __name__ == '__main__':
 
     importOldScan(pathToOutputCSV, DirectoryDictionary)  # populate memory with already scanned files.
 
+    DirectoryDictionary[FolderToScan].writeFilesDB(DB, update_pool)
+
+
 
     try:
         shutil.move(pathToOutputCSV, pathToOutputCSV + ".backup")  # Move old database to a backup location
