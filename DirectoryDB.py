@@ -39,16 +39,29 @@ class DirectoryDB(Thread):
                          "(path TEXT, filename TEXT);"
         self.lock.acquire()
         tables = self.DB_cursor.execute("SELECT name FROM sqlite_master"
-                                        " WHERE type='table' AND name='Updates';").fetchall()
+                                        " WHERE type='table' AND name='files';").fetchall()
         if tables == []:
             self.DB_cursor.execute(create_updates)
         self.lock.release()
 
     def add_file(self, file_path):
         path, filename = os.path.split(file_path)
+        path.replace("'", "\\'")
+        filename.replace("'", "\\'")
         if filename and path:
             self.local_lock.acquire()
             self.files_to_add.append([path, filename])
+            self.local_lock.release()
+    def del_folder(self, folder_path):
+        if folder_path:
+            self.local_lock.acquire()
+            self.folders_to_delete.append(folder_path)
+            self.local_lock.release()
+    def del_file(self, file_path):
+        path, filename = os.path.split(file_path)
+        if filename and path:
+            self.local_lock.acquire()
+            self.files_to_delete.append([path, filename])
             self.local_lock.release()
 
     def run(self):
@@ -63,15 +76,16 @@ class DirectoryDB(Thread):
             self.local_lock.acquire()
             if len(self.files_to_add):
                 for path, filename in self.files_to_add:
-                    query = "INSERT OR REPLACE INTO Updates VALUES(path, '{path}', filename, {filename}" \
+                    query = "INSERT OR REPLACE INTO files (path, filename) VALUES('{path}', '{filename}'" \
                     " );".format(path=path, filename=filename)
+                    print query
                     self.lock.acquire()
                     self.DB_cursor.execute(query)
                     self.lock.release()
             self.files_to_add = []
             if len(self.files_to_delete):
                 for path, filename in self.files_to_delete:
-                    query = "DELETE FROM Updates WHERE path ='{path}' and filename ='{filename}'" \
+                    query = "DELETE FROM files WHERE path ='{path}' AND filename ='{filename}'" \
                     " ;".format(path=path, filename=filename)
                     self.lock.acquire()
                     self.DB_cursor.execute(query)
@@ -79,7 +93,7 @@ class DirectoryDB(Thread):
             self.files_to_delete = []
             if len(self.folders_to_delete):
                 for path in self.folders_to_delete:
-                    query = "DELETE FROM Updates WHERE path LIKE '{path}%'".format(path=path)
+                    query = "DELETE FROM files WHERE path LIKE '{path}%'".format(path=path)
                     self.lock.acquire()
                     self.DB_cursor.execute(query)
                     self.lock.release()
@@ -91,7 +105,7 @@ class DirectoryDB(Thread):
 
 
     def get_folders(self, filename):
-        query = "SELECT path, filename WHERE filename = '{filename}';".format(filename=filename)
+        query = "SELECT path, filename FROM files WHERE filename = '{filename}';".format(filename=filename)
         self.lock.acquire()
         self.DB_cursor.execute(query)
         data = self.DB_cursor.fetchall()
@@ -102,3 +116,14 @@ class DirectoryDB(Thread):
         self.lock.acquire()
         self.DB.commit()
         self.lock.release()
+
+T = DirectoryDB("C:\\tmp\\test.db")
+T.start()
+to_scan = "C:\\Users\\boh01\\Downloads"
+files = os.listdir(to_scan)
+for i in files:
+    f = os.path.join(to_scan, i)
+    if os.path.isfile(f):
+        T.add_file(f)
+
+#print T.get_folders("My Movie.mp4")
