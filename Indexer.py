@@ -120,46 +120,45 @@ class Directory(object):
         :return: Does not return anything.
 
         """
-        thread_pool.messages.put("Updating " + str(self.path))
+        thread_pool.messages.put("Processing " + str(self.path)+" Folder Time:"+str(self.timeUpdated)+" Now:"+str(time.time()))
         import scandir as myScandir
         thread_pool.thread_lock.acquire()
         thread_pool.thread_count += 1
         thread_pool.thread_lock.release()
         if os.path.isdir(self.path):
-            thread_pool.messages.put("Processing " + str(self.path)+" "+str(os.path.getmtime(self.path))+" "+str(self.timeUpdated))
             if os.path.getmtime(self.path) > self.timeUpdated:
-                thread_pool.messages.put("Processing " + str(self.path)+" "+str(os.path.getmtime(self.path))+" "+str(self.timeUpdated))
+                thread_pool.messages.put("Updating " + str(self.path))
                 # Needs an update
-                (pathS, directoriesS, filesS) = (0, 0, 0)
+                (pathS, directoriesS, filesS) = ([], [], [])
                 for (pathS, directoriesS, filesS) in myScandir.walk(self.path):
                     break
                 if filesS:
                     self.files = filesS
-                    for f in self.files:
-                        DB.add_fileB(self.path, f)
                 if directoriesS:
                     self.directories = directoriesS
-                for folder in self.directories:
-                    fullfolder = os.path.join(self.path, folder)
-                    if fullfolder not in self.dirClasses:
-                        tmpDir = Directory(fullfolder, 0.0, self.DirectoryDictionary)
-                        self.DirectoryDictionary[fullfolder] = tmpDir
-                        self.dirClasses[fullfolder] = tmpDir
-                if recursive:
-                    for i in self.dirClasses:
-                        thread_pool.apply_async(self.dirClasses[i].update, args=(thread_pool, DB,))
             else:
                 thread_pool.messages.put("Path is all up to date: " + str(self.path))
                 self.markLower()
+            for folder in self.directories:
+                fullfolder = os.path.join(self.path, folder)
+                if fullfolder not in self.dirClasses:
+                    tmpDir = Directory(fullfolder, 0.0, self.DirectoryDictionary)
+                    self.DirectoryDictionary[fullfolder] = tmpDir
+                    self.dirClasses[fullfolder] = tmpDir
+            thread_pool.messages.put("Writing " + str(self.path))
+            for f in self.files:
+                DB.add_fileB(self.path, f)
+            if recursive:
+                for i in self.dirClasses:
+                    thread_pool.apply_async(self.dirClasses[i].update, args=(thread_pool, DB,))
         else:
             thread_pool.messages.put("Detected deleted path: " + str(self.path))
             self.delLower()
         self.scanned = 1
-        self.timeUpdated = datetime.date.fromtimestamp(time.time())
+        self.timeUpdated = time.time()
         thread_pool.thread_lock.acquire()
         thread_pool.thread_count -= 1
         thread_pool.thread_lock.release()
-        thread_pool.messages.put("Done " + str(self.path))
 
 
     def writeFilesDB(self, DB, recursive=True):

@@ -21,7 +21,8 @@ def backup_db(pathToDB):
 
 if __name__ == '__main__':
     # FolderToScan = "M:\\Drawings" # CHANGE this to whatever you want to. Just remember to use double slashes
-    FolderToScan = "M:\\Drawings"
+    #FolderToScan = "M:\\Drawings"
+    FolderToScan = "C:\\tmp"
     db_folder = "C:\\Projects"  # os.getcwd()
     db_file = "DB.csv"  # Will be placed next to the python file. Probably best to not run from network drive.
     DB_path = "C:\\tmp\\Monster.db"
@@ -53,6 +54,7 @@ if __name__ == '__main__':
     # Above plants a seed at the base of the folder tree. Any folders created before the date will not be scanned
 
     importOldScanFromDB(DB, DirectoryDictionary)  # populate memory with already scanned files.
+    DirectoryDictionary[FolderToScan].timeUpdated = 0.0 # Reset time for root.
 
     DB.nuke()
 
