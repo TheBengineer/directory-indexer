@@ -1,21 +1,29 @@
 __author__ = 'Wild_Doogy'
 
-import datetime
 import shutil
-import Queue
-import datetime
 from multiprocessing.dummy import Pool as ThreadPool
 from threading import Lock
 
 from Indexer import *
-
 import DirectoryDB
+
+
+def backup_db(pathToDB):
+    try:
+        nm = pathToDB + str(datetime.datetime.now()).replace(":", "-") + ".backup"
+        print nm
+        shutil.move(pathToDB, nm)  # Move old database to a backup location
+        print "Output file backed up."
+    except ValueError:
+        print "Output file not backed up. File may not exist, permissions, etc. This might be a problem later"
+
 
 if __name__ == '__main__':
     # FolderToScan = "M:\\Drawings" # CHANGE this to whatever you want to. Just remember to use double slashes
     FolderToScan = "M:\\Drawings"
-    db_folder = "C:\\Projects"  #os.getcwd()
+    db_folder = "C:\\Projects"  # os.getcwd()
     db_file = "DB.csv"  # Will be placed next to the python file. Probably best to not run from network drive.
+    DB_path = "C:\\tmp\\Monster.db"
     last_update_date = datetime.datetime(1990, 1, 1)
     pathToOutputCSV = os.path.join(db_folder, db_file)
 
@@ -24,24 +32,17 @@ if __name__ == '__main__':
     update_pool.thread_count = 0
     update_pool.thread_lock = Lock()
     update_pool.messages = Queue.Queue()
-    DB = DirectoryDB.DirectoryDB("C:\\tmp\\Monster.db")
-    DB.start()
 
+    backup_db(DB_path)
+    DB = DirectoryDB.DirectoryDB(DB_path)
+    DB.start()
 
     # TODO need to create a config file
 
     if not os.path.isdir(FolderToScan):  # Make sure the folder exists
-        print "Cannot access the folder to be scanned. Please fix this near the bottom of the source file."
+        print "Cannot access the folder to be scanned:", FolderToScan
         raw_input("Press enter to exit")
         exit()
-
-    if not os.path.isfile(pathToOutputCSV):  # Make sure the output database can be created
-        print "Cannot find an existing database. Get ready for hours of scanning."
-        if not os.path.isdir(os.path.split(pathToOutputCSV)[0]):
-            print "Cannot even find the folder for the output file to be placed. This means the scan will not be saved."
-            print pathToOutputCSV
-            raw_input("Press enter to exit")
-            exit()
 
     startTime = time.time()  # Write down time for later
 
@@ -50,30 +51,7 @@ if __name__ == '__main__':
     DirectoryDictionary[FolderToScan] = Directory(FolderToScan, last_update_date, DirectoryDictionary)
     # Above plants a seed at the base of the folder tree. Any folders created before the date will not be scanned
 
-    #importOldScan(pathToOutputCSV, DirectoryDictionary)  # populate memory with already scanned files.
     importOldScanFromDB(DB, DirectoryDictionary)  # populate memory with already scanned files.
-
-
-    print "Writing to DB"
-    DirectoryDictionary[FolderToScan].writeFilesDB(DB)
-    print "Done"
-
-
-    try:
-        nm = pathToOutputCSV + str(datetime.datetime.now()).replace(":","-") + ".backup"
-        print nm
-        shutil.move(pathToOutputCSV, nm)  # Move old database to a backup location
-        print "Output file backed up."
-    except ValueError:
-        print "Output file not backed up. File may not exist, permissions, etc. This might be a problem later"
-
-    try:
-        with open(pathToOutputCSV, "w"):
-            print "Output file opened."
-    except:
-        print "Cannot create output file" + pathToOutputCSV + "This is bad. Scan will not be saved."
-        raw_input("Press enter to exit, and then go create the directory, fix the file path. etc. ")
-        exit()
 
     update_pool.apply_async(DirectoryDictionary[FolderToScan].update, args=(update_pool,))  # Go. Scan. Be Free.
     time.sleep(.3)
@@ -85,23 +63,6 @@ if __name__ == '__main__':
     update_pool.close()
     update_pool.join()
 
-    filewritten = 0
 
-    while filewritten == 0:  # Failsafe to write the folder.
-        try:
-            f = open(pathToOutputCSV, "w")
-            dt = datetime.datetime.now().timetuple()
-            st = "Python Datetime"
-            for i in dt:
-                st += "," + str(i)
-            st += "\n"
-            print "Writing database."
-            f.write(st)
-            DirectoryDictionary[FolderToScan].writeFiles(f, update_pool)
-            f.close()
-            filewritten = 1
-        except IOError:
-            print "Something broke. Cannot open output file. Please type a new path for the output file"
-            pathToOutputCSV = raw_input("Path:")
     DB.go = 0
     raw_input("Completed in " + str((time.time() - startTime) / 60) + " Minutes")
