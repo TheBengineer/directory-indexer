@@ -3,7 +3,6 @@ import sqlite3 as lite
 
 from threading import Thread
 from threading import Lock
-import cPickle
 import time
 import datetime
 import os
@@ -39,7 +38,7 @@ class DirectoryDB(Thread):
 
     def create_table(self):
         create_table = "CREATE TABLE files " \
-                         "(path TEXT, filename TEXT, scan_time TIMESTAMP, CONSTRAINT unq UNIQUE (path, filename));"
+                       "(path TEXT, filename TEXT, scan_time TIMESTAMP, CONSTRAINT unq UNIQUE (path, filename));"
         self.lock.acquire()
         tables = self.DB_cursor.execute("SELECT name FROM sqlite_master"
                                         " WHERE type='table' AND name='files';").fetchall()
@@ -50,16 +49,19 @@ class DirectoryDB(Thread):
     def add_file(self, file_path):
         path, filename = os.path.split(file_path)
         self.add_fileB(path, filename)
+
     def add_fileB(self, path, filename):
         if filename and path:
             self.local_lock.acquire()
             self.files_to_add.append([path, filename])
             self.local_lock.release()
+
     def del_folder(self, folder_path):
         if folder_path:
             self.local_lock.acquire()
             self.folders_to_delete.append(folder_path)
             self.local_lock.release()
+
     def del_file(self, file_path):
         path, filename = os.path.split(file_path)
         if filename and path:
@@ -78,7 +80,8 @@ class DirectoryDB(Thread):
             if len(self.files_to_add):
                 for path, filename in self.files_to_add:
                     query = "INSERT OR REPLACE INTO files (path, filename, scan_time) VALUES(\"{path}\", " \
-                            " \"{filename}\", \"{time}\");".format(path=path, filename=filename, time=datetime.datetime.now())
+                            " \"{filename}\", \"{time}\");".format(path=path, filename=filename,
+                                                                   time=datetime.datetime.now())
                     self.lock.acquire()
                     try:
                         self.DB_cursor.execute(query)
@@ -90,7 +93,7 @@ class DirectoryDB(Thread):
             if len(self.files_to_delete):
                 for path, filename in self.files_to_delete:
                     query = "DELETE FROM files WHERE path ='{path}' AND filename ='{filename}'" \
-                    " ;".format(path=path, filename=filename)
+                            " ;".format(path=path, filename=filename)
                     self.lock.acquire()
                     self.DB_cursor.execute(query)
                     self.lock.release()
@@ -123,6 +126,14 @@ class DirectoryDB(Thread):
 
     def dump(self):
         query = "SELECT path, filename, scan_time FROM files;"
+        self.lock.acquire()
+        self.DB_cursor.execute(query)
+        data = self.DB_cursor.fetchall()
+        self.lock.release()
+        return data
+
+    def nuke(self):
+        query = "DELETE FROM files;"
         self.lock.acquire()
         self.DB_cursor.execute(query)
         data = self.DB_cursor.fetchall()

@@ -12,7 +12,7 @@ def backup_db(pathToDB):
     try:
         nm = pathToDB + str(datetime.datetime.now()).replace(":", "-") + ".backup"
         print nm
-        shutil.move(pathToDB, nm)  # Move old database to a backup location
+        shutil.copy(pathToDB, nm)  # Move old database to a backup location
         print "Output file backed up."
     except ValueError:
         print "Output file not backed up. File may not exist, permissions, etc. This might be a problem later"
@@ -53,7 +53,12 @@ if __name__ == '__main__':
 
     importOldScanFromDB(DB, DirectoryDictionary)  # populate memory with already scanned files.
 
-    update_pool.apply_async(DirectoryDictionary[FolderToScan].update, args=(update_pool, DB,))  # Go. Scan. Be Free.
+    DB.go = 0
+
+    new_DB = DirectoryDB.DirectoryDB(DB_path+"new")
+    new_DB.start()
+
+    update_pool.apply_async(DirectoryDictionary[FolderToScan].update, args=(update_pool, new_DB,))  # Go. Scan. Be Free.
     time.sleep(.3)
     while update_pool.thread_count > 0:
         while not update_pool.messages.empty():
@@ -64,5 +69,5 @@ if __name__ == '__main__':
     update_pool.join()
 
 
-    DB.go = 0
+    new_DB.go = 0
     raw_input("Completed in " + str((time.time() - startTime) / 60) + " Minutes")
