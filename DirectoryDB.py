@@ -81,7 +81,7 @@ class DirectoryDB(Thread):
                 for path, filename in self.files_to_add:
                     query = "INSERT OR REPLACE INTO files (path, filename, scan_time) VALUES(\"{path}\", " \
                             " \"{filename}\", \"{time}\");".format(path=path, filename=filename,
-                                                                   time=datetime.datetime.now())
+                                                                   time=time.time())
                     self.lock.acquire()
                     try:
                         self.DB_cursor.execute(query)

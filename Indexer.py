@@ -120,15 +120,15 @@ class Directory(object):
         :return: Does not return anything.
 
         """
+        thread_pool.messages.put("Updating " + str(self.path))
         import scandir as myScandir
-
         thread_pool.thread_lock.acquire()
         thread_pool.thread_count += 1
         thread_pool.thread_lock.release()
         if os.path.isdir(self.path):
-            if datetime.datetime.fromtimestamp(os.path.getmtime(self.path)) > self.timeUpdated:
+            if os.path.getmtime(self.path) > self.timeUpdated:
+                thread_pool.messages.put("Processing " + str(self.path)+" "+str(os.path.getmtime(self.path))+" "+str(self.timeUpdated))
                 # Needs an update
-                thread_pool.messages.put("Updating " + str(self.path))
                 (pathS, directoriesS, filesS) = (0, 0, 0)
                 for (pathS, directoriesS, filesS) in myScandir.walk(self.path):
                     break
@@ -147,7 +147,6 @@ class Directory(object):
                 if recursive:
                     for i in self.dirClasses:
                         thread_pool.apply_async(self.dirClasses[i].update, args=(thread_pool, DB,))
-                        print "Adding", i
             else:
                 thread_pool.messages.put("Path is all up to date: " + str(self.path))
                 self.markLower()
@@ -229,6 +228,7 @@ def importOldScanFromDB(DB, tmpDirectoryDictionary):
     """
     print "Attempting to import old Database from", DB.file_path
     data = DB.dump()
+    print data
     for f in data:
         path = f[0].strip("\"")
         mfile = f[1].strip("\"")

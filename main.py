@@ -12,8 +12,9 @@ def backup_db(pathToDB):
     try:
         nm = pathToDB + str(datetime.datetime.now()).replace(":", "-") + ".backup"
         print nm
-        shutil.copy(pathToDB, nm)  # Move old database to a backup location
-        print "Output file backed up."
+        if os.path.isfile(nm):
+            shutil.copy(pathToDB, nm)  # Move old database to a backup location
+            print "Output file backed up."
     except ValueError:
         print "Output file not backed up. File may not exist, permissions, etc. This might be a problem later"
 
@@ -24,7 +25,7 @@ if __name__ == '__main__':
     db_folder = "C:\\Projects"  # os.getcwd()
     db_file = "DB.csv"  # Will be placed next to the python file. Probably best to not run from network drive.
     DB_path = "C:\\tmp\\Monster.db"
-    last_update_date = datetime.datetime(1990, 1, 1)
+    last_update_date = 0.0 # datetime.datetime(1990, 1, 1)
     pathToOutputCSV = os.path.join(db_folder, db_file)
 
     number_of_threads = 16
