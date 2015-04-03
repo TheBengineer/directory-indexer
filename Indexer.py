@@ -126,6 +126,7 @@ class Directory(object):
         thread_pool.thread_count += 1
         thread_pool.thread_lock.release()
         if os.path.isdir(self.path):
+            thread_pool.messages.put("Processing " + str(self.path)+" "+str(os.path.getmtime(self.path))+" "+str(self.timeUpdated))
             if os.path.getmtime(self.path) > self.timeUpdated:
                 thread_pool.messages.put("Processing " + str(self.path)+" "+str(os.path.getmtime(self.path))+" "+str(self.timeUpdated))
                 # Needs an update
@@ -141,7 +142,7 @@ class Directory(object):
                 for folder in self.directories:
                     fullfolder = os.path.join(self.path, folder)
                     if fullfolder not in self.dirClasses:
-                        tmpDir = Directory(fullfolder, datetime.datetime(1900, 1, 1), self.DirectoryDictionary)
+                        tmpDir = Directory(fullfolder, 0.0, self.DirectoryDictionary)
                         self.DirectoryDictionary[fullfolder] = tmpDir
                         self.dirClasses[fullfolder] = tmpDir
                 if recursive:
