@@ -47,7 +47,7 @@ if __name__ == '__main__':
     DirectoryDictionary[FolderToScan] = Directory(FolderToScan, last_update_date ,DirectoryDictionary)
     # Above plants a seed at the base of the folder tree. Any folders created before the date will not be scanned
 
-    importOldScan(pathToOutputCSV,DirectoryDictionary) # populate memory with already scanned files.
+    importOldScan(pathToOutputCSV, DirectoryDictionary) # populate memory with already scanned files.
 
     try:
         shutil.move(pathToOutputCSV, pathToOutputCSV+".backup") # Move old database to a backup location
