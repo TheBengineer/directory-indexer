@@ -239,6 +239,6 @@ def importOldScanFromDB(DB, tmpDirectoryDictionary):
             tmpDirectoryDictionary[path].files.append(mfile)
         else:
             tmpDirectoryDictionary[path].files.append(mfile)
-
+    print "Done"
 
 
