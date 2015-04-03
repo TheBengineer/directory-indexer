@@ -228,7 +228,6 @@ def importOldScanFromDB(DB, tmpDirectoryDictionary):
     """
     print "Attempting to import old Database from", DB.file_path
     data = DB.dump()
-    print data[:3]
     for f in data:
         path = f[0].strip("\"")
         mfile = f[1].strip("\"")
