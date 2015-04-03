@@ -21,8 +21,8 @@ def backup_db(pathToDB):
 
 if __name__ == '__main__':
     # FolderToScan = "M:\\Drawings" # CHANGE this to whatever you want to. Just remember to use double slashes
-    #FolderToScan = "M:\\Drawings"
-    FolderToScan = "C:\\tmp"
+    FolderToScan = "M:\\Drawings"
+    #FolderToScan = "C:\\tmp"
     db_folder = "C:\\Projects"  # os.getcwd()
     db_file = "DB.csv"  # Will be placed next to the python file. Probably best to not run from network drive.
     DB_path = "C:\\tmp\\Monster.db"
@@ -64,6 +64,9 @@ if __name__ == '__main__':
         while not update_pool.messages.empty():
             print update_pool.messages.get()
         time.sleep(.1)
+    print "No threads left, printing trailing messages"
+    while not update_pool.messages.empty():
+        print update_pool.messages.get()
 
     update_pool.close()
     update_pool.join()

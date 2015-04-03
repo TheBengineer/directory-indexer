@@ -126,6 +126,9 @@ class Directory(object):
         thread_pool.thread_count += 1
         thread_pool.thread_lock.release()
         if os.path.isdir(self.path):
+            if type(self.timeUpdated) == "date":
+                self.timeUpdated = 0.0
+                print "fixed"
             if os.path.getmtime(self.path) > self.timeUpdated:
                 thread_pool.messages.put("Updating " + str(self.path))
                 # Needs an update
