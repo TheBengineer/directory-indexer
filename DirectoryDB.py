@@ -117,15 +117,3 @@ class DirectoryDB(Thread):
         self.lock.acquire()
         self.DB.commit()
         self.lock.release()
-
-T = DirectoryDB("C:\\tmp\\test.db")
-T.start()
-to_scan = "C:\\Users\\boh01\\Downloads"
-files = os.listdir(to_scan)
-for i in files:
-    f = os.path.join(to_scan, i)
-    if os.path.isfile(f):
-        T.add_file(f)
-
-print T.get_folders("My Movie.mp4")
-T.go = 0
