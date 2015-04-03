@@ -231,8 +231,11 @@ def importOldScanFromDB(DB, tmpDirectoryDictionary):
     for f in data:
         path = f[0].strip("\"")
         mfile = f[1].strip("\"")
+        s_time = datetime.datetime(1900, 1, 1)
+        if f[2]:
+            s_time = f[2]
         if path not in tmpDirectoryDictionary:
-            tmpDirectoryDictionary[path] = Directory(path, f[2], tmpDirectoryDictionary)
+            tmpDirectoryDictionary[path] = Directory(path, s_time, tmpDirectoryDictionary)
             tmpDirectoryDictionary[path].files.append(mfile)
         else:
             tmpDirectoryDictionary[path].files.append(mfile)
