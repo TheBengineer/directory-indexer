@@ -132,6 +132,7 @@ class Directory(object):
                     break
                 if filesS:
                     self.files = filesS
+                    se
                 if directoriesS:
                     self.directories = directoriesS
                 for folder in self.directories:
@@ -156,6 +157,28 @@ class Directory(object):
         thread_pool.thread_count -= 1
         thread_pool.thread_lock.release()
 
+
+    def writeFilesDB(self, DB, thread_pool, recursive=True):
+        """
+        Writes the files in this directory to the provided FILE object. Recursive can be turned off.
+        :param mfile: A FILE object where the files names will be written in CSV format
+        :type mfile: file
+        :param recursive: Flag for recursion
+        :type recursive: bool
+        :type DB: DirectoryDB.DirectoryDB
+        :param DB: Directory class for saving data
+        :return: does not return anything
+        """
+        if self.scanned == 0:
+            self.update(thread_pool)
+        self.files.sort()
+        for i in self.files:
+            DB.add_file(i)
+        sortedKeys = self.dirClasses.keys()
+        sortedKeys.sort()
+        if recursive:
+            for i in sortedKeys:
+               self.dirClasses[i].writeFiles(DB, thread_pool)
 
 
 def importOldScan(oldScanFile,tmpDirectoryDictionary):

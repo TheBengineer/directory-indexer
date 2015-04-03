@@ -1,20 +1,20 @@
 __author__ = 'Wild_Doogy'
 
-from Indexer import *
-import datetime, shutil
+import datetime
+import shutil
 import Queue
-
-from multiprocessing import Pool
 from multiprocessing.dummy import Pool as ThreadPool
-
 from threading import Lock
 
+from Indexer import *
+
+import DirectoryDB
 
 if __name__ == '__main__':
-    #FolderToScan = "M:\\Drawings" # CHANGE this to whatever you want to. Just remember to use double slashes
+    # FolderToScan = "M:\\Drawings" # CHANGE this to whatever you want to. Just remember to use double slashes
     FolderToScan = "M:\\Drawings"
-    db_folder = "C:\\Projects"#os.getcwd()
-    db_file = "DB.csv" # Will be placed next to the python file. Probably best to not run from network drive.
+    db_folder = "C:\\Projects"  #os.getcwd()
+    db_file = "DB.csv"  # Will be placed next to the python file. Probably best to not run from network drive.
     last_update_date = datetime.datetime(1990, 1, 1)
     pathToOutputCSV = os.path.join(db_folder, db_file)
 
@@ -23,6 +23,8 @@ if __name__ == '__main__':
     update_pool.thread_count = 0
     update_pool.thread_lock = Lock()
     update_pool.messages = Queue.Queue()
+    DB = DirectoryDB.DirectoryDB("C:\\tmp\\Monster.db")
+    DB.start()
 
 
     # TODO need to create a config file
@@ -40,30 +42,31 @@ if __name__ == '__main__':
             raw_input("Press enter to exit")
             exit()
 
-    startTime = time.time() # Write down time for later
+    startTime = time.time()  # Write down time for later
 
     DirectoryDictionary = {}
     """ :type DirectoryDictionary: dict of Directory"""
-    DirectoryDictionary[FolderToScan] = Directory(FolderToScan, last_update_date ,DirectoryDictionary)
+    DirectoryDictionary[FolderToScan] = Directory(FolderToScan, last_update_date, DirectoryDictionary)
     # Above plants a seed at the base of the folder tree. Any folders created before the date will not be scanned
 
-    importOldScan(pathToOutputCSV, DirectoryDictionary) # populate memory with already scanned files.
+    importOldScan(pathToOutputCSV, DirectoryDictionary)  # populate memory with already scanned files.
+
 
     try:
-        shutil.move(pathToOutputCSV, pathToOutputCSV+".backup") # Move old database to a backup location
+        shutil.move(pathToOutputCSV, pathToOutputCSV + ".backup")  # Move old database to a backup location
         print "Output file backed up."
     except:
         print "Output file not backed up. File may not exist, permissions, etc. This might be a problem later"
 
     try:
-        with open(pathToOutputCSV,"w"):
+        with open(pathToOutputCSV, "w"):
             print "Output file opened."
     except:
-        print "Cannot create output file"+pathToOutputCSV+"This is bad. Scan will not be saved."
+        print "Cannot create output file" + pathToOutputCSV + "This is bad. Scan will not be saved."
         raw_input("Press enter to exit, and then go create the directory, fix the file path. etc. ")
         exit()
 
-    update_pool.apply_async(DirectoryDictionary[FolderToScan].update, args=(update_pool,))# Go. Scan. Be Free.
+    update_pool.apply_async(DirectoryDictionary[FolderToScan].update, args=(update_pool,))  # Go. Scan. Be Free.
     time.sleep(.3)
     while update_pool.thread_count > 0:
         while not update_pool.messages.empty():
@@ -75,13 +78,13 @@ if __name__ == '__main__':
 
     filewritten = 0
 
-    while filewritten == 0: # Failsafe to write the folder.
+    while filewritten == 0:  # Failsafe to write the folder.
         try:
-            f = open(pathToOutputCSV,"w")
+            f = open(pathToOutputCSV, "w")
             dt = datetime.datetime.now().timetuple()
             st = "Python Datetime"
             for i in dt:
-                st += ","+str(i)
+                st += "," + str(i)
             st += "\n"
             print "Writing database."
             f.write(st)
@@ -92,4 +95,4 @@ if __name__ == '__main__':
             print "Something broke. Cannot open output file. Please type a new path for the output file"
             pathToOutputCSV = raw_input("Path:")
 
-    raw_input("Completed in "+str((time.time()-startTime)/60)+" Minutes")
+    raw_input("Completed in " + str((time.time() - startTime) / 60) + " Minutes")
