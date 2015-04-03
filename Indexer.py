@@ -168,14 +168,13 @@ class Directory(object):
         :param DB: Directory class for saving data
         :return: does not return anything
         """
-        if self.scanned == 0:
-            self.update(thread_pool)
-        self.files.sort()
+        #if self.scanned == 0:
+        #    self.update(thread_pool)
         for i in self.files:
-            DB.add_file(i)
+            DB.add_fileB(self.path, i)
         if recursive:
             for i in self.dirClasses:
-               i.writeFiles(DB, thread_pool)
+               self.dirClasses[i].writeFilesDB(DB, thread_pool)
 
 
 def importOldScan(oldScanFile,tmpDirectoryDictionary):

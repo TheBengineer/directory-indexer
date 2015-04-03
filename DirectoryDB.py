@@ -29,6 +29,7 @@ class DirectoryDB(Thread):
         self.files_to_add = []
         self.files_to_delete = []
         self.folders_to_delete = []
+        self.go = 1
         """
         :type self.lock: threading.Lock
         :type self.local_lock: threading.Lock
@@ -46,6 +47,8 @@ class DirectoryDB(Thread):
 
     def add_file(self, file_path):
         path, filename = os.path.split(file_path)
+        self.add_fileB(path, filename)
+    def add_fileB(self, path, filename):
         if filename and path:
             self.local_lock.acquire()
             self.files_to_add.append([path, filename])
@@ -68,8 +71,6 @@ class DirectoryDB(Thread):
         May need to be polling instead of event based to make the DB happy
         :return:
         """
-
-        self.go = 1
         while self.go:
             self.local_lock.acquire()
             if len(self.files_to_add):
@@ -102,7 +103,7 @@ class DirectoryDB(Thread):
             self.local_lock.release()
             self.writeout()
             # TODO is 30 seconds a good time for the database to be written to?
-            time.sleep(.1)
+            time.sleep(1)
 
 
     def get_folders(self, filename):

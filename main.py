@@ -3,6 +3,7 @@ __author__ = 'Wild_Doogy'
 import datetime
 import shutil
 import Queue
+import datetime
 from multiprocessing.dummy import Pool as ThreadPool
 from threading import Lock
 
@@ -51,14 +52,17 @@ if __name__ == '__main__':
 
     importOldScan(pathToOutputCSV, DirectoryDictionary)  # populate memory with already scanned files.
 
-    DirectoryDictionary[FolderToScan].writeFilesDB(DB, update_pool)
-
+    print "Writing to DB"
+    DirectoryDictionary[FolderToScan].writeFilesDB(DB, "asdf")
+    print "Done"
 
 
     try:
-        shutil.move(pathToOutputCSV, pathToOutputCSV + ".backup")  # Move old database to a backup location
+        nm = pathToOutputCSV + str(datetime.datetime.now()).replace(":","-") + ".backup"
+        print nm
+        shutil.move(pathToOutputCSV, nm)  # Move old database to a backup location
         print "Output file backed up."
-    except:
+    except ValueError:
         print "Output file not backed up. File may not exist, permissions, etc. This might be a problem later"
 
     try:
@@ -97,5 +101,5 @@ if __name__ == '__main__':
         except IOError:
             print "Something broke. Cannot open output file. Please type a new path for the output file"
             pathToOutputCSV = raw_input("Path:")
-
+    DB.go = 0
     raw_input("Completed in " + str((time.time() - startTime) / 60) + " Minutes")
