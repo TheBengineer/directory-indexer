@@ -20,7 +20,7 @@ def backup_db(pathToDB):
 
 if __name__ == '__main__':
     # FolderToScan = "M:\\Drawings" # CHANGE this to whatever you want to. Just remember to use double slashes
-    FolderToScan = "M:\\Drawings"
+    FolderToScan = "C:\\tmp"
     db_folder = "C:\\Projects"  # os.getcwd()
     db_file = "DB.csv"  # Will be placed next to the python file. Probably best to not run from network drive.
     DB_path = "C:\\tmp\\Monster.db"

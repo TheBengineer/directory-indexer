@@ -136,4 +136,5 @@ class DirectoryDB(Thread):
         query = "DELETE FROM files;"
         self.lock.acquire()
         self.DB_cursor.execute(query)
+        self.DB_cursor.execute("VACUUM;")
         self.lock.release()
