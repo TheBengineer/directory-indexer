@@ -36,7 +36,7 @@ class DirectoryDB(Thread):
 
     def create_table(self):
         create_updates = "CREATE TABLE files " \
-                         "(path TEXT, filename TEXT);"
+                         "(path TEXT, filename TEXT, CONSTRAINT unq UNIQUE (path, filename) );"
         self.lock.acquire()
         tables = self.DB_cursor.execute("SELECT name FROM sqlite_master"
                                         " WHERE type='table' AND name='files';").fetchall()
@@ -46,8 +46,6 @@ class DirectoryDB(Thread):
 
     def add_file(self, file_path):
         path, filename = os.path.split(file_path)
-        path.replace("'", "\\'")
-        filename.replace("'", "\\'")
         if filename and path:
             self.local_lock.acquire()
             self.files_to_add.append([path, filename])
@@ -76,11 +74,14 @@ class DirectoryDB(Thread):
             self.local_lock.acquire()
             if len(self.files_to_add):
                 for path, filename in self.files_to_add:
-                    query = "INSERT OR REPLACE INTO files (path, filename) VALUES('{path}', '{filename}'" \
+                    query = "INSERT OR REPLACE INTO files (path, filename) VALUES(\"{path}\",  \"{filename}\"" \
                     " );".format(path=path, filename=filename)
-                    print query
                     self.lock.acquire()
-                    self.DB_cursor.execute(query)
+                    try:
+                        self.DB_cursor.execute(query)
+                    except lite.OperationalError:
+                        print "ERROR, could not add file:"
+                        print query
                     self.lock.release()
             self.files_to_add = []
             if len(self.files_to_delete):
@@ -126,4 +127,5 @@ for i in files:
     if os.path.isfile(f):
         T.add_file(f)
 
-#print T.get_folders("My Movie.mp4")
+print T.get_folders("My Movie.mp4")
+T.go = 0
