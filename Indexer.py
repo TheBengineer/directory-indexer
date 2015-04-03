@@ -147,6 +147,7 @@ class Directory(object):
                 if recursive:
                     for i in self.dirClasses:
                         thread_pool.apply_async(self.dirClasses[i].update, args=(thread_pool, DB,))
+                        print "Adding", i
             else:
                 thread_pool.messages.put("Path is all up to date: " + str(self.path))
                 self.markLower()
@@ -158,6 +159,7 @@ class Directory(object):
         thread_pool.thread_lock.acquire()
         thread_pool.thread_count -= 1
         thread_pool.thread_lock.release()
+        thread_pool.messages.put("Done " + str(self.path))
 
 
     def writeFilesDB(self, DB, recursive=True):
