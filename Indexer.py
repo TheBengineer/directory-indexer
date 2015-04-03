@@ -144,7 +144,6 @@ class Directory(object):
                         tmpDir = Directory(fullfolder, datetime.datetime(1900, 1, 1), self.DirectoryDictionary)
                         self.DirectoryDictionary[fullfolder] = tmpDir
                         self.dirClasses[fullfolder] = tmpDir
-
                 if recursive:
                     for i in self.dirClasses:
                         thread_pool.apply_async(self.dirClasses[i].update, args=(thread_pool, DB,))
