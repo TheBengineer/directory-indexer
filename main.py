@@ -53,7 +53,7 @@ if __name__ == '__main__':
 
     importOldScanFromDB(DB, DirectoryDictionary)  # populate memory with already scanned files.
 
-    update_pool.apply_async(DirectoryDictionary[FolderToScan].update, args=(update_pool,))  # Go. Scan. Be Free.
+    update_pool.apply_async(DirectoryDictionary[FolderToScan].update, args=(update_pool, DB,))  # Go. Scan. Be Free.
     time.sleep(.3)
     while update_pool.thread_count > 0:
         while not update_pool.messages.empty():

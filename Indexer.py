@@ -106,7 +106,7 @@ class Directory(object):
         self.dirClasses = {}
         # del self.DirectoryDictionary[self.path]
 
-    def update(self, thread_pool, recursive=True):
+    def update(self, thread_pool, DB, recursive=True):
         """
         Where the real magic happens. This is used to refresh the files and folder in a directory. Recursive by default.
         :param thread_pool: A threaded pool to parallelize the update function
@@ -143,7 +143,7 @@ class Directory(object):
 
                 if recursive:
                     for i in self.dirClasses:
-                        thread_pool.apply_async(self.dirClasses[i].update, args=(thread_pool,))
+                        thread_pool.apply_async(self.dirClasses[i].update, args=(thread_pool, DB,))
             else:
                 thread_pool.messages.put("Path is all up to date: "+str(self.path))
                 self.markLower()
