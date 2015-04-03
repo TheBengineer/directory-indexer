@@ -157,7 +157,7 @@ class Directory(object):
         thread_pool.thread_lock.release()
 
 
-    def writeFilesDB(self, DB, thread_pool, recursive=True):
+    def writeFilesDB(self, DB,  recursive=True):
         """
         Writes the files in this directory to the provided FILE object. Recursive can be turned off.
         :param mfile: A FILE object where the files names will be written in CSV format
@@ -174,7 +174,8 @@ class Directory(object):
             DB.add_fileB(self.path, i)
         if recursive:
             for i in self.dirClasses:
-               self.dirClasses[i].writeFilesDB(DB, thread_pool)
+               self.dirClasses[i].writeFilesDB(DB)
+
 
 
 def importOldScan(oldScanFile,tmpDirectoryDictionary):
@@ -210,6 +211,27 @@ def importOldScan(oldScanFile,tmpDirectoryDictionary):
     except IOError:
         print "Could not read existing database. Scanning from scratch."
         print oldScanFile
+
+def importOldScanFromDB(DB, tmpDirectoryDictionary):
+    """
+    Used to import from a sqlite file generated from the last scan.
+    :param DB: The path to the .csv file
+    :type DB: DirectoryDB.DirectoryDB
+    :param tmpDirectoryDictionary: A dictionary to hold all the imported Directory classes
+    :type tmpDirectoryDictionary: dict of Directory
+    :return: Does not return anything.
+    """
+    print "Attempting to import old Database from", DB.file_path
+    data = DB.dump()
+    print data[:3]
+    for f in data:
+        path = f[0].strip("\"")
+        mfile = f[1].strip("\"")
+        if path not in tmpDirectoryDictionary:
+            tmpDirectoryDictionary[path] = Directory(path, f[2], tmpDirectoryDictionary)
+            tmpDirectoryDictionary[path].files.append(mfile)
+        else:
+            tmpDirectoryDictionary[path].files.append(mfile)
 
 
 
