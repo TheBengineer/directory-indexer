@@ -8,36 +8,16 @@ import time
 
 
 """
-The region database will hold all the sectors in a region.
-Changes to Systems will be in a Systems database.
-If a record does not exist, no changes will be made
-
-This class will do some caching, though possibly not at the beginning.
-
-
-
-Sectors
-
-ID unINT64 (40G)
-X sINT 16 (-10k)
-Y sINT 16 (-10k)
-Z sINT 16 (-4k)
-
-This is all wrong
+This database will hold all the files and paths that are normally written to a CSV file.
 
 """
 
 
-class RegionDB(Thread):
-    def __init__(self, name):
-        """
-        This turns out not to be needed since it is best to generate the ID of the sector.
-        :type name str
-        """
+class DirectoryDB(Thread):
+    def __init__(self):
         # TODO make this save data more efficiently
         Thread.__init__(self)
         self.lock = Lock()
-        self.filename = name
         self.lock.acquire()
         self.DB = lite.connect(self.filename+".db", check_same_thread=False)
         self.DB_cursor = self.DB.cursor()
