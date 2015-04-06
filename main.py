@@ -71,4 +71,4 @@ if __name__ == '__main__':
 
 
     DB.go = 0
-    raw_input("Completed in " + str((time.time() - startTime) / 60) + " Minutes")
+    #raw_input("Completed in " + str((time.time() - startTime) / 60) + " Minutes")
