@@ -56,8 +56,6 @@ if __name__ == '__main__':
     importOldScanFromDB(DB, DirectoryDictionary)  # populate memory with already scanned files.
     DirectoryDictionary[FolderToScan].timeUpdated = 0.0 # Reset time for root.
 
-    DB.nuke()
-
     update_pool.apply_async(DirectoryDictionary[FolderToScan].update, args=(update_pool, DB,))  # Go. Scan. Be Free.
     time.sleep(.3)
     while update_pool.thread_count > 0:

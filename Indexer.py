@@ -96,7 +96,7 @@ class Directory(object):
             self.dirClasses[i].markLower()
         self.scanned = 1
 
-    def delLower(self):
+    def delLower(self, DB):
         """
         Breaks the links associating this class with it's subdirectories. This is used when a folder does not exist.
         :return: Does not return anything
@@ -104,6 +104,7 @@ class Directory(object):
         # for i in self.dirClasses:  # No need to go recursive. only break reference
         # self.dirClasses[i].delLower()
         self.dirClasses = {}
+        DB.del_folder(self.path)
         # del self.DirectoryDictionary[self.path]
 
     def update(self, thread_pool, DB, recursive=True):
@@ -156,7 +157,7 @@ class Directory(object):
                     thread_pool.apply_async(self.dirClasses[i].update, args=(thread_pool, DB,))
         else:
             thread_pool.messages.put("Detected deleted path: " + str(self.path))
-            self.delLower()
+            self.delLower(DB)
         self.scanned = 1
         self.timeUpdated = time.time()
         thread_pool.thread_lock.acquire()
@@ -164,24 +165,25 @@ class Directory(object):
         thread_pool.thread_lock.release()
 
 
-    def writeFilesDB(self, DB, recursive=True):
+    def writeFilesDB(self, thread_pool, DB, recursive=True, verify=False):
         """
-        Writes the files in this directory to the provided FILE object. Recursive can be turned off.
-        :param mfile: A FILE object where the files names will be written in CSV format
-        :type mfile: file
+        Writes the files in this directory to the provided Database object. Recursive can be turned off.
+        :param thread_pool: A threaded pool to parallelize the update function
+        :type thread_pool: Pool
+        :param DB: A Database object where the files names will be stored
+        :type DB: DirectoryDB.DirectoryDB
         :param recursive: Flag for recursion
         :type recursive: bool
-        :type DB: DirectoryDB.DirectoryDB
-        :param DB: Directory class for saving data
         :return: does not return anything
         """
-        # if self.scanned == 0:
-        #    self.update(thread_pool)
+        if verify:
+            if self.scanned == 0:
+                self.update(thread_pool, DB)
         for i in self.files:
             DB.add_fileB(self.path, i)
         if recursive:
             for i in self.dirClasses:
-                self.dirClasses[i].writeFilesDB(DB)
+                self.dirClasses[i].writeFilesDB(thread_pool, DB)
 
 
 def importOldScan(oldScanFile, tmpDirectoryDictionary):
@@ -234,7 +236,7 @@ def importOldScanFromDB(DB, tmpDirectoryDictionary):
     for f in data:
         path = f[0].strip("\"")
         mfile = f[1].strip("\"")
-        s_time = datetime.datetime(1900, 1, 1)
+        s_time = 0.0
         if f[2]:
             s_time = f[2]
         if path not in tmpDirectoryDictionary:
