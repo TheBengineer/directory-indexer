@@ -12,7 +12,7 @@ def backup_db(pathToDB):
     try:
         nm = pathToDB + str(datetime.datetime.now()).replace(":", "-") + ".backup"
         print nm
-        if os.path.isfile(nm):
+        if os.path.isfile(pathToDB):
             shutil.copy(pathToDB, nm)  # Move old database to a backup location
             print "Output file backed up."
     except ValueError:
