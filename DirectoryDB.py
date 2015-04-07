@@ -111,7 +111,7 @@ class DirectoryDB(Thread):
 
 
     def get_folders(self, filename):
-        query = "SELECT path, filename FROM files WHERE filename = '{filename}';".format(filename=filename)
+        query = "SELECT path, filename FROM files WHERE filename LIKE '{filename}';".format(filename=filename)
         self.lock.acquire()
         self.DB_cursor.execute(query)
         data = self.DB_cursor.fetchall()

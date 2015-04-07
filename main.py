@@ -21,11 +21,11 @@ def backup_db(pathToDB):
 
 if __name__ == '__main__':
     # FolderToScan = "M:\\Drawings" # CHANGE this to whatever you want to. Just remember to use double slashes
-    FolderToScan = "M:\\Drawings"
+    FolderToScan = "M:\\Projects"
     #FolderToScan = "C:\\tmp"
     db_folder = "C:\\Projects"  # os.getcwd()
     db_file = "DB.csv"  # Will be placed next to the python file. Probably best to not run from network drive.
-    DB_path = "C:\\tmp\\Monster.db"
+    DB_path = "C:\\tmp\\Monster-Projects.db"
     last_update_date = 0.0 # datetime.datetime(1990, 1, 1)
     pathToOutputCSV = os.path.join(db_folder, db_file)
 
@@ -71,4 +71,5 @@ if __name__ == '__main__':
 
 
     DB.go = 0
+    print DB.get_folders("%QSA80%")
     #raw_input("Completed in " + str((time.time() - startTime) / 60) + " Minutes")
