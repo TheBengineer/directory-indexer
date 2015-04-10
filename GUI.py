@@ -85,110 +85,10 @@ class Window(Thread):
         self.results_listbox.bind('<<ListboxSelect>>', self.a)
         self.results_listbox.bind('<Double-Button-1>', self.a)
 
-
-        for i in range(20):
-            self.results_listbox.insert(tk.END, "asdfasdfasdf " + str(i))
-
         self.results_frame.pack(fill=tk.BOTH, expand=1)
 
     def a(self, asdf):
         pass
-
-        """
-        self.mainFrame = tk.Frame(self.window)
-        self.mainFrame.pack(fill=tk.BOTH, expand=1)
-
-        self.menuFrame = tk.Frame(self.mainFrame)  # holds the buttons at the top
-
-        self.add_path_frame = tk.Frame(self.menuFrame)  # Redundant?
-        self.add_path_button = tk.Button(self.add_path_frame, text="Add Path")
-        self.add_path_button.pack(fill=tk.BOTH, expand=1)
-        self.add_path_button.pack_propagate(0)
-        self.add_path_button.pack(side="left")
-        self.startRMABar = ttk.Progressbar(self.menuFrame, orient='horizontal', mode='determinate', maximum=100)
-        self.startRMABar.pack(expand=True, fill=tk.X, side="bottom")
-        self.RMAButtonsFrame.pack(side="top")
-        self.RMALatestButton = tk.Button(self.RMAButtonsFrame, text="Use latest ticket list")
-        self.RMALatestButton.pack(side="left")
-        self.RMAfileButton = tk.Button(self.RMAButtonsFrame, text="Select a ticket list")
-        self.RMAfileButton.pack(side="left")
-        self.launchPuttyB = tk.Button(self.RMAButtonsFrame, text="Launch Putty", command=self.launchPutty)
-        self.launchPuttyB.pack(side="left")
-        # End of Buttons
-        self.status = tk.Label(self.window, text="Status: Waiting for a ticket list", bd=1, relief=tk.SUNKEN,
-                               anchor=tk.W)
-        self.status.pack(side=tk.BOTTOM, fill=tk.X)
-        # Menu bar for the top
-        self.menuBar = tk.Menu(self.menuFrame)
-        self.fileMenu = tk.Menu(self.menuBar, tearoff=0)
-        self.menuBar.add_cascade(label="File", menu=self.fileMenu)
-        self.window.config(menu=self.menuBar)
-        self.menuFrame.pack(side="top")
-
-        # Paned window
-        self.mainWindow = tk.PanedWindow(self.mainFrame, orient=tk.HORIZONTAL)
-        self.mainWindow.config(borderwidth=5, handlesize=15, showhandle=1, opaqueresize=1, width=250)
-        self.mainWindow.pack(fill=tk.BOTH, expand=1)
-
-        # Left side (Unscanned RMAS)
-        self.RMAFrameLeft = tk.Frame(self.mainWindow)  # select of names
-        self.scrollL = tk.Scrollbar(self.RMAFrameLeft, orient=tk.VERTICAL)
-        self.RMAListBoxL = tk.Listbox(self.RMAFrameLeft, yscrollcommand=self.scrollL.set, height=6,
-                                      activestyle='dotbox')
-        self.scrollL.config(command=self.RMAListBoxL.yview)
-        self.scrollL.pack(side=tk.RIGHT, fill=tk.Y)
-        tk.Label(self.RMAFrameLeft, text="Unchecked RMAs").pack(side=tk.TOP, fill=tk.X)
-        self.RMAListBoxL.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
-        self.RMAListBoxL.bind('<<ListboxSelect>>', self.onselectL)
-        self.RMAListBoxL.bind('<Double-Button-1>', self.openTicket)
-
-        # Not Recieved RMAs
-        self.RMAFrame2 = tk.Frame(self.mainWindow)  # select of names
-        self.scroll2 = tk.Scrollbar(self.RMAFrame2, orient=tk.VERTICAL)
-        self.RMAListBox2 = tk.Listbox(self.RMAFrame2, yscrollcommand=self.scroll2.set, height=6, activestyle='dotbox')
-        self.scroll2.config(command=self.RMAListBox2.yview)
-        self.scroll2.pack(side=tk.RIGHT, fill=tk.Y)
-        tk.Label(self.RMAFrame2, text="Outstanding RMAs").pack(side=tk.TOP, fill=tk.X)
-        self.RMAListBox2.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
-        #self.RMAListBox2.bind('<<ListboxSelect>>', self.onselect2)
-        self.RMAListBox2.bind('<Double-Button-1>', self.openTicket)
-        #self.RMAListBox2.bind('<Button-3>', self.onselectVis)
-
-        #Right side (Scanned RMAS)
-        self.RMAFrameRight = tk.Frame(self.mainWindow)  # select of names
-        self.scrollR = tk.Scrollbar(self.RMAFrameRight, orient=tk.VERTICAL)
-        self.RMAListBoxR = tk.Listbox(self.RMAFrameRight, yscrollcommand=self.scrollR.set, height=6,
-                                      activestyle='dotbox')
-        self.scrollR.config(command=self.RMAListBoxR.yview)
-        self.scrollR.pack(side=tk.RIGHT, fill=tk.Y)
-        tk.Label(self.RMAFrameRight, text="Open tickets with shipped RMAs").pack(side=tk.TOP, fill=tk.X)
-        self.RMAListBoxR.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
-        self.RMAListBoxR.bind('<<ListboxSelect>>', self.onselectR)
-        self.RMAListBoxR.bind('<Double-Button-1>', self.openTicket)
-        self.RMAListBoxR.bind('<Button-3>', self.onselectVis)
-        self.RMALockR = Lock()
-
-
-
-        #Add to Panes
-        self.mainWindow.add(self.RMAFrameLeft)
-        self.mainWindow.add(self.RMAFrame2)
-        self.mainWindow.add(self.RMAFrameRight)
-        self.RMAFrameLeft.pack_propagate(0)
-        self.RMAFrameLeft.config(width=300)
-        self.RMAFrame2.pack_propagate(0)
-        self.RMAFrame2.config(width=300)
-        self.RMALock2 = Lock()
-        self.RMALockL = Lock()
-
-        self.RMAThread = RMAstripper.getRMAs(self.startRMABar, self.status, self)  # the RMA getting thread
-        self.startRMA.config(command=self.startGetRMA)
-        self.RMALatestButton.config(command=self.shortcutRMA)
-        self.fileMenu.add_command(label="Open", command=self.getFileName)
-        self.RMAfileButton.config(command=self.getFileName)
-        #self.RMAFrame.pack(fill=tk.BOTH,side="left",expand=1)
-        #self.start()
-        self.RMAlist = {}
 
     def launchPutty(self):
         self.putty.start()
@@ -385,7 +285,6 @@ class Window(Thread):
         self.status["text"] = text
         self.status["bg"] = "SystemButtonFace"
 
-    """
 
     def onQuit(self):
         print "User aborted, quitting."
