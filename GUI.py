@@ -3,9 +3,6 @@ __author__ = 'boh01'
 from threading import Thread
 import os
 import Tkinter as tk
-import ttk
-import tkFileDialog
-from threading import Lock
 
 
 class Window(Thread):
@@ -13,25 +10,53 @@ class Window(Thread):
         Thread.__init__(self)
 
         self.window = tk.Tk()  # Init
-        self.window.geometry("900x500+300+300")
+        self.window.geometry("400x500+300+300")
         self.window.title("Fujifilm Dimatix File Index Database - Ben Holleran April 2014")
         self.window.protocol("WM_DELETE_WINDOW", self.onQuit)
+
+        # ################ Menu
 
         self.menu = tk.Menu(self.window)
         self.window.config(menu=self.menu)
         self.file_menu = tk.Menu(self.menu)
-        self.menu.add_cascade(label="File",menu=self.file_menu)
+        self.menu.add_cascade(label="File", menu=self.file_menu)
         self.file_menu.add_command(label="Exit", command=self.window.quit)
 
         self.edit_menu = tk.Menu(self.menu)
-        self.menu.add_cascade(label="Edit",menu=self.edit_menu)
+        self.menu.add_cascade(label="Edit", menu=self.edit_menu)
 
         self.help_menu = tk.Menu(self.menu)
-        self.menu.add_cascade(label="Help",menu=self.help_menu)
+        self.menu.add_cascade(label="Help", menu=self.help_menu)
+        self.help_menu.add_command(label="About")  # TODO add an about window here.
+
+        ################# Scan
+
+        self.scan_frame = tk.Frame(self.window)
+        self.scan_frame.config()
+        self.scan_button = tk.Button(self.scan_frame, text="Scan")
+        self.scan_button.pack(side=tk.LEFT)
+        self.scan_text = tk.Entry(self.scan_frame, font="courier 13")
+        self.scan_text.config(width=300)
+        self.scan_browse = tk.Button(self.scan_frame, text="Browse")
+        self.scan_browse.pack(side=tk.RIGHT)
+        self.scan_text.pack()
+        self.scan_frame.pack(fill=tk.X)
+
+        self.scan_status_frame = tk.Frame(self.window)
+        self.scan_status_frame.config(relief=tk.GROOVE)
+        self.scan_status = tk.Label(self.scan_status_frame, text="Status:", justify=tk.LEFT)
+        self.scan_status.pack()
+        self.scan_status_frame.pack(fill=tk.X)
 
 
+        ################# Search
 
-
+        self.search_frame = tk.Frame(self.window)
+        self.search_frame.config(borderwidth=4, relief=tk.GROOVE)
+        self.search_button = tk.Button(self.search_frame, text="Search")
+        self.search_text = tk.Entry(self.search_frame)
+        self.search_button.pack()
+        self.search_frame.pack()
 
         """
         self.mainFrame = tk.Frame(self.window)
@@ -329,7 +354,7 @@ class Window(Thread):
     def onQuit(self):
         print "User aborted, quitting."
         # self.RMAThread.interrupt_main()
-        #self.VisThread.interrupt_main()
+        # self.VisThread.interrupt_main()
         self.window.destroy()
 
         os._exit(1)
