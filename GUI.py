@@ -16,6 +16,24 @@ class Window(Thread):
         self.window.geometry("900x500+300+300")
         self.window.title("Fujifilm Dimatix File Index Database - Ben Holleran April 2014")
         self.window.protocol("WM_DELETE_WINDOW", self.onQuit)
+
+        self.menu = tk.Menu(self.window)
+        self.window.config(menu=self.menu)
+        self.file_menu = tk.Menu(self.menu)
+        self.menu.add_cascade(label="File",menu=self.file_menu)
+        self.file_menu.add_command(label="Exit", command=self.window.quit)
+
+        self.edit_menu = tk.Menu(self.menu)
+        self.menu.add_cascade(label="Edit",menu=self.edit_menu)
+
+        self.help_menu = tk.Menu(self.menu)
+        self.menu.add_cascade(label="Help",menu=self.help_menu)
+
+
+
+
+
+        """
         self.mainFrame = tk.Frame(self.window)
         self.mainFrame.pack(fill=tk.BOTH, expand=1)
 
@@ -306,6 +324,7 @@ class Window(Thread):
         self.status["text"] = text
         self.status["bg"] = "SystemButtonFace"
 
+    """
 
     def onQuit(self):
         print "User aborted, quitting."
@@ -317,3 +336,7 @@ class Window(Thread):
 
     def run(self):
         self.window.mainloop()
+
+
+a = Window()
+a.start()
