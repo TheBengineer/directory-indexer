@@ -29,13 +29,13 @@ class Window(Thread):
         self.menu.add_cascade(label="Help", menu=self.help_menu)
         self.help_menu.add_command(label="About")  # TODO add an about window here.
 
-        ################# Scan
+        # ################ Scan
 
         self.scan_frame = tk.Frame(self.window)
         self.scan_frame.config()
         self.scan_button = tk.Button(self.scan_frame, text="Scan")
         self.scan_button.pack(side=tk.LEFT)
-        self.scan_text = tk.Entry(self.scan_frame, font="courier 13")
+        self.scan_text = tk.Entry(self.scan_frame, font="courier 14")
         self.scan_text.config(width=300)
         self.scan_browse = tk.Button(self.scan_frame, text="Browse")
         self.scan_browse.pack(side=tk.RIGHT)
@@ -43,20 +43,52 @@ class Window(Thread):
         self.scan_frame.pack(fill=tk.X)
 
         self.scan_status_frame = tk.Frame(self.window)
-        self.scan_status_frame.config(relief=tk.GROOVE)
         self.scan_status = tk.Label(self.scan_status_frame, text="Status:", justify=tk.LEFT)
-        self.scan_status.pack()
+        self.scan_status.pack(side=tk.LEFT)
         self.scan_status_frame.pack(fill=tk.X)
 
 
-        ################# Search
+        # ################ Search
 
         self.search_frame = tk.Frame(self.window)
-        self.search_frame.config(borderwidth=4, relief=tk.GROOVE)
+        #self.search_frame.config(borderwidth=4, relief=tk.GROOVE) # layout
         self.search_button = tk.Button(self.search_frame, text="Search")
-        self.search_text = tk.Entry(self.search_frame)
-        self.search_button.pack()
-        self.search_frame.pack()
+        self.search_text = tk.Entry(self.search_frame, width=300, font="courier 14")
+        self.search_button.pack(side=tk.LEFT)
+        self.search_text.pack()
+        self.search_frame.pack(side=tk.TOP, fill=tk.X)
+
+        ################# Results
+        self.results_frame = tk.Frame(self.window)
+        self.results_frame.config(borderwidth=4, relief=tk.GROOVE)
+        self.results_options_frame = tk.Frame(self.results_frame)
+        self.open_file_button = tk.Button(self.results_options_frame, text="Open File")
+        self.open_folder_button = tk.Button(self.results_options_frame, text="Open Folder")
+        self.open_file_button.pack(side=tk.LEFT)
+        self.open_folder_button.pack(side=tk.LEFT)
+        self.results_options_frame.pack()
+        self.results_frame.pack(fill=tk.BOTH)
+
+        ################# Results Scroll Box
+
+        self.results_frame_scroll = tk.Frame(self.results_frame)  # select of names
+        self.scrollL = tk.Scrollbar(self.results_frame_scroll, orient=tk.VERTICAL)
+        self.results_listbox = tk.Listbox(self.results_frame_scroll, yscrollcommand=self.scrollL.set, height=6,
+                                      activestyle='dotbox')
+        self.scrollL.config(command=self.results_listbox.yview)
+        self.scrollL.pack(side=tk.RIGHT, fill=tk.Y)
+        tk.Label(self.results_frame_scroll, text="Files matching search").pack(side=tk.TOP, fill=tk.X)
+        self.results_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
+        self.results_listbox.bind('<<ListboxSelect>>', self.a)
+        self.results_listbox.bind('<Double-Button-1>', self.a)
+        self.results_frame_scroll.pack()
+
+        for i in range(20):
+            self.results_listbox.insert(tk.END, "asdfasdfasdf")
+
+
+    def a(self):
+        pass
 
         """
         self.mainFrame = tk.Frame(self.window)
