@@ -51,7 +51,7 @@ class Window(Thread):
         # ################ Search
 
         self.search_frame = tk.Frame(self.window)
-        #self.search_frame.config(borderwidth=4, relief=tk.GROOVE) # layout
+        # self.search_frame.config(borderwidth=4, relief=tk.GROOVE) # layout
         self.search_button = tk.Button(self.search_frame, text="Search")
         self.search_text = tk.Entry(self.search_frame, width=300, font="courier 14")
         self.search_button.pack(side=tk.LEFT)
@@ -59,6 +59,7 @@ class Window(Thread):
         self.search_frame.pack(side=tk.TOP, fill=tk.X)
 
         ################# Results
+
         self.results_frame = tk.Frame(self.window)
         self.results_frame.config(borderwidth=4, relief=tk.GROOVE)
         self.results_options_frame = tk.Frame(self.results_frame)
@@ -67,27 +68,30 @@ class Window(Thread):
         self.open_file_button.pack(side=tk.LEFT)
         self.open_folder_button.pack(side=tk.LEFT)
         self.results_options_frame.pack()
-        self.results_frame.pack(fill=tk.BOTH)
 
         ################# Results Scroll Box
 
         self.results_frame_scroll = tk.Frame(self.results_frame)  # select of names
         self.scrollL = tk.Scrollbar(self.results_frame_scroll, orient=tk.VERTICAL)
         self.results_listbox = tk.Listbox(self.results_frame_scroll, yscrollcommand=self.scrollL.set, height=6,
-                                      activestyle='dotbox')
+                                          activestyle='dotbox')
         self.scrollL.config(command=self.results_listbox.yview)
         self.scrollL.pack(side=tk.RIGHT, fill=tk.Y)
-        tk.Label(self.results_frame_scroll, text="Files matching search").pack(side=tk.TOP, fill=tk.X)
-        self.results_listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
+        self.results_label = tk.Label(self.results_frame, text="Files matching search")
+        self.results_label.pack(side=tk.TOP, fill=tk.BOTH)
+        self.results_frame_scroll.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
+        self.results_listbox.config(width=300)
+        self.results_listbox.pack(fill=tk.Y, expand=1)
         self.results_listbox.bind('<<ListboxSelect>>', self.a)
         self.results_listbox.bind('<Double-Button-1>', self.a)
-        self.results_frame_scroll.pack()
+
 
         for i in range(20):
-            self.results_listbox.insert(tk.END, "asdfasdfasdf")
+            self.results_listbox.insert(tk.END, "asdfasdfasdf " + str(i))
 
+        self.results_frame.pack(fill=tk.BOTH, expand=1)
 
-    def a(self):
+    def a(self, asdf):
         pass
 
         """
