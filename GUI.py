@@ -7,7 +7,7 @@ import tkFileDialog
 import subprocess
 
 import DirectoryDB
-import Directory
+
 
 
 class Window(Thread):
@@ -21,7 +21,7 @@ class Window(Thread):
 
         self.Directory_index_database = DirectoryDB.DirectoryDB("C:/tmp/Monster.db")
         self.Directory_index_database.start()
-        self.directory_indexer = Directory.Directory()
+        #self.directory_indexer = Directory.Directory()
 
         # ################ Menu
 
