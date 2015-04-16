@@ -121,7 +121,7 @@ class Window(Thread):
         try:
             index = int(self.results_listbox.curselection()[0])
             path = self.results_listbox.get(index)
-            print "Opening ", path
+            subprocess.Popen(path, shell=True)
         except IndexError:
             pass
 
@@ -130,14 +130,12 @@ class Window(Thread):
         try:
             index = int(self.results_listbox.curselection()[0])
             path = self.results_listbox.get(index)
-            print "Opening ", path
         except IndexError:
             pass
         if path:
             folder_path, filename = os.path.split(path)
-            command = "explorer /Select \"{0}\"".format(path)
-            print command
-            subprocess.call(command, shell=True)
+            command = "explorer /Select, \"{0}\"".format(path)
+            subprocess.Popen(command, shell=True)
 
 
     def startGetRMA(self):
