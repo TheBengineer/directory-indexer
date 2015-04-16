@@ -94,6 +94,10 @@ class Window(Thread):
 
         self.results_frame.pack(fill=tk.BOTH, expand=1)
 
+        # Tab order
+
+        self.search_text.focus()
+
     def a(self, asdf):
         pass
 
