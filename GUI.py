@@ -19,6 +19,7 @@ class Window(Thread):
         self.window.protocol("WM_DELETE_WINDOW", self.onQuit)
 
         self.scanner = DirectoryDB.DirectoryDB("C:/tmp/Monster.db")
+        self.scanner.start()
 
         # ################ Menu
 
@@ -42,6 +43,7 @@ class Window(Thread):
         self.scan_button = tk.Button(self.scan_frame, text="Scan", command=self.start_scan)
         self.scan_button.pack(side=tk.LEFT)
         self.scan_text = tk.Entry(self.scan_frame, font="courier 14")
+        self.scan_text.bind('<Return>', self.start_scan)
         self.scan_text.config(width=300)
         self.scan_browse = tk.Button(self.scan_frame, text="Browse", command=self.browse_scan_path)
         self.scan_browse.pack(side=tk.RIGHT)
@@ -101,9 +103,10 @@ class Window(Thread):
     def a(self, asdf):
         pass
 
-    def start_scan(self):
+    def start_scan(self, event=""):
         path = self.scan_text.get()
         print "Would now scan ", path
+        self.scanner.
         # TODO make this start a scan running.
 
     def browse_scan_path(self):
@@ -136,6 +139,7 @@ class Window(Thread):
             folder_path, filename = os.path.split(path)
             command = "explorer /Select, \"{0}\"".format(path)
             subprocess.Popen(command, shell=True)
+
 
 
     def startGetRMA(self):
