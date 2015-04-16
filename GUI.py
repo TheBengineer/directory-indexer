@@ -7,6 +7,7 @@ import tkFileDialog
 import subprocess
 
 import DirectoryDB
+import Directory
 
 
 class Window(Thread):
@@ -18,8 +19,9 @@ class Window(Thread):
         self.window.title("Fujifilm Dimatix File Index Database - Ben Holleran April 2014")
         self.window.protocol("WM_DELETE_WINDOW", self.onQuit)
 
-        self.scanner = DirectoryDB.DirectoryDB("C:/tmp/Monster.db")
-        self.scanner.start()
+        self.Directory_index_database = DirectoryDB.DirectoryDB("C:/tmp/Monster.db")
+        self.Directory_index_database.start()
+        self.directory_indexer = Directory.Directory()
 
         # ################ Menu
 
@@ -40,7 +42,7 @@ class Window(Thread):
 
         self.scan_frame = tk.Frame(self.window)
         self.scan_frame.config()
-        self.scan_button = tk.Button(self.scan_frame, text="Scan", command=self.start_scan)
+        self.scan_button = tk.Button(self.scan_frame, text="Index", command=self.start_scan)
         self.scan_button.pack(side=tk.LEFT)
         self.scan_text = tk.Entry(self.scan_frame, font="courier 14")
         self.scan_text.bind('<Return>', self.start_scan)
@@ -92,7 +94,7 @@ class Window(Thread):
         self.results_listbox.config(width=300)
         self.results_listbox.pack(fill=tk.Y, expand=1)
         # self.results_listbox.bind('<<ListboxSelect>>', self.a) # No single click action needed
-        self.results_listbox.bind('<Double-Button-1>', self.a)
+        self.results_listbox.bind('<Double-Button-1>', self.open_folder)
 
         self.results_frame.pack(fill=tk.BOTH, expand=1)
 
@@ -106,7 +108,6 @@ class Window(Thread):
     def start_scan(self, event=""):
         path = self.scan_text.get()
         print "Would now scan ", path
-        self.scanner.
         # TODO make this start a scan running.
 
     def browse_scan_path(self):
@@ -115,7 +116,7 @@ class Window(Thread):
 
     def search(self, event=""):
         search_text = self.search_text.get()
-        results = self.scanner.get_folders("%" + search_text + "%")
+        results = self.Directory_index_database.get_folders("%" + search_text + "%")
         self.results_listbox.delete(0, tk.END)
         for result in results:
             self.results_listbox.insert(0, os.path.join(result[0], result[1]))
@@ -128,7 +129,7 @@ class Window(Thread):
         except IndexError:
             pass
 
-    def open_folder(self):
+    def open_folder(self, event=""):
         path = ""
         try:
             index = int(self.results_listbox.curselection()[0])
