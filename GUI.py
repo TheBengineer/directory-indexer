@@ -86,18 +86,20 @@ class Window(Thread):
 
         self.results_frame_scroll = tk.Frame(self.results_frame)  # select of names
         self.scrollL = tk.Scrollbar(self.results_frame_scroll, orient=tk.VERTICAL)
-        self.results_listbox = tk.Listbox(self.results_frame_scroll, yscrollcommand=self.scrollL.set, height=6,
+        self.folders_listbox = tk.Listbox(self.results_frame_scroll, yscrollcommand=self.scrollL.set, height=6,
                                           activestyle='dotbox')
-        self.scrollL.config(command=self.results_listbox.yview)
+        self.files_listbox = tk.Listbox(self.results_frame_scroll, yscrollcommand=self.scrollL.set, height=6,
+                                          activestyle='dotbox')
+        self.scrollL.config(command=self.folders_listbox.yview)
         self.scrollL.pack(side=tk.RIGHT, fill=tk.Y)
         self.results_label = tk.Label(self.results_frame, text="Files matching search")
         self.results_label.pack(side=tk.TOP, fill=tk.BOTH)
         self.results_frame_scroll.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
-        self.results_listbox.config(width=300)
-        self.results_listbox.pack(fill=tk.Y, expand=1)
+        self.folders_listbox.config(width=300)
+        self.folders_listbox.pack(fill=tk.Y, expand=1)
         # self.results_listbox.bind('<<ListboxSelect>>', self.a) # No single click action needed
-        self.results_listbox.bind('<Double-Button-1>', self.open_file)
-        self.results_listbox.bind('<Button-3>', self.open_folder)
+        self.folders_listbox.bind('<Double-Button-1>', self.open_file)
+        self.folders_listbox.bind('<Button-3>', self.open_folder)
 
         self.results_frame.pack(fill=tk.BOTH, expand=1)
 
@@ -122,17 +124,17 @@ class Window(Thread):
     def search(self, event=""):
         search_text = self.search_text.get()
         results = self.scanner.directory_database.get_folders("%" + search_text + "%")
-        self.results_listbox.delete(0, tk.END)
+        self.folders_listbox.delete(0, tk.END)
         #max_len = max([max(sub[1]) for sub in results])
         #max_to_use = min(max_len, 60)
         for result in results:
             text = os.path.join(result[0], result[1])
-            self.results_listbox.insert(0, text)
+            self.folders_listbox.insert(0, text)
 
     def open_file(self, event=""):
         try:
-            index = int(self.results_listbox.curselection()[0])
-            path = self.results_listbox.get(index)
+            index = int(self.folders_listbox.curselection()[0])
+            path = self.folders_listbox.get(index)
             subprocess.Popen(path, shell=True)
         except IndexError:
             pass
@@ -140,8 +142,8 @@ class Window(Thread):
     def open_folder(self, event=""):
         path = ""
         try:
-            index = int(self.results_listbox.curselection()[0])
-            path = self.results_listbox.get(index)
+            index = int(self.folders_listbox.curselection()[0])
+            path = self.folders_listbox.get(index)
         except IndexError:
             pass
         if path:
