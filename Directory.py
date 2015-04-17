@@ -1,19 +1,19 @@
 __author__ = 'Wild_Doogy'
-import os, time,datetime
+import os
+import time
+import datetime
 import gc
-
-from multiprocessing import Pool
 import Queue
 
 
-gc.disable()
-
+gc.disable()  # about to play with 200MB+ data structure. No GC please.
 
 
 class Directory(object):
     """
     This class holds a directory in memory, all the files it has, and a dictionary of the directories it has under it.
     """
+
     def __init__(self, path, timeUpdated, DirDict):
         """
 
@@ -44,15 +44,15 @@ class Directory(object):
                 else:
                     break
             for i in paths:
-                DirDict[i] = Directory(i,self.timeUpdated,DirDict)
+                DirDict[i] = Directory(i, self.timeUpdated, DirDict)
             if self.root in DirDict:
-                DirDict[self.root].dirClasses[self.path] = self # linking
+                DirDict[self.root].dirClasses[self.path] = self  # linking
             else:
                 print "Assuming", self.root, "to be the global root"
         else:
             print "Assuming", self.root, "to be the global root because there are no slashes"
 
-    def printFiles(self, thread_pool,  recursive=True):
+    def printFiles(self, thread_pool, recursive=True):
         """
         Prints the files of this folder, and all subfolders recursively depending on the flag
         :param recursive: If this is true, then all files are printed recursively. Defaults to true
@@ -62,7 +62,7 @@ class Directory(object):
         if self.scanned == 0:
             self.update(thread_pool)
         for i in self.files:
-            print self.path+"\\"+i
+            print self.path + "\\" + i
         if recursive:
             for i in self.dirClasses:
                 self.dirClasses[i].printFiles(thread_pool)
@@ -80,12 +80,12 @@ class Directory(object):
             self.update(thread_pool)
         self.files.sort()
         for i in self.files:
-            mfile.write("\""+self.path+"\",\""+i+"\"\n")
+            mfile.write("\"" + self.path + "\",\"" + i + "\"\n")
         sortedKeys = self.dirClasses.keys()
         sortedKeys.sort()
         if recursive:
             for i in sortedKeys:
-               self.dirClasses[i].writeFiles(mfile, thread_pool)
+                self.dirClasses[i].writeFiles(mfile, thread_pool)
 
     def markLower(self):
         """
@@ -96,17 +96,18 @@ class Directory(object):
             self.dirClasses[i].markLower()
         self.scanned = 1
 
-    def delLower(self):
+    def delLower(self, DB):
         """
         Breaks the links associating this class with it's subdirectories. This is used when a folder does not exist.
         :return: Does not return anything
         """
         # for i in self.dirClasses:  # No need to go recursive. only break reference
-        #    self.dirClasses[i].delLower()
+        # self.dirClasses[i].delLower()
         self.dirClasses = {}
+        DB.del_folder(self.path)
         # del self.DirectoryDictionary[self.path]
 
-    def update(self, thread_pool, recursive=True):
+    def update(self, thread_pool, DB, recursive=True):
         """
         Where the real magic happens. This is used to refresh the files and folder in a directory. Recursive by default.
         :param thread_pool: A threaded pool to parallelize the update function
@@ -114,51 +115,80 @@ class Directory(object):
         :type thread_pool.thread_lock: multiprocessing.Pool
         :type thread_pool.messages: Queue.Queue
         :type thread_pool.thread_count: int
+        :type DB: DirectoryDB.DirectoryDB
         :param recursive: Flag for recursion
         :type recursive: bool
         :return: Does not return anything.
 
         """
-        import  scandir as myScandir
+        thread_pool.messages.put(
+            "Processing " + str(self.path) + " Folder Time:" + str(self.timeUpdated) + " Now:" + str(time.time()))
+        import scandir as myScandir
+
         thread_pool.thread_lock.acquire()
         thread_pool.thread_count += 1
         thread_pool.thread_lock.release()
         if os.path.isdir(self.path):
-            if datetime.datetime.fromtimestamp(os.path.getmtime(self.path)) > self.timeUpdated:
+            if type(self.timeUpdated) == "date":
+                self.timeUpdated = 0.0
+                print "fixed"
+            if os.path.getmtime(self.path) > self.timeUpdated:
+                thread_pool.messages.put("Updating " + str(self.path))
                 # Needs an update
-                thread_pool.messages.put("Updating "+str(self.path))
-                (pathS, directoriesS , filesS) = (0,0,0)
+                (pathS, directoriesS, filesS) = ([], [], [])
                 for (pathS, directoriesS, filesS) in myScandir.walk(self.path):
                     break
                 if filesS:
                     self.files = filesS
                 if directoriesS:
                     self.directories = directoriesS
-                for folder in self.directories:
-                    fullfolder = os.path.join(self.path, folder)
-                    if fullfolder not in self.dirClasses:
-                        tmpDir = Directory(fullfolder, datetime.datetime(1900, 1, 1), self.DirectoryDictionary)
-                        self.DirectoryDictionary[fullfolder] = tmpDir
-                        self.dirClasses[fullfolder] = tmpDir
-
-                if recursive:
-                    for i in self.dirClasses:
-                        thread_pool.apply_async(self.dirClasses[i].update, args=(thread_pool,))
             else:
-                thread_pool.messages.put("Path is all up to date: "+str(self.path))
+                thread_pool.messages.put("Path is all up to date: " + str(self.path))
                 self.markLower()
+            for folder in self.directories:
+                fullfolder = os.path.join(self.path, folder)
+                if fullfolder not in self.dirClasses:
+                    tmpDir = Directory(fullfolder, 0.0, self.DirectoryDictionary)
+                    self.DirectoryDictionary[fullfolder] = tmpDir
+                    self.dirClasses[fullfolder] = tmpDir
+            thread_pool.messages.put("Writing " + str(self.path))
+            for f in self.files:
+                DB.add_fileB(self.path, f)
+            if recursive:
+                for i in self.dirClasses:
+                    thread_pool.apply_async(self.dirClasses[i].update, args=(thread_pool, DB,))
         else:
-            thread_pool.messages.put("Detected deleted path: "+str(self.path))
-            self.delLower()
+            thread_pool.messages.put("Detected deleted path: " + str(self.path))
+            self.delLower(DB)
         self.scanned = 1
-        self.timeUpdated = datetime.date.fromtimestamp(time.time())
+        self.timeUpdated = time.time()
         thread_pool.thread_lock.acquire()
         thread_pool.thread_count -= 1
         thread_pool.thread_lock.release()
 
 
+    def writeFilesDB(self, thread_pool, DB, recursive=True, verify=False):
+        """
+        Writes the files in this directory to the provided Database object. Recursive can be turned off.
+        :param thread_pool: A threaded pool to parallelize the update function
+        :type thread_pool: Pool
+        :param DB: A Database object where the files names will be stored
+        :type DB: DirectoryDB.DirectoryDB
+        :param recursive: Flag for recursion
+        :type recursive: bool
+        :return: does not return anything
+        """
+        if verify:
+            if self.scanned == 0:
+                self.update(thread_pool, DB)
+        for i in self.files:
+            DB.add_fileB(self.path, i)
+        if recursive:
+            for i in self.dirClasses:
+                self.dirClasses[i].writeFilesDB(thread_pool, DB)
 
-def importOldScan(oldScanFile,tmpDirectoryDictionary):
+
+def importOldScanCSV(oldScanFile, tmpDirectoryDictionary):
     """
     Used to import a .csv file generated from the last scan.
     :param oldScanFile: The path to the .csv file
@@ -168,6 +198,7 @@ def importOldScan(oldScanFile,tmpDirectoryDictionary):
     :return: Does not return anything.
     """
     import csv
+
     print "Attempting to import old Database"
     try:
         with open(oldScanFile, 'rb') as csvfile:
@@ -179,7 +210,7 @@ def importOldScan(oldScanFile,tmpDirectoryDictionary):
                 print "Existing database file is empty."
                 return
             for row in spamreader:
-                if spamreader.line_num%10000 == 0:
+                if spamreader.line_num % 10000 == 0:
                     print "reading line:", spamreader.line_num
                 path = row[0].strip("\"")
                 mfile = row[1].strip("\"")
@@ -191,6 +222,8 @@ def importOldScan(oldScanFile,tmpDirectoryDictionary):
     except IOError:
         print "Could not read existing database. Scanning from scratch."
         print oldScanFile
+
+
 
 
 

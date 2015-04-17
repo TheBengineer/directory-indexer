@@ -2,3 +2,5 @@
 DB.csv
 DB_2_2.csv
 DB.csv.backup
+*.pyc
+scandir/
