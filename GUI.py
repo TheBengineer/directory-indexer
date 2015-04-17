@@ -110,7 +110,10 @@ class Window(Thread):
 
     def start_scan(self, event=""):
         path = self.scan_text.get()
-        self.sca
+        if os.path.isdir(path):
+            self.scanner.scan_dir(path)
+        else:
+            print "Path does not exist for scanning:", path
 
     def browse_scan_path(self):
         fullpath = tkFileDialog.askdirectory(initialdir="C:")
