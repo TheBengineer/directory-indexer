@@ -5,6 +5,7 @@ from multiprocessing.dummy import Pool as ThreadPool
 from threading import Lock
 
 from Directory import *
+import Scanner
 import DirectoryDB
 import GUI
 
@@ -21,8 +22,12 @@ def backup_db(pathToDB):
 
 
 if __name__ == '__main__':
+    scanner = Scanner.Scanner()
+    scanner.start()
     gui = GUI.Window()
     gui.start()
+
+
     # FolderToScan = "M:\\Drawings" # CHANGE this to whatever you want to. Just remember to use double slashes
     FolderToScan = "M:\\Projects"
     #FolderToScan = "C:\\tmp"
