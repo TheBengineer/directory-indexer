@@ -22,8 +22,8 @@ class Window(Thread):
         self.window.title("Fujifilm Dimatix File Index Database - Ben Holleran April 2014")
         self.window.protocol("WM_DELETE_WINDOW", self.onQuit)
 
-        self.Directory_index_database = DirectoryDB.DirectoryDB("C:/tmp/Monster.db")
-        self.Directory_index_database.start()
+        #self.Directory_index_database = DirectoryDB.DirectoryDB("C:/tmp/Monster.db")
+        #self.Directory_index_database.start()
         # self.directory_indexer = Directory.Directory()
 
         # ################ Menu
@@ -97,7 +97,8 @@ class Window(Thread):
         self.results_listbox.config(width=300)
         self.results_listbox.pack(fill=tk.Y, expand=1)
         # self.results_listbox.bind('<<ListboxSelect>>', self.a) # No single click action needed
-        self.results_listbox.bind('<Double-Button-1>', self.open_folder)
+        self.results_listbox.bind('<Double-Button-1>', self.open_file)
+        self.results_listbox.bind('<Button-3>', self.open_folder)
 
         self.results_frame.pack(fill=tk.BOTH, expand=1)
 
@@ -121,12 +122,12 @@ class Window(Thread):
 
     def search(self, event=""):
         search_text = self.search_text.get()
-        results = self.Directory_index_database.get_folders("%" + search_text + "%")
+        results = self.scanner.directory_database.get_folders("%" + search_text + "%")
         self.results_listbox.delete(0, tk.END)
         for result in results:
             self.results_listbox.insert(0, os.path.join(result[0], result[1]))
 
-    def open_file(self):
+    def open_file(self, event=""):
         try:
             index = int(self.results_listbox.curselection()[0])
             path = self.results_listbox.get(index)
@@ -149,7 +150,7 @@ class Window(Thread):
 
     def onQuit(self):
         print "User aborted, quitting."
-        self.Directory_index_database.go = 0
+        self.scanner.directory_database.go = 0
         self.window.destroy()
         os._exit(1)
 
