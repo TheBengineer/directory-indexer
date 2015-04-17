@@ -7,8 +7,10 @@ from multiprocessing.dummy import Pool as ThreadPool
 from threading import Lock
 import Queue
 
+# Needed for backup
+import datetime, shutil
+
 import os, time
-import datetime, shutil # Needed for backup
 
 import DirectoryDB
 import Directory
@@ -30,8 +32,7 @@ class Scanner(Thread):
 
         self.importOldScanFromDB(self.directory_database, self.directory_dictionary)
 
-        print self.directory_dictionary
-
+        self.go = 1
 
 
     def init_database(self):
@@ -63,20 +64,27 @@ class Scanner(Thread):
         # TODO need to create a config file
         pass
 
-
-    def load_database(self):
-        pass
-
     def run(self):
-        pass
+        while self.go:
+            while self.update_pool.thread_count > 0:
+                while not self.update_pool.messages.empty():
+                    print self.update_pool.messages.get()
+                time.sleep(.1)
+            while not self.update_pool.messages.empty():
+                print self.update_pool.messages.get()
+            time.sleep(.1) # Poll
+        self.update_pool.close()
+        self.update_pool.join()
+        self.directory_database.go = 0
 
     def scan_dir(self, folder_to_scan):
         if not os.path.isdir(folder_to_scan):  # Make sure the folder exists
             print "Cannot access the folder to be scanned:", folder_to_scan
-            raw_input("Press enter to exit")
-            exit()
         else:
-            pass
+            self.directory_dictionary[folder_to_scan] = Directory.Directory(folder_to_scan, 0.0,
+                                                                            self.directory_dictionary)  # Create Root and reset time.
+            self.update_pool.apply_async(self.directory_dictionary[folder_to_scan].update,
+                                         args=(self.update_pool, self.directory_database,))  # Go. Scan. Be Free.
 
     def backup_db(self, pathToDB):
         try:

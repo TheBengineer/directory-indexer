@@ -9,7 +9,6 @@ import subprocess
 import DirectoryDB
 
 
-
 class Window(Thread):
     def __init__(self):
         Thread.__init__(self)
@@ -21,7 +20,7 @@ class Window(Thread):
 
         self.Directory_index_database = DirectoryDB.DirectoryDB("C:/tmp/Monster.db")
         self.Directory_index_database.start()
-        #self.directory_indexer = Directory.Directory()
+        # self.directory_indexer = Directory.Directory()
 
         # ################ Menu
 
@@ -142,198 +141,11 @@ class Window(Thread):
             subprocess.Popen(command, shell=True)
 
 
-
-    def startGetRMA(self):
-        self.RMAThread.state = 0
-        self.RMAThread.go = 1
-        try:
-            self.RMAThread.start()
-        except RuntimeError:
-            self.RMAThread.go = 0
-            self.RMAThread = RMAstripper.getRMAs(self.startRMABar, self.status, self)  # the RMA getting thread
-            self.RMAThread.state = 0
-            self.RMAThread.substate = 0
-            self.RMAThread.go = 1
-
-        self.startRMA.config(text="Use latest RMA file", command=self.stopGetRMA)
-
-    def getFileName(self):
-        fullpath = tkFileDialog.askopenfilename(initialdir=self.RMAThread.DLpath,
-                                                filetypes=(("Comma Separated Values", ".csv"), ("All Files", "*.*")))
-        path, filename = os.path.split(fullpath)
-        if filename != "":
-            self.status["text"] = "Status: Using " + filename
-            self.RMAThread.DLpath = path
-            self.RMAThread.ticketFN = filename
-            self.RMAThread.state = 3
-            self.RMAThread.gp = 1
-            try:
-                self.RMAThread.start()
-            except RuntimeError:
-                self.RMAThread.go = 0
-                self.RMAThread = RMAstripper.getRMAs(self.startRMABar, self.status, self)  # the RMA getting thread
-                self.status["text"] = "Status: Using " + filename
-                self.RMAThread.DLpath = path
-                self.RMAThread.ticketFN = filename
-                self.RMAThread.state = 3
-                self.RMAThread.go = 1
-                self.RMAThread.start()
-
-    def shortcutRMA(self):
-        self.RMAThread.state = 2
-        self.RMAThread.go = 1
-        try:
-            self.RMAThread.start()
-        except RuntimeError:
-            self.RMAThread.go = 0
-            self.RMAThread = RMAstripper.getRMAs(self.startRMABar, self.status, self)  # the RMA getting thread
-            self.RMAThread.state = 2
-            self.RMAThread.go = 1
-            self.RMAThread.start()
-
-
-    def updateLeftoutdated(self):
-        self.RMALockL.acquire()
-        self.RMAListBoxL.delete(0, tk.END)
-        for i in self.RMAlist:
-            RMA = self.RMAlist[i]
-            text = " " + str(RMA["TICKET"]) + ": " + str(RMA["RMA"]) + "  " + str(RMA["DESC"])
-            self.RMAListBoxL.insert(tk.END, text)
-        self.RMALockL.release()
-
-    def updateLeft(self):
-        self.RMALockL.acquire()
-        self.RMAListBoxL.delete(0, tk.END)
-        if len(self.VisThread.uncheckedRMANums) == 0:
-            self.RMALockL.release()
-            self.updateLeftoutdated()
-        else:
-            for i in self.VisThread.uncheckedRMANums:
-                RMA = self.VisThread.uncheckedRMANums[i]
-                text = " " + str(RMA["TICKET"]) + ": " + str(RMA["RMA"]) + "  " + str(RMA["DESC"])
-                # print "Adding to list:",text
-                self.RMAListBoxL.insert(tk.END, text)
-        self.RMALockL.release()
-
-    def updateMiddle(self):
-        self.RMALock2.acquire()
-        self.RMAListBox2.delete(0, tk.END)
-        tmp2 = self.SHaG.checkedRMANums.copy()
-        tmp = []
-        for i in tmp2:
-            tmp.append((i, tmp2[i]["CSV"][14]))
-        tmp.sort()
-        for i, j in tmp:
-            RMA = tmp2[i]
-            text = " " + str(RMA["TICKET"]) + ": " + str(RMA["RMA"]) + "  Has not been received for " + str(
-                RMA["CSV"][14]) + " days"
-            # print "Adding to list:",text
-            if RMA["RESULT"] == []:
-                self.RMAListBox2.insert(tk.END, text)
-        self.RMALock2.release()
-
-    def updateRight(self):
-        self.RMALockR.acquire()
-        self.RMAListBoxR.delete(0, tk.END)
-        for i in self.VisThread.checkedRMANums:
-            RMA = self.VisThread.checkedRMANums[i]
-            text = " " + str(RMA["TICKET"]) + ": " + str(RMA["RMA"]) + " " + str(RMA["DESC"])
-            self.RMAListBoxR.insert(tk.END, text)
-        self.RMALockR.release()
-
-    def onselectL(self, evt):
-        # Note here that Tkinter passes an event object to onselect()
-        self.RMALockR.acquire()
-        w = evt.widget
-        try:
-            index = int(w.curselection()[0])
-            value = w.get(index)
-            RMA = int(value[6:14])
-            string = str(RMA) + "-1;7;2" + ent
-            self.window.clipboard_clear()
-            self.window.clipboard_append(string)
-            self.onCopy(string)
-        except IndexError:
-            pass
-        finally:
-            self.RMALockR.release()
-
-    def onselectVis(self, evt):
-        # Note here that Tkinter passes an event object to onselect()
-        self.RMALock2.acquire()
-        w = evt.widget
-        try:
-            index = int(w.curselection()[0])
-            value = w.get(index)
-            RMA = int(value[6:14])
-            string = str(RMA) + "-1;7;2" + ent + ent
-            self.window.clipboard_clear()
-            self.window.clipboard_append(string)
-            self.onCopy(string)
-        except IndexError:
-            pass
-        finally:
-            self.RMALock2.release()
-
-    def onselectR(self, evt):
-        # Note here that Tkinter passes an event object to onselect()
-        self.RMALockR.acquire()
-        w = evt.widget
-        try:
-            index = int(w.curselection()[0])
-            value = w.get(index)
-            tk = int(value[:5])
-            RMA = int(value[6:14])
-            if self.RMAlist[RMA]["TN"] != "":
-                string = "This RMA shipped back on " + self.RMAlist[RMA]["SD"] + " via UPS.\nTracking number: " + \
-                         self.RMAlist[RMA]["TN"]
-                self.window.clipboard_clear()
-                self.window.clipboard_append(string)
-                self.onCopy(string)
-        except IndexError:
-            pass
-        finally:
-            self.RMALockR.release()
-
-
-    def openTicket(self, evt):
-        w = evt.widget
-        index = int(w.curselection()[0])
-        value = w.get(index)
-        tk = int(value[:5])
-        RMA = int(value[6:14])
-        ticket = "https://app.teamsupport.com/?TicketNumber=" + str(tk)
-        os.system("start chrome \"" + ticket + "\"")
-        if self.RMAlist[RMA]["TN"] != "":
-            string = "This RMA shipped back on " + self.RMAlist[RMA]["SD"] + " via UPS.\nTracking number: " + \
-                     self.RMAlist[RMA]["TN"]
-            self.window.clipboard_clear()
-            self.window.clipboard_append(string)
-            self.onCopy(string)
-
-    def onCopy(self, text):
-        oldText = self.status["text"]
-        text = text.rstrip()
-        self.status["text"] = "Status: Set paste buffer to: " + text
-        self.status["bg"] = "pale green"
-        self.window.after(1000, self.onUnCopy, oldText)
-
-    def onUnCopy(self, text):
-        self.status["text"] = text
-        self.status["bg"] = "SystemButtonFace"
-
-
     def onQuit(self):
         print "User aborted, quitting."
-        # self.RMAThread.interrupt_main()
-        # self.VisThread.interrupt_main()
+        self.Directory_index_database.go = 0
         self.window.destroy()
-
         os._exit(1)
 
     def run(self):
         self.window.mainloop()
-
-
-a = Window()
-a.start()
