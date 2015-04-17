@@ -73,8 +73,12 @@ class Window(Thread):
 
         # ################ Results
 
+
         self.results_frame = tk.Frame(self.window)
-        self.results_frame.config(borderwidth=4, relief=tk.GROOVE)
+        self.results_paned = tk.PanedWindow(self.results_frame, orient=tk.HORIZONTAL)
+        self.results_paned.config(borderwidth=5, handlesize=15, showhandle=1, opaqueresize=1, width=250)
+
+        self.results_paned.config(borderwidth=4, relief=tk.GROOVE)
         self.results_options_frame = tk.Frame(self.results_frame)
         self.open_file_button = tk.Button(self.results_options_frame, text="Open File", command=self.open_file)
         self.open_folder_button = tk.Button(self.results_options_frame, text="Open Folder", command=self.open_folder)
@@ -84,22 +88,37 @@ class Window(Thread):
 
         # ################ Results Scroll Box
 
-        self.results_frame_scroll = tk.Frame(self.results_frame)  # select of names
-        self.scrollL = tk.Scrollbar(self.results_frame_scroll, orient=tk.VERTICAL)
-        self.folders_listbox = tk.Listbox(self.results_frame_scroll, yscrollcommand=self.scrollL.set, height=6,
-                                          activestyle='dotbox')
-        self.files_listbox = tk.Listbox(self.results_frame_scroll, yscrollcommand=self.scrollL.set, height=6,
-                                          activestyle='dotbox')
-        self.scrollL.config(command=self.folders_listbox.yview)
+        self.results_frame_scroll_left = tk.Frame(self.results_paned)  # select of names
+        self.results_frame_scroll_right = tk.Frame(self.results_paned)  # select of names
+        self.scrollL = tk.Scrollbar(self.results_frame, orient=tk.VERTICAL, command=self.yview)
+        self.folders_listbox = tk.Listbox(self.results_frame_scroll_left, yscrollcommand=self.scrollL.set, height=6,
+                                          activestyle='dotbox', exportselection=0)
+        self.files_listbox = tk.Listbox(self.results_frame_scroll_right, yscrollcommand=self.scrollL.set, height=6,
+                                        activestyle='dotbox', exportselection=0)
         self.scrollL.pack(side=tk.RIGHT, fill=tk.Y)
         self.results_label = tk.Label(self.results_frame, text="Files matching search")
-        self.results_label.pack(side=tk.TOP, fill=tk.BOTH)
-        self.results_frame_scroll.pack(side=tk.LEFT, fill=tk.BOTH, expand=1)
+        self.results_label.pack(side=tk.TOP, fill=tk.X)
+        self.results_paned.pack(fill=tk.BOTH, expand=1)
+        self.results_paned.add(self.results_frame_scroll_right)
+        self.results_paned.add(self.results_frame_scroll_left)
+        self.results_frame_scroll_left.pack_propagate(0)
+        self.results_frame_scroll_left.config(width=300)
+        self.results_frame_scroll_right.pack_propagate(0)
+        self.results_frame_scroll_right.config(width=300)
         self.folders_listbox.config(width=300)
+        self.files_listbox.config(width=300)
+        self.files_listbox.pack(fill=tk.Y, side=tk.LEFT)
         self.folders_listbox.pack(fill=tk.Y, expand=1)
-        # self.results_listbox.bind('<<ListboxSelect>>', self.a) # No single click action needed
         self.folders_listbox.bind('<Double-Button-1>', self.open_file)
+        self.files_listbox.bind('<Double-Button-1>', self.open_file)
         self.folders_listbox.bind('<Button-3>', self.open_folder)
+        self.files_listbox.bind('<Button-3>', self.open_folder)
+        self.folders_listbox.bind('<MouseWheel>', self.on_scroll)
+        self.files_listbox.bind('<MouseWheel>', self.on_scroll)
+        #self.folders_listbox.bind('<Button-4>', self.scroll_up)
+        #self.files_listbox.bind('<Button-4>', self.scroll_up)
+        #self.folders_listbox.bind('<Button-5>', self.scroll_down)
+        #self.files_listbox.bind('<Button-5>', self.scroll_down)
 
         self.results_frame.pack(fill=tk.BOTH, expand=1)
 
@@ -108,7 +127,25 @@ class Window(Thread):
         self.search_text.focus()
 
     def a(self, asdf):
-        pass
+        print "here"
+
+
+    def yview(self, *args):
+        """connect the yview action together"""
+        self.folders_listbox.yview(*args)
+        self.files_listbox.yview(*args)
+
+    def on_scroll(self, event, delta=0):
+        self.folders_listbox.yview("scroll", -int(event.delta/10), "units")
+        self.files_listbox.yview("scroll", -int(event.delta/10), "units")
+
+    def scroll_up(self, event):
+        self.folders_listbox.yview("scroll", 1, "units")
+        self.files_listbox.yview("scroll", 1, "units")
+
+    def scroll_down(self, event):
+        self.folders_listbox.yview("scroll", -1, "units")
+        self.files_listbox.yview("scroll", -1, "units")
 
     def start_scan(self, event=""):
         path = self.scan_text.get()
@@ -125,11 +162,11 @@ class Window(Thread):
         search_text = self.search_text.get()
         results = self.scanner.directory_database.get_folders("%" + search_text + "%")
         self.folders_listbox.delete(0, tk.END)
-        #max_len = max([max(sub[1]) for sub in results])
-        #max_to_use = min(max_len, 60)
+        self.files_listbox.delete(0, tk.END)
         for result in results:
             text = os.path.join(result[0], result[1])
             self.folders_listbox.insert(0, text)
+            self.files_listbox.insert(0, result[1])
 
     def open_file(self, event=""):
         try:
