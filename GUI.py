@@ -86,9 +86,10 @@ class Window(Thread):
 
         # ################ Results Scroll Box
         self.multi_list_box = mhMultiListBox.MultiListbox(self.results_frame, (('File', 170),
-                                                              ('Type', 70),
-                                                              ('Path', 400)), height=20, command=self.open_file, commandRC=self.open_folder)
-        #self.results_options_frame.pack()
+                                                                               ('Type', 70),
+                                                                               ('Path', 400)), height=20,
+                                                          command=self.open_file, commandRC=self.open_folder)
+        # self.results_options_frame.pack()
 
         #self.results_label.pack(side=tk.TOP, fill=tk.X)
         self.multi_list_box.pack(expand=tk.YES, fill=tk.BOTH)
@@ -114,8 +115,6 @@ class Window(Thread):
         print "here"
 
 
-
-
     def start_scan(self, event=""):
         path = self.scan_text.get()
         if os.path.isdir(path):
@@ -132,7 +131,7 @@ class Window(Thread):
         results = self.scanner.directory_database.get_folders("%" + search_text + "%")
         self.multi_list_box.delete(0, tk.END)
         for result in results:
-            text = (result[1], result[1][result[1].rfind(".")+1:], os.path.join(result[0], result[1]))
+            text = (result[1], result[1][result[1].rfind(".") + 1:], os.path.join(result[0], result[1]))
             self.multi_list_box.insert(0, text)
 
     def open_file(self, event=""):
