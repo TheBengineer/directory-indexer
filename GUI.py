@@ -6,7 +6,6 @@ import Tkinter as tk
 import tkFileDialog
 import subprocess
 
-import DirectoryDB
 import Scanner
 
 
@@ -22,8 +21,8 @@ class Window(Thread):
         self.window.title("Fujifilm Dimatix File Index Database - Ben Holleran April 2014")
         self.window.protocol("WM_DELETE_WINDOW", self.onQuit)
 
-        #self.Directory_index_database = DirectoryDB.DirectoryDB("C:/tmp/Monster.db")
-        #self.Directory_index_database.start()
+        # self.Directory_index_database = DirectoryDB.DirectoryDB("C:/tmp/Monster.db")
+        # self.Directory_index_database.start()
         # self.directory_indexer = Directory.Directory()
 
         # ################ Menu
@@ -124,8 +123,11 @@ class Window(Thread):
         search_text = self.search_text.get()
         results = self.scanner.directory_database.get_folders("%" + search_text + "%")
         self.results_listbox.delete(0, tk.END)
+        #max_len = max([max(sub[1]) for sub in results])
+        #max_to_use = min(max_len, 60)
         for result in results:
-            self.results_listbox.insert(0, os.path.join(result[0], result[1]))
+            text = os.path.join(result[0], result[1])
+            self.results_listbox.insert(0, text)
 
     def open_file(self, event=""):
         try:
