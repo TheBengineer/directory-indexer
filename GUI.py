@@ -88,7 +88,7 @@ class Window(Thread):
         self.multi_list_box = mhMultiListBox.MultiListbox(self.results_frame, (('File', 170),
                                                                                ('Type', 70),
                                                                                ('Path', 400)), height=20,
-                                                          command=self.open_file, commandRC=self.open_folder)
+                                                          command=self.open_folder, commandRC=self.open_file)
         # self.results_options_frame.pack()
 
         #self.results_label.pack(side=tk.TOP, fill=tk.X)
@@ -117,6 +117,7 @@ class Window(Thread):
 
     def start_scan(self, event=""):
         path = self.scan_text.get()
+        self.scan_status["text"] = "Scanning: " + path
         if os.path.isdir(path):
             self.scanner.scan_dir(path)
         else:
@@ -131,14 +132,12 @@ class Window(Thread):
         results = self.scanner.directory_database.get_folders("%" + search_text + "%")
         self.multi_list_box.delete(0, tk.END)
         for result in results:
-            text = (result[1], result[1][result[1].rfind(".") + 1:], os.path.join(result[0], result[1]))
+            text = (result[1], result[1][result[1].rfind(".") + 1:], os.path.join(result[0], result[1]).replace("/", "\\"))
             self.multi_list_box.insert(0, text)
 
     def open_file(self, event=""):
         try:
             index = int(self.multi_list_box.curselection()[0])
-            print index
-            print self.multi_list_box.get(index)
             path = self.multi_list_box.get(index)[2]
             subprocess.Popen(path, shell=True)
         except IndexError:
