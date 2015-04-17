@@ -91,7 +91,7 @@ class MultiListbox(Frame):
     with a header of column-label.  Also takes many of the normal
     Listbox options for background, font, etc.
     """
-    def __init__(self, master, lists, command=None, **options):
+    def __init__(self, master, lists, command=None, commandRC=None, **options):
         defaults = {
             'background': None,
             'borderwidth': 2,
@@ -175,6 +175,9 @@ background=options['background'], showhandle=0, sashpad=1)
             lb.bind ('<Button-2>',  lambda e, s=self: s._button2 (e.x, e.y))
             if command:
                 lb.bind ('<Double-Button-1>', command)
+            if commandRC:
+                lb.bind ('<Button-3>', commandRC)
+
 
         sbframe = Frame (self)
         sbframe.pack (side=LEFT, fill=Y)
@@ -227,8 +230,10 @@ background=options['background'], showhandle=0, sashpad=1)
         self.delete(0,END)
 
         # refill widget
-        for row in range(rowcount):
-            self.insert(END, tableData[row])
+        #for row in range(rowcount):
+        #    self.insert(END, tableData[row])
+        for row in tableData:
+            self.insert(END, row)
 
         # toggle direction flag 
         if direction==1: direction=-1

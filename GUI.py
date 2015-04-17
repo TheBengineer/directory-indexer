@@ -76,51 +76,29 @@ class Window(Thread):
 
 
         self.results_frame = tk.Frame(self.window)
-        self.results_paned = tk.PanedWindow(self.results_frame, orient=tk.HORIZONTAL)
-        self.results_paned.config(borderwidth=5, handlesize=15, showhandle=1, opaqueresize=1, width=250)
 
-        self.results_paned.config(borderwidth=4, relief=tk.GROOVE)
         self.results_options_frame = tk.Frame(self.results_frame)
         self.open_file_button = tk.Button(self.results_options_frame, text="Open File", command=self.open_file)
         self.open_folder_button = tk.Button(self.results_options_frame, text="Open Folder", command=self.open_folder)
         self.open_file_button.pack(side=tk.LEFT)
         self.open_folder_button.pack(side=tk.LEFT)
-        self.results_options_frame.pack()
+        self.results_label = tk.Label(self.results_frame, text="Files matching search")
 
         # ################ Results Scroll Box
-        self.multi_list_box = mhMultiListBox.MultiListbox(tk, (("File", 140),
-                                                              ("Type", 50),
-                                                              ("Path", 400)))
+        self.multi_list_box = mhMultiListBox.MultiListbox(self.results_frame, (('File', 170),
+                                                              ('Type', 70),
+                                                              ('Path', 400)), height=20, command=self.open_file, commandRC=self.open_folder)
+        #self.results_options_frame.pack()
+
+        #self.results_label.pack(side=tk.TOP, fill=tk.X)
         self.multi_list_box.pack(expand=tk.YES, fill=tk.BOTH)
 
-
-        self.results_frame_scroll_left = tk.Frame(self.results_paned)  # select of names
-        self.results_frame_scroll_right = tk.Frame(self.results_paned)  # select of names
-        self.scrollL = tk.Scrollbar(self.results_frame, orient=tk.VERTICAL, command=self.yview)
-        self.folders_listbox = tk.Listbox(self.results_frame_scroll_left, yscrollcommand=self.a, height=6,
-                                          activestyle='dotbox', exportselection=0)
-        self.files_listbox = tk.Listbox(self.results_frame_scroll_right, yscrollcommand=self.a, height=6,
-                                        activestyle='dotbox', exportselection=0)
-        self.scrollL.pack(side=tk.RIGHT, fill=tk.Y)
-        self.results_label = tk.Label(self.results_frame, text="Files matching search")
-        self.results_label.pack(side=tk.TOP, fill=tk.X)
-        self.results_paned.pack(fill=tk.BOTH, expand=1)
-        self.results_paned.add(self.results_frame_scroll_right)
-        self.results_paned.add(self.results_frame_scroll_left)
-        self.results_frame_scroll_left.pack_propagate(0)
-        self.results_frame_scroll_left.config(width=300)
-        self.results_frame_scroll_right.pack_propagate(0)
-        self.results_frame_scroll_right.config(width=300)
-        self.folders_listbox.config(width=300)
-        self.files_listbox.config(width=300)
-        self.files_listbox.pack(fill=tk.Y, side=tk.LEFT)
-        self.folders_listbox.pack(fill=tk.Y, expand=1)
-        self.folders_listbox.bind('<Double-Button-1>', self.open_file)
-        self.files_listbox.bind('<Double-Button-1>', self.open_file)
-        self.folders_listbox.bind('<Button-3>', self.open_folder)
-        self.files_listbox.bind('<Button-3>', self.open_folder)
-        self.folders_listbox.bind('<MouseWheel>', self.on_scroll)
-        self.files_listbox.bind('<MouseWheel>', self.on_scroll)
+        #self.multi_list_box.colmapping['Files'].bind('<Double-Button-1>', self.open_file)
+        self.multi_list_box.bind('<Double-Button-1>', self.open_file)
+        self.multi_list_box.bind('<Button-3>', self.open_folder)
+        #self.files_listbox.bind('<Button-3>', self.open_folder)
+        #self.folders_listbox.bind('<MouseWheel>', self.on_scroll)
+        #self.files_listbox.bind('<MouseWheel>', self.on_scroll)
         # self.folders_listbox.bind('<Button-4>', self.scroll_up)
         #self.files_listbox.bind('<Button-4>', self.scroll_up)
         #self.folders_listbox.bind('<Button-5>', self.scroll_down)
@@ -136,22 +114,7 @@ class Window(Thread):
         print "here"
 
 
-    def yview(self, *args):
-        """connect the yview action together"""
-        self.folders_listbox.yview(*args)
-        self.files_listbox.yview(*args)
 
-    def on_scroll(self, event, delta=0):
-        self.folders_listbox.yview("scroll", -int(event.delta / 10), "units")
-        self.files_listbox.yview("scroll", -int(event.delta / 10), "units")
-
-    def scroll_up(self, event):
-        self.folders_listbox.yview("scroll", 1, "units")
-        self.files_listbox.yview("scroll", 1, "units")
-
-    def scroll_down(self, event):
-        self.folders_listbox.yview("scroll", -1, "units")
-        self.files_listbox.yview("scroll", -1, "units")
 
     def start_scan(self, event=""):
         path = self.scan_text.get()
@@ -167,17 +130,17 @@ class Window(Thread):
     def search(self, event=""):
         search_text = self.search_text.get()
         results = self.scanner.directory_database.get_folders("%" + search_text + "%")
-        self.folders_listbox.delete(0, tk.END)
-        self.files_listbox.delete(0, tk.END)
+        self.multi_list_box.delete(0, tk.END)
         for result in results:
-            text = os.path.join(result[0], result[1])
-            self.folders_listbox.insert(0, text)
-            self.files_listbox.insert(0, result[1])
+            text = (result[1], result[1][result[1].rfind(".")+1:], os.path.join(result[0], result[1]))
+            self.multi_list_box.insert(0, text)
 
     def open_file(self, event=""):
         try:
-            index = int(self.folders_listbox.curselection()[0])
-            path = self.folders_listbox.get(index)
+            index = int(self.multi_list_box.curselection()[0])
+            print index
+            print self.multi_list_box.get(index)
+            path = self.multi_list_box.get(index)[2]
             subprocess.Popen(path, shell=True)
         except IndexError:
             pass
@@ -185,8 +148,8 @@ class Window(Thread):
     def open_folder(self, event=""):
         path = ""
         try:
-            index = int(self.folders_listbox.curselection()[0])
-            path = self.folders_listbox.get(index)
+            index = int(self.multi_list_box.curselection()[0])
+            path = self.multi_list_box.get(index)[2]
         except IndexError:
             pass
         if path:
