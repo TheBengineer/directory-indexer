@@ -6,7 +6,7 @@ import gc
 import Queue
 
 
-gc.disable()
+gc.disable() # about to play with 200MB+ data structure. No GC please.
 
 
 class Directory(object):
@@ -186,7 +186,7 @@ class Directory(object):
                 self.dirClasses[i].writeFilesDB(thread_pool, DB)
 
 
-def importOldScan(oldScanFile, tmpDirectoryDictionary):
+def importOldScanCSV(oldScanFile, tmpDirectoryDictionary):
     """
     Used to import a .csv file generated from the last scan.
     :param oldScanFile: The path to the .csv file
@@ -222,28 +222,6 @@ def importOldScan(oldScanFile, tmpDirectoryDictionary):
         print oldScanFile
 
 
-def importOldScanFromDB(DB, tmpDirectoryDictionary):
-    """
-    Used to import from a sqlite file generated from the last scan.
-    :param DB: The path to the .csv file
-    :type DB: DirectoryDB.DirectoryDB
-    :param tmpDirectoryDictionary: A dictionary to hold all the imported Directory classes
-    :type tmpDirectoryDictionary: dict of Directory
-    :return: Does not return anything.
-    """
-    print "Attempting to import old Database from", DB.file_path
-    data = DB.dump()
-    for f in data:
-        path = f[0].strip("\"")
-        mfile = f[1].strip("\"")
-        s_time = 0.0
-        if f[2]:
-            s_time = f[2]
-        if path not in tmpDirectoryDictionary:
-            tmpDirectoryDictionary[path] = Directory(path, s_time, tmpDirectoryDictionary)
-            tmpDirectoryDictionary[path].files.append(mfile)
-        else:
-            tmpDirectoryDictionary[path].files.append(mfile)
-    print "Done"
+
 
 

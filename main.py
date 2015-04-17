@@ -23,7 +23,6 @@ if __name__ == '__main__':
     db_file = "DB.csv"  # Will be placed next to the python file. Probably best to not run from network drive.
     DB_path = "C:\\tmp\\Monster-Projects.db"
     last_update_date = 0.0 # datetime.datetime(1990, 1, 1)
-    pathToOutputCSV = os.path.join(db_folder, db_file)
 
 
 

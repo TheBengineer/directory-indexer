@@ -11,13 +11,15 @@ import os, time
 import datetime, shutil # Needed for backup
 
 import DirectoryDB
+import Directory
 
 
 class Scanner(Thread):
     def __init__(self):
         Thread.__init__(self)
+        """ :type self.directory_dictionary: dict of Directory.Directory"""
         self.directory_dictionary = {}
-        self.init_db()
+        self.directory_database = self.init_database()
         self.start_time = time.time()
 
         self.number_of_threads = 16
@@ -26,20 +28,25 @@ class Scanner(Thread):
         self.update_pool.thread_lock = Lock()
         self.update_pool.messages = Queue.Queue()
 
+        self.importOldScanFromDB(self.directory_database, self.directory_dictionary)
+
+        print self.directory_dictionary
 
 
-    def init_db(self):
-        FindIt = self.create_FindIt()
+
+    def init_database(self):
+        FindIt = self.create_FindIt_folder()
         if not FindIt:
             print "Could not create the FindIt directory. Will now crash."
             quit()
         database_filename = os.path.join(FindIt, "FindIt.db")
         self.backup_db(database_filename)
-        self.directory_database = DirectoryDB.DirectoryDB(database_filename)
-        self.directory_database.start()
+        directory_database = DirectoryDB.DirectoryDB(database_filename)
+        directory_database.start()
+        return directory_database
 
 
-    def create_FindIt(self):
+    def create_FindIt_folder(self):
         appdata = os.getenv('APPDATA')
         FindIt = os.path.join(appdata, "FindIt")
         if os.path.isdir(FindIt):
@@ -82,4 +89,27 @@ class Scanner(Thread):
             print "Output file not backed up. File may not exist, permissions, etc. This might be a problem later"
 
 
-a = Scanner()
+    def importOldScanFromDB(self, DB, tmpDirectoryDictionary):
+        """
+        Used to import from a sqlite file generated from the last scan.
+        :param DB: The path to the .csv file
+        :type DB: DirectoryDB.DirectoryDB
+        :param tmpDirectoryDictionary: A dictionary to hold all the imported Directory classes
+        :type tmpDirectoryDictionary: dict of Directory.Directory
+        :return: Does not return anything.
+        """
+        print "Attempting to import old Database from", DB.file_path
+        data = DB.dump()
+        for f in data:
+            path = f[0].strip("\"")
+            mfile = f[1].strip("\"")
+            s_time = 0.0
+            if f[2]:
+                s_time = f[2]
+            if path not in tmpDirectoryDictionary:
+                tmpDirectoryDictionary[path] = Directory.Directory(path, s_time, tmpDirectoryDictionary)
+                tmpDirectoryDictionary[path].files.append(mfile)
+            else:
+                tmpDirectoryDictionary[path].files.append(mfile)
+        print "Done Importing"
+
