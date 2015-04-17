@@ -7,6 +7,7 @@ import tkFileDialog
 import subprocess
 
 import Scanner
+import mhMultiListBox
 
 
 class Window(Thread):
@@ -87,6 +88,11 @@ class Window(Thread):
         self.results_options_frame.pack()
 
         # ################ Results Scroll Box
+        self.multi_list_box = mhMultiListBox.MultiListbox(tk, (("File", 140),
+                                                              ("Type", 50),
+                                                              ("Path", 400)))
+        self.multi_list_box.pack(expand=tk.YES, fill=tk.BOTH)
+
 
         self.results_frame_scroll_left = tk.Frame(self.results_paned)  # select of names
         self.results_frame_scroll_right = tk.Frame(self.results_paned)  # select of names
@@ -199,111 +205,6 @@ class Window(Thread):
         self.window.mainloop()
 
 
-class dual_lists():
-
-    def __init__(self, root):
-
-        self.frame = Frame(root, borderwidth=1, relief=GROOVE)
-        self.frame.pack()
-        self.frame.place(x=40, y=40)
-
-        self.scrollbar = Scrollbar(self.frame, orient=VERTICAL, command=self.OnVsb)
-        self.scrollbar.pack(side=RIGHT, fill=Y)
-
-        self.listbox1 = Listbox(self.frame, font=('Courier', 12, 'roman'),
-            width=16, height=6)
-        self.listbox1.pack(side=LEFT, fill=Y)
-
-        self.listbox2 = Listbox(self.frame, font=('Courier', 12, 'roman'),
-            width=16, height=6)
-        self.listbox2.pack(side=LEFT, fill=Y)
-
-        self.listbox1.configure(yscrollcommand=self.scrollbar.set)
-        self.listbox2.configure(yscrollcommand=self.scrollbar.set)
-
-        closeBtn = tk.Button(padx = 4, pady = 4, text = "Exit",
-            font=('Helvetica', 12), command = self.close_window)
-        closeBtn.pack()
-        closeBtn.place(x=20, y=200)
-
-        txt = 'Click on a listbox and use these keys to scroll:\n' + \
-              'Home, End, PageUp, PageDown,\n' \
-              'UpArrow, DownArrow, and the Mousewheel'
-        tk.Label(root, text=txt, font=('Helvetica', 10)).place(x=90, y=180)
-
-        for n in range(64+26, 64, -1):
-            self.listbox1.insert(0, chr(n)+'able')
-            self.listbox2.insert(0, chr(n)+'able')
-
-        self.listbox1.bind('<Up>', lambda event: self.scroll_listboxes(-1))
-        self.listbox2.bind('<Up>', lambda event: self.scroll_listboxes(-1))
-        self.listbox1.bind('<Down>', lambda event: self.scroll_listboxes(1))
-        self.listbox2.bind('<Down>', lambda event: self.scroll_listboxes(1))
-
-        self.listbox1.bind('<End>', self.end_pressed)
-        self.listbox2.bind('<End>', self.end_pressed)
-        self.listbox1.bind('<Home>', self.home_pressed)
-        self.listbox2.bind('<Home>', self.home_pressed)
-
-        self.listbox1.bind('<Next>', self.pgdown_pressed)
-        self.listbox2.bind('<Next>', self.pgdown_pressed)
-        self.listbox1.bind('<Prior>', self.pgup_pressed)
-        self.listbox2.bind('<Prior>', self.pgup_pressed)
-
-        self.listbox1.bind("<MouseWheel>", self.OnMouseWheel)
-        self.listbox2.bind("<MouseWheel>", self.OnMouseWheel)
-
-        self.listbox1.focus_set()  #set up listbox1 for immediate scrolling
-        self.listbox1.activate(0)  #first scrolling will scroll away from listbox item #1
-
-    def OnMouseWheel(self, event):
-        if event.num == 5 or event.delta == -120:
-            yFactor = 1
-        else:
-            yFactor = -1
-        self.listbox1.yview("scroll", yFactor, "units")
-        self.listbox2.yview("scroll", yFactor, "units")
-        return "break"
-
-    def OnVsb(self, *args):    #vertical scrollbar position changed
-        self.listbox1.yview(*args)
-        self.listbox2.yview(*args)
-
-    def home_pressed(self, event):
-        self.listbox1.see(0)
-        self.listbox1.activate(0)    #added
-        self.listbox2.see(0)
-        self.listbox2.activate(0)    #added
-        self.clear_sel()
-
-    def end_pressed(self, event):
-        lboxSize = self.listbox1.size()
-        self.listbox1.see(lboxSize)
-        self.listbox1.activate(lboxSize)    #added
-        self.listbox2.see(lboxSize)
-        self.listbox2.activate(lboxSize)    #added
-        self.clear_sel()
-
-    def pgup_pressed(self, event):
-        self.listbox1.yview_scroll(-(self.listbox1['height']), "units")
-        self.listbox2.yview_scroll(-(self.listbox2['height']), "units")
-        self.clear_sel()
-        return "break"
-
-    def pgdown_pressed(self, event):
-        self.listbox1.yview_scroll(self.listbox1['height'], "units")
-        self.listbox2.yview_scroll(self.listbox2['height'], "units")
-        self.clear_sel()
-        return "break"
-
-    def scroll_listboxes(self, yFactor):
-        #function runs when a listbox has focus and the Up or Down arrow keys are pressed
-        self.listbox1.yview_scroll(yFactor, "units")
-        self.listbox2.yview_scroll(yFactor, "units")
-
-    def clear_sel(self):
-        self.listbox1.selection_clear(0, tk.END)
-        self.listbox2.selection_clear(0, tk.END)
-
-    def close_window(self):
-        root.destroy()
+if __name__ == "__main__":
+    a = Window()
+    a.start()
