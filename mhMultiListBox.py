@@ -171,13 +171,14 @@ class MultiListbox(Frame):
 
             lb.bind('<B1-Motion>', lambda e, s=self: s._select(e.y))
             lb.bind('<Button-1>', lambda e, s=self: s._select(e.y))
+            lb.bind('<Button-3>', lambda e, s=self: s._select(e.y))
             lb.bind('<Leave>', lambda e: 'break')
             lb.bind('<B2-Motion>', lambda e, s=self: s._b2motion(e.x, e.y))
             lb.bind('<Button-2>', lambda e, s=self: s._button2(e.x, e.y))
             if command:
                 lb.bind('<Double-Button-1>', command)
             if commandRC:
-                lb.bind('<Button-3>', commandRC)
+                lb.bind('<Double-Button-3>', commandRC)
 
         sbframe = Frame(self)
         sbframe.pack(side=LEFT, fill=Y)
