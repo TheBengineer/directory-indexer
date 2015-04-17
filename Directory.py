@@ -6,7 +6,7 @@ import gc
 import Queue
 
 
-gc.disable() # about to play with 200MB+ data structure. No GC please.
+gc.disable()  # about to play with 200MB+ data structure. No GC please.
 
 
 class Directory(object):
@@ -121,8 +121,10 @@ class Directory(object):
         :return: Does not return anything.
 
         """
-        thread_pool.messages.put("Processing " + str(self.path)+" Folder Time:"+str(self.timeUpdated)+" Now:"+str(time.time()))
+        thread_pool.messages.put(
+            "Processing " + str(self.path) + " Folder Time:" + str(self.timeUpdated) + " Now:" + str(time.time()))
         import scandir as myScandir
+
         thread_pool.thread_lock.acquire()
         thread_pool.thread_count += 1
         thread_pool.thread_lock.release()

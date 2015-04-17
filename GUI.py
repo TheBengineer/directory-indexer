@@ -7,11 +7,15 @@ import tkFileDialog
 import subprocess
 
 import DirectoryDB
+import Scanner
 
 
 class Window(Thread):
     def __init__(self):
         Thread.__init__(self)
+
+        self.scanner = Scanner.Scanner()
+        self.scanner.start()
 
         self.window = tk.Tk()  # Init
         self.window.geometry("800x500+300+300")
@@ -106,8 +110,7 @@ class Window(Thread):
 
     def start_scan(self, event=""):
         path = self.scan_text.get()
-        print "Would now scan ", path
-        # TODO make this start a scan running.
+        self.sca
 
     def browse_scan_path(self):
         fullpath = tkFileDialog.askdirectory(initialdir="C:")

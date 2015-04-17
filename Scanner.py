@@ -72,7 +72,7 @@ class Scanner(Thread):
                 time.sleep(.1)
             while not self.update_pool.messages.empty():
                 print self.update_pool.messages.get()
-            time.sleep(.1) # Poll
+            time.sleep(.1)  # Poll
         self.update_pool.close()
         self.update_pool.join()
         self.directory_database.go = 0
