@@ -11,8 +11,8 @@ except:
 
 
 setup(
-    options = {'py2exe': {'bundle_files': 1, 'compressed': True}},
+    options = {'py2exe': {'compressed': False}},
     windows = [{'script': "main.py"}],
-    zipfile = None,
+    
 )
 
