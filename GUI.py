@@ -16,7 +16,7 @@ class Window(Thread):
 
         self.scanner = Scanner.Scanner()
         self.scanner.start()
-        self.version = "1.0.2"
+        self.version = "1.0.3"
 
         self.window = tk.Tk()  # Init
         self.window.geometry("800x500+300+300")
@@ -157,6 +157,13 @@ class Window(Thread):
             subprocess.Popen(command, shell=True)
 
     def show_version(self):
+        frmMain = tk.Tk()
+        label = tk.Label(frmMain, text="Version:\n"+self.version)
+        label.pack()
+        frmMain.mainloop()
+
+
+    def show_help(self):
         frmMain = tk.Tk()
         label = tk.Label(frmMain, text="Version:\n"+self.version)
         label.pack()

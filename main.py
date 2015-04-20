@@ -4,6 +4,8 @@ import GUI
 
 
 if __name__ == '__main__':
+    version= "1.0.3"
     gui = GUI.Window()
+    gui.version = version
     gui.start()
 
