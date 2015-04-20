@@ -13,6 +13,6 @@ except:
 setup(
     options = {'py2exe': {'compressed': False}},
     windows = [{'script': "main.py"}],
-    
+
 )
 
