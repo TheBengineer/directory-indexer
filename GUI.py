@@ -16,6 +16,7 @@ class Window(Thread):
 
         self.scanner = Scanner.Scanner()
         self.scanner.start()
+        self.version = "1.0.2"
 
         self.window = tk.Tk()  # Init
         self.window.geometry("800x500+300+300")
@@ -39,7 +40,7 @@ class Window(Thread):
 
         self.help_menu = tk.Menu(self.menu)
         self.menu.add_cascade(label="Help", menu=self.help_menu)
-        self.help_menu.add_command(label="About")  # TODO add an about window here.
+        self.help_menu.add_command(label="About", command=self.show_version)
 
         # ################ Scan
 
@@ -155,6 +156,11 @@ class Window(Thread):
             command = "explorer /Select, \"{0}\"".format(path)
             subprocess.Popen(command, shell=True)
 
+    def show_version(self):
+        frmMain = tk.Tk()
+        label = tk.Label(frmMain, text="Version:\n"+self.version)
+        label.pack()
+        frmMain.mainloop()
 
     def onQuit(self):
         print "User aborted, quitting."
