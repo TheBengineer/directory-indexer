@@ -17,11 +17,16 @@ import Directory
 
 
 class Scanner(Thread):
-    def __init__(self):
+    def __init__(self, GUI=None):
         Thread.__init__(self)
-        """ :type self.directory_dictionary: dict of Directory.Directory"""
+        """
+        :type GUI: GUI.Window
+        :return:
+        """
+
         self.directory_dictionary = {}
         self.directory_database = self.init_database()
+        """ :type self.directory_dictionary: dict of Directory.Directory"""
         self.start_time = time.time()
 
         self.number_of_threads = 16
@@ -32,7 +37,10 @@ class Scanner(Thread):
 
         self.importOldScanFromDB(self.directory_database, self.directory_dictionary)
 
+        self.GUI = GUI
+
         self.go = 1
+        self.log = ""
 
 
     def init_database(self):
@@ -68,11 +76,12 @@ class Scanner(Thread):
         while self.go:
             while self.update_pool.thread_count > 0:
                 while not self.update_pool.messages.empty():
-                    print self.update_pool.messages.get()
+                    self.log += self.update_pool.messages.get()
                 time.sleep(.1)
             while not self.update_pool.messages.empty():
-                print self.update_pool.messages.get()
+                self.log += self.update_pool.messages.get()
             time.sleep(.1)  # Poll
+            self.GUI.set_status("Done Scanning.")
         self.update_pool.close()
         self.update_pool.join()
         self.directory_database.go = 0
@@ -85,6 +94,8 @@ class Scanner(Thread):
                                                                             self.directory_dictionary)  # Create Root and reset time.
             self.update_pool.apply_async(self.directory_dictionary[folder_to_scan].update,
                                          args=(self.update_pool, self.directory_database,))  # Go. Scan. Be Free.
+            if self.GUI:
+                self.GUI.set_status("Scanning: " + folder_to_scan)
 
     def backup_db(self, pathToDB):
         try:

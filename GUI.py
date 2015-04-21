@@ -14,9 +14,9 @@ class Window(Thread):
     def __init__(self):
         Thread.__init__(self)
 
-        self.scanner = Scanner.Scanner()
+        self.scanner = Scanner.Scanner(self)
         self.scanner.start()
-        self.version = "1.0.3"
+        self.version = "Beta"
 
         self.window = tk.Tk()  # Init
         self.window.geometry("800x500+300+300")
@@ -92,7 +92,7 @@ class Window(Thread):
                                                           command=self.open_folder, commandRC=self.open_file)
         # self.results_options_frame.pack()
 
-        #self.results_label.pack(side=tk.TOP, fill=tk.X)
+        # self.results_label.pack(side=tk.TOP, fill=tk.X)
         self.multi_list_box.pack(expand=tk.YES, fill=tk.BOTH)
 
         #self.multi_list_box.colmapping['Files'].bind('<Double-Button-1>', self.open_file)
@@ -115,10 +115,12 @@ class Window(Thread):
     def a(self, asdf=0, asdf2=0):
         print "here"
 
+    def set_status(self, status):
+        self.scan_status["text"] = status
 
     def start_scan(self, event=""):
         path = self.scan_text.get()
-        self.scan_status["text"] = "Scanning: " + path
+        # self.set_status("Scanning: " + path)
         if os.path.isdir(path):
             self.scanner.scan_dir(path)
         else:
@@ -133,7 +135,8 @@ class Window(Thread):
         results = self.scanner.directory_database.get_folders("%" + search_text + "%")
         self.multi_list_box.delete(0, tk.END)
         for result in results:
-            text = (result[1], result[1][result[1].rfind(".") + 1:], os.path.join(result[0], result[1]).replace("/", "\\"))
+            text = (
+            result[1], result[1][result[1].rfind(".") + 1:], os.path.join(result[0], result[1]).replace("/", "\\"))
             self.multi_list_box.insert(0, text)
 
     def open_file(self, event=""):
@@ -158,14 +161,14 @@ class Window(Thread):
 
     def show_version(self):
         frmMain = tk.Tk()
-        label = tk.Label(frmMain, text="Version:\n"+self.version)
+        label = tk.Label(frmMain, text="Version:\n" + self.version)
         label.pack()
         frmMain.mainloop()
 
 
     def show_help(self):
         frmMain = tk.Tk()
-        label = tk.Label(frmMain, text="Version:\n"+self.version)
+        label = tk.Label(frmMain, text="Version:\n" + self.version)
         label.pack()
         frmMain.mainloop()
 
