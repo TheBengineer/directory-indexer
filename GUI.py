@@ -129,6 +129,7 @@ class Window(Thread):
 
     def browse_scan_path(self):
         fullpath = tkFileDialog.askdirectory(initialdir="C:")
+        self.scan_text.delete(0, tk.END)
         self.scan_text.insert(0, fullpath)
 
     def search(self, event=""):
