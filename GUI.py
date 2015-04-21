@@ -15,7 +15,6 @@ class Window(Thread):
         Thread.__init__(self)
 
         self.scanner = Scanner.Scanner(self)
-        self.scanner.start()
         self.version = "Beta"
 
         self.window = tk.Tk()  # Init
@@ -111,6 +110,7 @@ class Window(Thread):
         # Tab order
 
         self.search_text.focus()
+        self.scanner.start()
 
     def a(self, asdf=0, asdf2=0):
         print "here"

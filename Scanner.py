@@ -49,7 +49,7 @@ class Scanner(Thread):
             print "Could not create the FindIt directory. Will now crash."
             quit()
         database_filename = os.path.join(FindIt, "FindIt.db")
-        self.backup_db(database_filename)
+        #self.backup_db(database_filename)
         directory_database = DirectoryDB.DirectoryDB(database_filename)
         directory_database.start()
         return directory_database
