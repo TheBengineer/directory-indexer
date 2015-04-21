@@ -58,9 +58,7 @@ class Scanner(Thread):
     def create_FindIt_folder(self):
         appdata = os.getenv('APPDATA')
         FindIt = os.path.join(appdata, "FindIt")
-        if os.path.isdir(FindIt):
-            print "Yes"
-        else:
+        if not os.path.isdir(FindIt):
             os.mkdir(FindIt)
         if os.path.isdir(FindIt):
             return FindIt

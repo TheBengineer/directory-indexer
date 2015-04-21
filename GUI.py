@@ -136,7 +136,7 @@ class Window(Thread):
         self.multi_list_box.delete(0, tk.END)
         for result in results:
             text = (
-            result[1], result[1][result[1].rfind(".") + 1:], os.path.join(result[0], result[1]).replace("/", "\\"))
+            result[1], result[1][result[1].rfind(".") + 1:], os.path.join(result[0].upper(), result[1]).replace("/", "\\"))
             self.multi_list_box.insert(0, text)
 
     def open_file(self, event=""):
