@@ -34,8 +34,8 @@ class Window(Thread):
         self.menu.add_cascade(label="File", menu=self.file_menu)
         self.file_menu.add_command(label="Exit", command=self.window.quit)
 
-        #self.edit_menu = tk.Menu(self.menu)
-        #self.menu.add_cascade(label="Edit", menu=self.edit_menu)
+        # self.edit_menu = tk.Menu(self.menu)
+        # self.menu.add_cascade(label="Edit", menu=self.edit_menu)
 
         self.help_menu = tk.Menu(self.menu)
         self.menu.add_cascade(label="Help", menu=self.help_menu)
@@ -115,6 +115,10 @@ class Window(Thread):
     def a(self, asdf=0, asdf2=0):
         print "here"
 
+    def launch_tree(self):
+        self.tree_main = Tree_view(tk)
+        self.tree_main.start()
+
 
     def set_status(self, status):
         self.scan_status["text"] = status
@@ -138,7 +142,8 @@ class Window(Thread):
         self.multi_list_box.delete(0, tk.END)
         for result in results:
             text = (
-            result[1], result[1][result[1].rfind(".") + 1:].upper(), os.path.join(result[0], result[1]).replace("/", "\\"))
+                result[1], result[1][result[1].rfind(".") + 1:].upper(),
+                os.path.join(result[0], result[1]).replace("/", "\\"))
             self.multi_list_box.insert(0, text)
 
     def open_file(self, event=""):
