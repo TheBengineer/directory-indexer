@@ -139,13 +139,14 @@ class Window(Thread):
 
     def search(self, event=""):
         search_text = self.search_text.get()
-        results = self.scanner.directory_database.get_folders("%" + search_text + "%")
-        self.multi_list_box.delete(0, tk.END)
-        for result in results:
-            text = (
-                result[1], result[1][result[1].rfind(".") + 1:].upper(),
-                os.path.join(result[0], result[1]).replace("/", "\\"))
-            self.multi_list_box.insert(0, text)
+        if search_text:
+            results = self.scanner.directory_database.get_folders("%" + search_text + "%")
+            self.multi_list_box.delete(0, tk.END)
+            for result in results:
+                text = (
+                    result[1], result[1][result[1].rfind(".") + 1:].upper(),
+                    os.path.join(result[0], result[1]).replace("/", "\\"))
+                self.multi_list_box.insert(0, text)
 
     def open_file(self, event=""):
         try:
