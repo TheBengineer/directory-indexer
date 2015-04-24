@@ -59,7 +59,7 @@ class TreeView(Thread):
         print "here"
 
 
-    if __name__ == "__main__":
-        a = TreeView(tk)
-        a.start()
-        print a.limbs_dict
+if __name__ == "__main__":
+    a = TreeView(tk)
+    a.start()
+    print a.limbs_dict
