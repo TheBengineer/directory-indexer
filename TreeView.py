@@ -4,6 +4,10 @@ from threading import Thread
 
 import Tkinter as tk
 import random
+import math
+import Directory
+import time
+import os
 
 
 class TreeView(Thread):
@@ -20,15 +24,21 @@ class TreeView(Thread):
         self.canvas = tk.Canvas(self.tree_main, width=self.canvas_width, height=self.canvas_height)
         self.canvas.pack()
         self.canvas.create_line(0, 0, random.random() * 40, random.random() * 40, fill="#FF00FF")
-        self.data = {}
+        self.pile = {}
+        self.limbs_dict = {}
+        self.root = Limb("", self.limbs_dict)
         self.make_data()
 
+
     def make_data(self):
-        for i in range(random.randrange(2,5)):
-            self.make_limb(0, [])
+        for root, dirs, files in os.walk("C:\\tmp"):
+            for f in files:
+                path = os.path.join(root, f)
+                self.root.
+                new_limb = Limb(, self.limbs_dict)
 
     def make_limb(self, depth, heritage):
-        limb = Limb()
+        limb = Limb("", self.limbs_dict)
         if depth < 2:
             limbs = random.randrange(2,5)
         elif depth < 4:
@@ -44,20 +54,15 @@ class TreeView(Thread):
         for i in range(limbs):
             self.make_limb(depth+1, heritage)
 
+    def add_to_pile(self, data):
+        pass
 
     def run(self):
         self.tree_main.mainloop()
         print "here"
 
-class Limb():
-    def __init__(self, limbs, history, heritage):
-        self.heritage = heritage
-        self.limbs = limbs
-        self.history = history
-
-    def draw(self, canvas):
-        pass
 
 if __name__ == "__main__":
     a = TreeView(tk)
     a.start()
+    print a.limbs_dict
