@@ -15,6 +15,7 @@ class Limb():
         :return:
         """
         self.path = os.path.normpath(path)
+        self.path_list = self.split_path(path)
         self.limbs_dict = limbs_dict
         self.parent = parent
         self.location = (0, 0)
@@ -36,8 +37,38 @@ class Limb():
         path = os.path.normpath(path)
         dir = os.path.split(path)[0]
         dirs = self.split_path(dir)
-        me = os.path.split(self.path)[1]
+
+        if dirs[0] not in self.limbs_dict:
+            new_trunk = Limb(dirs[0], self.limbs_dict, self.limbs_dict[""])
+            self.limbs_dict[dirs[0]] = new_trunk
+        dirs_expanded =[]
+        for i, d in enumerate(dirs):
+            dirs_expanded = os.path.join(*dirs[:i])
+
+        for i, d in enumerate(dirs_expanded):
+            if d not in self.limbs_dict and i > 0:
+                print i, d, dirs, dirs[:i]
+                parent_path = dirs[0]
+                if i > 2:
+                    parent_path = os.path.join(*dirs[:i])
+                new_limb = Limb(d, self.limbs_dict, self.limbs_dict[parent_path])
+                self.limbs_dict[parent_path] = new_limb
+        else:
+            print self.limbs_dict
+            self.limbs_dict[dir].grow()
+        return
+
         print me, self.path, dirs, dir
+
+        for i, d in enumerate(self.path_list):
+            if d in dirs:
+                continue
+            else:
+                break
+        else:
+            new_limb = Limb()
+        if dirs[0] not in self.children:
+            new_branch = Limb()
         if me in dirs:
             return
         if self.path == path[:len(self.path)]:

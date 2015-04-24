@@ -25,8 +25,9 @@ class TreeView(Thread):
         self.pile = {}
         self.limbs_dict = {}
         self.root = Limb.Limb("", self.limbs_dict)
+        self.limbs_dict[""] = self.root
         self.root.location = (self.canvas_width/2.0, self.canvas_height)
-        self.angle = 270
+        self.angle = 3.14159*1.5
         self.make_data()
 
 
