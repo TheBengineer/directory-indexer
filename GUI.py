@@ -132,7 +132,8 @@ class Window(Thread):
             print "Path does not exist for scanning:", path
 
     def browse_scan_path(self):
-        fullpath = tkFileDialog.askdirectory(initialdir="C:").replace("/", "\\")
+        fullpath = tkFileDialog.askdirectory(initialdir="C:")
+        fullpath = os.path.normpath(fullpath)
         self.scan_text.delete(0, tk.END)
         self.scan_text.insert(0, fullpath)
 
