@@ -25,6 +25,8 @@ class TreeView(Thread):
         self.pile = {}
         self.limbs_dict = {}
         self.root = Limb.Limb("", self.limbs_dict)
+        self.root.location = (self.canvas_width/2.0, self.canvas_height)
+        self.angle = 270
         self.make_data()
 
 
@@ -33,6 +35,7 @@ class TreeView(Thread):
             for f in files:
                 path = os.path.join(root, f)
                 self.root.add_path(path)
+                self.root.draw(self.canvas, self, True)
 
     def make_limb(self, depth, heritage):
         limb = Limb.Limb("", self.limbs_dict)
@@ -62,4 +65,10 @@ class TreeView(Thread):
 if __name__ == "__main__":
     a = TreeView(tk)
     a.start()
-    print a.limbs_dict
+
+    def foo(root, level=0):
+        print "\t"*level, root.path
+        for i in root.children:
+            foo(root.children[i], level + 1)
+
+    #foo(a.root)
