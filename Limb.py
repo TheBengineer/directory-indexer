@@ -3,7 +3,7 @@ __author__ = 'boh01'
 import os
 import math
 import random
-
+import Tkinter as tk
 
 class Limb():
     def __init__(self, path, limbs_dict, parent=None):
@@ -22,7 +22,7 @@ class Limb():
         if self.parent:
             self.location = (parent.location[0] + (parent.length * math.cos(parent.angle)),
                              parent.location[1] + (parent.length * math.sin(parent.angle)))
-            self.angle = parent.angle + (random.random() *.2) -.1
+            self.angle = parent.angle + (random.random() *2.0) -1.0
         else:
             self.location = (0, 0)
             self.angle = 3.14159*1.5
@@ -30,9 +30,17 @@ class Limb():
         self.size = 1
         self.width = 1
         self.color = "black"
+        self.color = random.choice(["red", "orange", "green", "blue", "violet"])
         self.children = {}
 
     def draw(self, canvas, parent, recursive=False):
+        """
+
+        :type canvas: tk.Canvas
+        :param parent:
+        :param recursive:
+        :return:
+        """
         x1 = self.location[0]
         y1 = self.location[1]
         x2 = self.location[0] + (self.length * math.cos(self.angle))
@@ -76,7 +84,7 @@ class Limb():
         if self.parent:
             self.location = (self.parent.location[0] + (self.parent.length * math.cos(self.parent.angle)),
                              self.parent.location[1] + (self.parent.length * math.sin(self.parent.angle)))
-            self.angle = self.parent.angle + (random.random()*.2) -.1
+            self.angle = self.parent.angle + (random.random()*2) -1
             self.length = 40
         limb.grow()
 

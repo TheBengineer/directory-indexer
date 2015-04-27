@@ -26,9 +26,10 @@ class TreeView(Thread):
         self.limbs_dict = {}
         self.root = Limb.Limb("", self.limbs_dict)
         self.limbs_dict[""] = self.root
-        self.root.location = (self.canvas_width/2.0, self.canvas_height-100)
-        self.root.angle = 3.14159*1.5
+        self.root.location = (self.canvas_width / 2.0, self.canvas_height - 100)
+        self.root.angle = 3.14159 * 1.5
         self.make_data()
+        self.root.draw(self.canvas, self, True)
 
 
     def make_data(self):
@@ -37,24 +38,7 @@ class TreeView(Thread):
                 path = os.path.join(root, f)
                 print path
                 self.root.add_path(path)
-                self.root.draw(self.canvas, self, True)
-
-    def make_limb(self, depth, heritage):
-        limb = Limb.Limb("", self.limbs_dict)
-        if depth < 2:
-            limbs = random.randrange(2, 5)
-        elif depth < 4:
-            limbs = random.randrange(2, 8)
-        elif depth < 6:
-            limbs = int(random.randrange(0, 2))
-        else:
-            if random.random() < 1.0 / depth:
-                limbs = 1
-            else:
-                limbs = 0
-        heritage.append(limb)
-        for i in range(limbs):
-            self.make_limb(depth + 1, heritage)
+                # self.root.draw(self.canvas, self, True)
 
     def add_to_pile(self, data):
         pass
@@ -68,8 +52,8 @@ if __name__ == "__main__":
     a.start()
 
     def foo(root, level=0):
-        print "\t"*level, root.path
+        print "\t" * level, root.path
         for i in root.children:
             foo(root.children[i], level + 1)
 
-    #foo(a.root)
+            # foo(a.root)
