@@ -26,11 +26,11 @@ class Limb():
         else:
             self.location = (0, 0)
             self.angle = 3.14159*1.5
-        self.length = 40.0
+        self.length = 20.0
         self.size = 1
         self.width = 1
         self.color = "black"
-        self.color = random.choice(["red", "orange", "green", "blue", "violet"])
+        self.color = "#"+hex(int(random.random()*255))[2:].rjust(2,"0")+hex(int(random.random()*255))[2:].rjust(2,"0")+hex(int(random.random()*255))[2:].rjust(2,"0")
         self.children = {}
 
     def draw(self, canvas, parent, recursive=False):
@@ -41,11 +41,14 @@ class Limb():
         :param recursive:
         :return:
         """
+        if parent:
+            if parent.parent:
+                parent.draw(canvas, parent.parent)
         x1 = self.location[0]
         y1 = self.location[1]
         x2 = self.location[0] + (self.length * math.cos(self.angle))
         y2 = self.location[1] + (self.length * math.sin(self.angle))
-        print self.path, x1, y1, x2, y2
+        print self.path, x1, y1, x2, y2, self.width
         canvas.create_line(x1, y1, x2, y2, fill=self.color, width=self.width)
         if recursive:
             for l in self.children:
@@ -61,6 +64,7 @@ class Limb():
         if dirs[0] not in self.limbs_dict:
             new_trunk = Limb(dirs[0], self.limbs_dict, self.limbs_dict[""])
             self.limbs_dict[dirs[0]] = new_trunk
+            self.limbs_dict[""].children[new_trunk.path] = new_trunk
         dirs_expanded = []
 
         for i, d in enumerate(dirs):
@@ -71,7 +75,6 @@ class Limb():
 
         for i, d in enumerate(dirs_expanded):
             if d not in self.limbs_dict and i > 0:
-                print i, d, dirs, dirs[:i]
                 parent_path = dirs_expanded[i - 1]
                 new_limb = Limb(d, self.limbs_dict, self.limbs_dict[parent_path])
                 self.add_limb(new_limb)
@@ -80,12 +83,12 @@ class Limb():
 
     def add_limb(self, limb):
         self.limbs_dict[limb.path] = limb
-        self.children[os.path.split(limb.path)[1]] = limb
+        self.children[limb.path] = limb
         if self.parent:
             self.location = (self.parent.location[0] + (self.parent.length * math.cos(self.parent.angle)),
                              self.parent.location[1] + (self.parent.length * math.sin(self.parent.angle)))
-            self.angle = self.parent.angle + (random.random()*2) -1
-            self.length = 40
+            self.angle = self.parent.angle + (random.random()*.6) -0.3
+            self.length = 20
         limb.grow()
 
     def split_path(self, p):
@@ -96,7 +99,7 @@ class Limb():
 
     def grow(self):
         self.size += 1
-        self.width = (math.sqrt(self.size)/5) + 1
+        self.width = (math.sqrt(self.size)/2) + 1
         if self.parent:
             self.parent.grow()
 

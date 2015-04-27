@@ -38,6 +38,7 @@ class Scanner(Thread):
         self.importOldScanFromDB(self.directory_database, self.directory_dictionary)
 
         self.GUI = GUI
+        self.tree = GUI.tree_main
 
         self.go = 1
         self.log = ""
@@ -49,7 +50,7 @@ class Scanner(Thread):
             print "Could not create the FindIt directory. Will now crash."
             quit()
         database_filename = os.path.join(FindIt, "FindIt.db")
-        #self.backup_db(database_filename)
+        # self.backup_db(database_filename)
         directory_database = DirectoryDB.DirectoryDB(database_filename)
         directory_database.start()
         return directory_database
@@ -88,6 +89,7 @@ class Scanner(Thread):
         if not os.path.isdir(folder_to_scan):  # Make sure the folder exists
             print "Cannot access the folder to be scanned:", folder_to_scan
         else:
+            self.tree.add_path(folder_to_scan)
             self.directory_dictionary[folder_to_scan] = Directory.Directory(folder_to_scan, 0.0,
                                                                             self.directory_dictionary)  # Create Root and reset time.
             self.update_pool.apply_async(self.directory_dictionary[folder_to_scan].update,

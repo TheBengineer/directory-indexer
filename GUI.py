@@ -8,11 +8,14 @@ import subprocess
 
 import Scanner
 import mhMultiListBox
+import TreeView
 
 
 class Window(Thread):
     def __init__(self):
         Thread.__init__(self)
+
+        self.tree_main = TreeView.TreeView(tk)
 
         self.scanner = Scanner.Scanner(self)
         self.version = "Beta"
@@ -116,7 +119,6 @@ class Window(Thread):
         print "here"
 
     def launch_tree(self):
-        self.tree_main = Tree_view(tk)
         self.tree_main.start()
 
 

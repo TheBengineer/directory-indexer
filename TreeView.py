@@ -21,27 +21,24 @@ class TreeView(Thread):
         self.canvas_height = 500
         self.canvas = tk.Canvas(self.tree_main, width=self.canvas_width, height=self.canvas_height)
         self.canvas.pack()
-        self.canvas.create_line(0, 0, random.random() * 40, random.random() * 40, fill="#FF00FF")
         self.pile = {}
         self.limbs_dict = {}
         self.root = Limb.Limb("", self.limbs_dict)
         self.limbs_dict[""] = self.root
         self.root.location = (self.canvas_width / 2.0, self.canvas_height - 100)
         self.root.angle = 3.14159 * 1.5
-        self.make_data()
-        self.root.draw(self.canvas, self, True)
+
 
 
     def make_data(self):
         for root, dirs, files in os.walk("C:\\tmp"):
             for f in files:
                 path = os.path.join(root, f)
-                print path
                 self.root.add_path(path)
-                # self.root.draw(self.canvas, self, True)
+                self.root.draw(self.canvas, self)
 
-    def add_to_pile(self, data):
-        pass
+    def add_path(self, path):
+        self.root.add_path(path)
 
     def run(self):
         self.tree_main.mainloop()
