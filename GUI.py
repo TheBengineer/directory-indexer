@@ -15,7 +15,7 @@ class Window(Thread):
     def __init__(self):
         Thread.__init__(self)
 
-        self.tree_main = TreeView.TreeView(tk)
+        self.tree = TreeView.TreeView(tk)
 
         self.scanner = Scanner.Scanner(self)
         self.version = "Beta"

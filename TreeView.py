@@ -27,6 +27,7 @@ class TreeView(Thread):
         self.limbs_dict[""] = self.root
         self.root.location = (self.canvas_width / 2.0, self.canvas_height - 100)
         self.root.angle = 3.14159 * 1.5
+        self.tree_main.title("Tree View - Ben Holleran April 2015")
 
 
 

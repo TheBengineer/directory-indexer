@@ -38,7 +38,7 @@ class Scanner(Thread):
         self.importOldScanFromDB(self.directory_database, self.directory_dictionary)
 
         self.GUI = GUI
-        self.tree = GUI.tree_main
+        self.tree = GUI.tree
 
         self.go = 1
         self.log = ""
