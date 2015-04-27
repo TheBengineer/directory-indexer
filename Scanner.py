@@ -35,8 +35,6 @@ class Scanner(Thread):
         self.update_pool.thread_lock = Lock()
         self.update_pool.messages = Queue.Queue()
 
-        self.importOldScanFromDB(self.directory_database, self.directory_dictionary)
-
         self.GUI = GUI
         self.tree = GUI.tree
 
@@ -72,6 +70,7 @@ class Scanner(Thread):
         pass
 
     def run(self):
+        self.importOldScanFromDB(self.directory_database, self.directory_dictionary)
         while self.go:
             while self.update_pool.thread_count > 0:
                 while not self.update_pool.messages.empty():

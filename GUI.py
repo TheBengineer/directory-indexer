@@ -98,10 +98,10 @@ class Window(Thread):
         # self.results_label.pack(side=tk.TOP, fill=tk.X)
         self.multi_list_box.pack(expand=tk.YES, fill=tk.BOTH)
 
-        #self.multi_list_box.colmapping['Files'].bind('<Double-Button-1>', self.open_file)
+        # self.multi_list_box.colmapping['Files'].bind('<Double-Button-1>', self.open_file)
         self.multi_list_box.bind('<Double-Button-1>', self.open_file)
         self.multi_list_box.bind('<Button-3>', self.open_folder)
-        #self.files_listbox.bind('<Button-3>', self.open_folder)
+        # self.files_listbox.bind('<Button-3>', self.open_folder)
         #self.folders_listbox.bind('<MouseWheel>', self.on_scroll)
         #self.files_listbox.bind('<MouseWheel>', self.on_scroll)
         # self.folders_listbox.bind('<Button-4>', self.scroll_up)
@@ -113,7 +113,7 @@ class Window(Thread):
 
         # Tab order
 
-        self.tree.start()
+        #self.tree.start()
         print "Here"
         self.search_text.focus()
         self.scanner.start()
@@ -126,8 +126,6 @@ class Window(Thread):
     def launch_tree(self):
         if not self.tree.running:
             self.tree.start()
-
-
 
 
     def set_status(self, status):
