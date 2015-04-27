@@ -37,10 +37,11 @@ class TreeView(Thread):
             for f in files:
                 path = os.path.join(root, f)
                 self.root.add_path(path)
-                self.root.draw(self.canvas, self)
+                self.root.draw(self.canvas, None)
 
     def add_path(self, path):
         self.root.add_path(path)
+        self.root.draw(self.canvas, self)
 
     def run(self):
         self.canvas.create_line(0, 0, random.random() * 40, random.random() * 40, fill="#00FFFF")

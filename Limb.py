@@ -41,6 +41,7 @@ class Limb():
         :param recursive:
         :return:
         """
+        print parent
         if parent:
             if parent.parent:
                 parent.draw(canvas, parent.parent)

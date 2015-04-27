@@ -5,6 +5,7 @@ import os
 import Tkinter as tk
 import tkFileDialog
 import subprocess
+import random
 
 import Scanner
 import mhMultiListBox
@@ -114,16 +115,16 @@ class Window(Thread):
         # Tab order
 
         #self.tree.start()
-        print "Here"
         self.search_text.focus()
         self.scanner.start()
-        print "Here"
 
 
     def a(self, asdf=0, asdf2=0):
-        print "here"
+        pass
 
     def launch_tree(self):
+        color = "#"+hex(int(random.random()*255))[2:].rjust(2,"0")+hex(int(random.random()*255))[2:].rjust(2,"0")+hex(int(random.random()*255))[2:].rjust(2,"0")
+        self.tree.canvas.create_line(0, 0, random.random() * 40, random.random() * 40, fill=color)
         if not self.tree.running:
             self.tree.start()
 

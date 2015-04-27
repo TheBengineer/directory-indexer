@@ -88,6 +88,7 @@ class Scanner(Thread):
         if not os.path.isdir(folder_to_scan):  # Make sure the folder exists
             print "Cannot access the folder to be scanned:", folder_to_scan
         else:
+            print "adding path", folder_to_scan
             self.tree.add_path(folder_to_scan)
             self.directory_dictionary[folder_to_scan] = Directory.Directory(folder_to_scan, 0.0,
                                                                             self.directory_dictionary)  # Create Root and reset time.
