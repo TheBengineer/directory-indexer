@@ -35,6 +35,7 @@ class Window(Thread):
         self.window.config(menu=self.menu)
         self.file_menu = tk.Menu(self.menu)
         self.menu.add_cascade(label="File", menu=self.file_menu)
+        self.file_menu.add_command(label="Tree", command=self.launch_tree)
         self.file_menu.add_command(label="Exit", command=self.window.quit)
 
         # self.edit_menu = tk.Menu(self.menu)
@@ -112,14 +113,21 @@ class Window(Thread):
 
         # Tab order
 
+        self.tree.start()
+        print "Here"
         self.search_text.focus()
         self.scanner.start()
+        print "Here"
+
 
     def a(self, asdf=0, asdf2=0):
         print "here"
 
     def launch_tree(self):
-        self.tree_main.start()
+        if not self.tree.running:
+            self.tree.start()
+
+
 
 
     def set_status(self, status):

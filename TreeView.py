@@ -16,6 +16,7 @@ class TreeView(Thread):
         :return:
         """
         Thread.__init__(self)
+        self.running = False
         self.tree_main = tk.Tk()
         self.canvas_width = 800
         self.canvas_height = 500
@@ -28,7 +29,7 @@ class TreeView(Thread):
         self.root.location = (self.canvas_width / 2.0, self.canvas_height - 100)
         self.root.angle = 3.14159 * 1.5
         self.tree_main.title("Tree View - Ben Holleran April 2015")
-
+        self.canvas.create_line(0, 0, random.random() * 40, random.random() * 40, fill="#FF00FF")
 
 
     def make_data(self):
@@ -42,6 +43,8 @@ class TreeView(Thread):
         self.root.add_path(path)
 
     def run(self):
+        self.canvas.create_line(0, 0, random.random() * 40, random.random() * 40, fill="#00FFFF")
+        self.running = True
         self.tree_main.mainloop()
 
 
