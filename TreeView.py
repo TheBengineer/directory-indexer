@@ -1,6 +1,7 @@
 __author__ = 'boh01'
 
 from threading import Thread
+import Queue
 import Tkinter as tk
 import random
 import os
@@ -9,13 +10,14 @@ import Limb
 
 
 class TreeView(Thread):
-    def __init__(self, tk):
+    def __init__(self, tk, GUI):
         """
 
         :type tk: Tkinter
         :return:
         """
         Thread.__init__(self)
+        self.GUI = GUI
         self.running = False
         self.tree_main = tk.Tk()
         self.canvas_width = 800
@@ -30,7 +32,7 @@ class TreeView(Thread):
         self.root.angle = 3.14159 * 1.5
         self.tree_main.title("Tree View - Ben Holleran April 2015")
         self.canvas.create_line(0, 0, random.random() * 40, random.random() * 40, fill="#FF00FF")
-
+        self.pile = Queue.Queue()
 
     def make_data(self):
         for root, dirs, files in os.walk("C:\\tmp"):
@@ -40,13 +42,22 @@ class TreeView(Thread):
                 self.root.draw(self.canvas, None)
 
     def add_path(self, path):
-        self.root.add_path(path)
-        self.root.draw(self.canvas, self)
+        self.pile.put(path)
+
+    def burn_pile(self):
+        while not self.GUI.scanned_paths.empty():
+            path = self.GUI.scanned_paths.get()
+            self.root.add_path(path)
+        self.root.draw(self.canvas, None, True)
+        self.tree_main.after(100, self.burn_pile)
 
     def run(self):
         self.canvas.create_line(0, 0, random.random() * 40, random.random() * 40, fill="#00FFFF")
         self.running = True
+        self.tree_main.after(100, self.burn_pile)
         self.tree_main.mainloop()
+
+
 
 
 if __name__ == "__main__":

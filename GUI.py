@@ -6,6 +6,7 @@ import Tkinter as tk
 import tkFileDialog
 import subprocess
 import random
+import Queue
 
 import Scanner
 import mhMultiListBox
@@ -16,7 +17,9 @@ class Window(Thread):
     def __init__(self):
         Thread.__init__(self)
 
-        self.tree = TreeView.TreeView(tk)
+        self.tree = TreeView.TreeView(tk, self)
+
+        self.scanned_paths = Queue.Queue()
 
         self.scanner = Scanner.Scanner(self)
         self.version = "Beta"
@@ -121,6 +124,9 @@ class Window(Thread):
 
     def a(self, asdf=0, asdf2=0):
         pass
+
+    def add_scanned_path(self, path):
+        self.scanned_paths.put(path)
 
     def launch_tree(self):
         color = "#"+hex(int(random.random()*255))[2:].rjust(2,"0")+hex(int(random.random()*255))[2:].rjust(2,"0")+hex(int(random.random()*255))[2:].rjust(2,"0")

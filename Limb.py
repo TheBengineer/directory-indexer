@@ -41,7 +41,6 @@ class Limb():
         :param recursive:
         :return:
         """
-        print parent
         if parent:
             if parent.parent:
                 parent.draw(canvas, parent.parent)
@@ -49,7 +48,6 @@ class Limb():
         y1 = self.location[1]
         x2 = self.location[0] + (self.length * math.cos(self.angle))
         y2 = self.location[1] + (self.length * math.sin(self.angle))
-        print self.path, x1, y1, x2, y2, self.width
         canvas.create_line(x1, y1, x2, y2, fill=self.color, width=self.width)
         if recursive:
             for l in self.children:

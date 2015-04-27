@@ -23,6 +23,7 @@ class Scanner(Thread):
         :type GUI: GUI.Window
         :return:
         """
+        self.GUI = GUI
 
         self.directory_dictionary = {}
         self.directory_database = self.init_database()
@@ -35,7 +36,7 @@ class Scanner(Thread):
         self.update_pool.thread_lock = Lock()
         self.update_pool.messages = Queue.Queue()
 
-        self.GUI = GUI
+
         self.tree = GUI.tree
 
         self.go = 1
@@ -49,7 +50,7 @@ class Scanner(Thread):
             quit()
         database_filename = os.path.join(FindIt, "FindIt.db")
         # self.backup_db(database_filename)
-        directory_database = DirectoryDB.DirectoryDB(database_filename)
+        directory_database = DirectoryDB.DirectoryDB(database_filename, self.GUI)
         directory_database.start()
         return directory_database
 
@@ -89,8 +90,8 @@ class Scanner(Thread):
             print "Cannot access the folder to be scanned:", folder_to_scan
         else:
             print "adding path", folder_to_scan
-            self.tree.add_path(folder_to_scan)
-            self.directory_dictionary[folder_to_scan] = Directory.Directory(folder_to_scan, 0.0,
+            if folder_to_scan not in self.directory_dictionary:
+                self.directory_dictionary[folder_to_scan] = Directory.Directory(folder_to_scan, 0.0,
                                                                             self.directory_dictionary)  # Create Root and reset time.
             self.update_pool.apply_async(self.directory_dictionary[folder_to_scan].update,
                                          args=(self.update_pool, self.directory_database,))  # Go. Scan. Be Free.

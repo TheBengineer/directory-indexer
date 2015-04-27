@@ -14,7 +14,7 @@ This database will hold all the files and paths that are normally written to a C
 
 
 class DirectoryDB(Thread):
-    def __init__(self, file_path):
+    def __init__(self, file_path, GUI=None):
         # TODO make this save data more efficiently
         Thread.__init__(self)
         self.lock = Lock()
@@ -29,6 +29,7 @@ class DirectoryDB(Thread):
         self.files_to_add = []
         self.files_to_delete = []
         self.folders_to_delete = []
+        self.GUI = GUI
         self.go = 1
         """
         :type self.lock: threading.Lock
@@ -56,6 +57,8 @@ class DirectoryDB(Thread):
             self.local_lock.acquire()
             self.files_to_add.append([path, filename])
             self.local_lock.release()
+            if self.GUI:
+                self.GUI.add_scanned_path(os.path.join(path, filename))
 
     def del_folder(self, folder_path):
         if folder_path:
