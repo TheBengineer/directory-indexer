@@ -17,18 +17,28 @@ class Limb():
         self.path = os.path.normpath(path)
         self.path_list = self.split_path(path)
         self.limbs_dict = limbs_dict
+        limbs_dict[path] = self
         self.parent = parent
-        self.location = (0, 0)
-        self.angle = 0.0
-        self.length = 20.0
+        if self.parent:
+            self.location = (parent.location[0] + (parent.length * math.cos(parent.angle)),
+                             parent.location[1] + (parent.length * math.sin(parent.angle)))
+            self.angle = parent.angle + (random.random() *.2) -.1
+        else:
+            self.location = (0, 0)
+            self.angle = 3.14159*1.5
+        self.length = 40.0
         self.size = 1
         self.width = 1
         self.color = "black"
         self.children = {}
 
     def draw(self, canvas, parent, recursive=False):
-        canvas.create_line(self.location[0], self.location[1], self.location[0] + (self.length * math.cos(self.angle)),
-                           self.location[1] + (self.length * math.sin(self.angle)), fill=self.color, width=self.width)
+        x1 = self.location[0]
+        y1 = self.location[1]
+        x2 = self.location[0] + (self.length * math.cos(self.angle))
+        y2 = self.location[1] + (self.length * math.sin(self.angle))
+        print self.path, x1, y1, x2, y2
+        canvas.create_line(x1, y1, x2, y2, fill=self.color, width=self.width)
         if recursive:
             for l in self.children:
                 self.children[l].draw(canvas, self, True)
@@ -38,62 +48,27 @@ class Limb():
         dir = os.path.split(path)[0]
         dirs = self.split_path(dir)
 
+        dirs[0] = dirs[0].replace(":", ":" + os.sep)
+
         if dirs[0] not in self.limbs_dict:
             new_trunk = Limb(dirs[0], self.limbs_dict, self.limbs_dict[""])
             self.limbs_dict[dirs[0]] = new_trunk
-        dirs_expanded =[]
+        dirs_expanded = []
+
         for i, d in enumerate(dirs):
-            dirs_expanded = os.path.join(*dirs[:i])
+            if i == 0:
+                dirs_expanded.append(d)
+            else:
+                dirs_expanded.append(os.path.join(*dirs[:i + 1]))
 
         for i, d in enumerate(dirs_expanded):
             if d not in self.limbs_dict and i > 0:
                 print i, d, dirs, dirs[:i]
-                parent_path = dirs[0]
-                if i > 2:
-                    parent_path = os.path.join(*dirs[:i])
+                parent_path = dirs_expanded[i - 1]
                 new_limb = Limb(d, self.limbs_dict, self.limbs_dict[parent_path])
-                self.limbs_dict[parent_path] = new_limb
-        else:
-            print self.limbs_dict
-            self.limbs_dict[dir].grow()
-        return
-
-        print me, self.path, dirs, dir
-
-        for i, d in enumerate(self.path_list):
-            if d in dirs:
-                continue
-            else:
-                break
-        else:
-            new_limb = Limb()
-        if dirs[0] not in self.children:
-            new_branch = Limb()
-        if me in dirs:
-            return
-        if self.path == path[:len(self.path)]:
-            tail = path[len(self.path):]
-            tails = self.split_path(tail)
-            new_dir = tails[0]
-            if tails:
-                child_path = os.path.join(self.path, new_dir)
-                new_limb = Limb(child_path, self.limbs_dict, self)
-                new_limb.add_path(path)
                 self.add_limb(new_limb)
-        else:
-            if not self.parent:
-                drive = os.path.splitdrive(path)
-                if drive:
-                    if drive not in self.children:
-                        new_trunk = Limb(path, self.limbs_dict, self)
-                        print "New trunk", drive, path
-                        self.add_limb(new_trunk)
-                    else:
-                        self.children[drive].add_path(path)
-                else:
-                    print path, "Seems to not have a drive"
-            else:
-                self.parent.add_path(path)
+        self.limbs_dict[dir].grow()
+        return
 
     def add_limb(self, limb):
         self.limbs_dict[limb.path] = limb
@@ -101,9 +76,9 @@ class Limb():
         if self.parent:
             self.location = (self.parent.location[0] + (self.parent.length * math.cos(self.parent.angle)),
                              self.parent.location[1] + (self.parent.length * math.sin(self.parent.angle)))
-            self.angle = self.parent.angle + random.uniform(-10.0, 10.0)
-            self.length = 20
-        self.grow()
+            self.angle = self.parent.angle + (random.random()*.2) -.1
+            self.length = 40
+        limb.grow()
 
     def split_path(self, p):
         a, b = os.path.split(p)
@@ -113,7 +88,7 @@ class Limb():
 
     def grow(self):
         self.size += 1
-        self.width = math.sqrt(self.size)
+        self.width = (math.sqrt(self.size)/5) + 1
         if self.parent:
             self.parent.grow()
 
@@ -121,3 +96,9 @@ class Limb():
         self.size += 1
         if self.parent:
             self.parent.fattten()
+
+
+if __name__ == "__main__":
+    ld = {}
+    a = Limb("", ld)
+    a.add_path("C:\\tmp\\crap\\more\\asdf\\no\\test.txt")
