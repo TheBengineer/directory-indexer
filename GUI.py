@@ -18,6 +18,7 @@ class Window(Thread):
         Thread.__init__(self)
 
         self.scanned_paths = Queue.Queue()
+        self.tree = None
 
         self.scanner = Scanner.Scanner(self)
         self.version = "Beta"
@@ -199,6 +200,8 @@ class Window(Thread):
 
     def onQuit(self):
         print "User aborted, quitting."
+        if self.tree:
+            self.tree.tree_main.destroy()
         self.scanner.directory_database.go = 0
         self.window.destroy()
         os._exit(1)
