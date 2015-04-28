@@ -30,9 +30,9 @@ class TreeView(Thread):
         self.limbs_dict[""] = self.root
         self.root.location = (self.canvas_width / 2.0, self.canvas_height - 100)
         self.root.angle = 3.14159 * 1.5
-        self.tree_main.title("Tree View - Ben Holleran April 2015")
+        self.tree_main.title("Tree View")
         self.pile = Queue.Queue()
-        self.tree_main.protocol("WM_DELETE_WINDOW", self.tree_main.destroy)
+        self.tree_main.protocol("WM_DELETE_WINDOW", self.tree_main.quit)
 
     def make_data(self):
         for root, dirs, files in os.walk("C:\\tmp"):
@@ -45,19 +45,27 @@ class TreeView(Thread):
         self.pile.put(path)
 
     def num_waiting(self):
-        self.canvas.create_text(20, 40, text=str(self.GUI.scanned_paths.qsize()))
+        #self.canvas.create_rectangle(10, 30, 30, 0, fill="#F0F0F0")
+        #self.canvas.create_text(20, 40, text=str(self.GUI.scanned_paths.qsize()), bg="#F0F0F0" )
+        self.tree_main.title("Tree View - " + str(self.GUI.scanned_paths.qsize()) + " Remaining")
+
 
     def burn_pile(self):
         if self.GUI:
             self.num_waiting()
-            while not self.GUI.scanned_paths.empty():
+            paths = 0
+            while not self.GUI.scanned_paths.empty() and paths < 100:
                 path = self.GUI.scanned_paths.get()
                 self.root.add_path(path)
+                paths += 1
             self.root.draw(self.canvas, None, True)
-            self.tree_main.after(100, self.burn_pile)
+            self.GUI.scanned_paths.empty()
+            if self.GUI.scanned_paths.empty():
+                self.tree_main.after(200, self.burn_pile)
+            else:
+                self.tree_main.after(10, self.burn_pile)
 
     def run(self):
-        # self.canvas.create_line(0, 0, random.random() * 40, random.random() * 40, fill="#00FFFF")
         self.running = True
         self.tree_main.after(100, self.burn_pile)
         self.tree_main.mainloop()

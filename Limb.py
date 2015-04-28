@@ -24,7 +24,7 @@ class Limb():
             self.location = (parent.end[0], parent.end[1])
             self.angle = parent.angle + (random.random() * 2.0) - 1.0
         else:
-            self.location = (0, 0)
+            self.location = (400, 400)
             self.angle = 3.14159 * 1.5
         self.length = 20.0
         self.end = (self.location[0] + (self.length * math.cos(self.angle)),
@@ -87,12 +87,10 @@ class Limb():
     def add_limb(self, limb):
         self.limbs_dict[limb.path] = limb
         self.children[limb.path] = limb
-        # if self.parent:
-        # self.location = (self.parent.location[0] + (self.parent.length * math.cos(self.parent.angle)),
-        #                     self.parent.location[1] + (self.parent.length * math.sin(self.parent.angle)))
-        #self.end = (self.location[0] + (self.length * math.cos(self.angle)),
-        #            self.location[1] + (self.length * math.sin(self.angle)))
-        self.angle = self.parent.angle + (random.random() * .6) - 0.3
+        if self.parent:
+            self.angle = self.parent.angle + (random.random() * .6) - 0.3
+        else:
+            self.angle = 3.14159 * 1.5
         self.length = 20
         limb.grow()
 
