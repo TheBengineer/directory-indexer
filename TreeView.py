@@ -44,6 +44,9 @@ class TreeView(Thread):
     def add_path(self, path):
         self.pile.put(path)
 
+    def num_waiting(self):
+        self.canvas.create_text(0, 40, text=str(len(self.GUI.scanned_paths)))
+
     def burn_pile(self):
         while not self.GUI.scanned_paths.empty():
             path = self.GUI.scanned_paths.get()
@@ -61,7 +64,7 @@ class TreeView(Thread):
 
 
 if __name__ == "__main__":
-    a = TreeView(tk)
+    a = TreeView(tk, None)
     a.start()
 
     def foo(root, level=0):

@@ -17,8 +17,6 @@ class Window(Thread):
     def __init__(self):
         Thread.__init__(self)
 
-        self.tree = TreeView.TreeView(tk, self)
-
         self.scanned_paths = Queue.Queue()
 
         self.scanner = Scanner.Scanner(self)
@@ -106,18 +104,18 @@ class Window(Thread):
         self.multi_list_box.bind('<Double-Button-1>', self.open_file)
         self.multi_list_box.bind('<Button-3>', self.open_folder)
         # self.files_listbox.bind('<Button-3>', self.open_folder)
-        #self.folders_listbox.bind('<MouseWheel>', self.on_scroll)
-        #self.files_listbox.bind('<MouseWheel>', self.on_scroll)
+        # self.folders_listbox.bind('<MouseWheel>', self.on_scroll)
+        # self.files_listbox.bind('<MouseWheel>', self.on_scroll)
         # self.folders_listbox.bind('<Button-4>', self.scroll_up)
-        #self.files_listbox.bind('<Button-4>', self.scroll_up)
-        #self.folders_listbox.bind('<Button-5>', self.scroll_down)
-        #self.files_listbox.bind('<Button-5>', self.scroll_down)
+        # self.files_listbox.bind('<Button-4>', self.scroll_up)
+        # self.folders_listbox.bind('<Button-5>', self.scroll_down)
+        # self.files_listbox.bind('<Button-5>', self.scroll_down)
 
         self.results_frame.pack(fill=tk.BOTH, expand=1)
 
         # Tab order
 
-        #self.tree.start()
+        # self.tree.start()
         self.search_text.focus()
         self.scanner.start()
 
@@ -129,7 +127,10 @@ class Window(Thread):
         self.scanned_paths.put(path)
 
     def launch_tree(self):
-        color = "#"+hex(int(random.random()*255))[2:].rjust(2,"0")+hex(int(random.random()*255))[2:].rjust(2,"0")+hex(int(random.random()*255))[2:].rjust(2,"0")
+        self.tree = TreeView.TreeView(tk, self)
+        color = "#" + hex(int(random.random() * 255))[2:].rjust(2, "0") + hex(int(random.random() * 255))[2:].rjust(2,
+                                                                                                                    "0") + hex(
+            int(random.random() * 255))[2:].rjust(2, "0")
         self.tree.canvas.create_line(0, 0, random.random() * 40, random.random() * 40, fill=color)
         if not self.tree.running:
             self.tree.start()

@@ -36,9 +36,6 @@ class Scanner(Thread):
         self.update_pool.thread_lock = Lock()
         self.update_pool.messages = Queue.Queue()
 
-
-        self.tree = GUI.tree
-
         self.go = 1
         self.log = ""
 
