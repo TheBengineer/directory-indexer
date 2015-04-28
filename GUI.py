@@ -5,7 +5,6 @@ import os
 import Tkinter as tk
 import tkFileDialog
 import subprocess
-import random
 import Queue
 
 import Scanner
@@ -129,10 +128,6 @@ class Window(Thread):
 
     def launch_tree(self):
         self.tree = TreeView.TreeView(tk, self)
-        color = "#" + hex(int(random.random() * 255))[2:].rjust(2, "0") + hex(int(random.random() * 255))[2:].rjust(2,
-                                                                                                                    "0") + hex(
-            int(random.random() * 255))[2:].rjust(2, "0")
-        self.tree.canvas.create_line(0, 0, random.random() * 40, random.random() * 40, fill=color)
         if not self.tree.running:
             self.tree.start()
 

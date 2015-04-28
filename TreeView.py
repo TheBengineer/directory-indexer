@@ -3,7 +3,6 @@ __author__ = 'boh01'
 from threading import Thread
 import Queue
 import Tkinter as tk
-import random
 import os
 
 import Limb
@@ -32,7 +31,6 @@ class TreeView(Thread):
         self.root.location = (self.canvas_width / 2.0, self.canvas_height - 100)
         self.root.angle = 3.14159 * 1.5
         self.tree_main.title("Tree View - Ben Holleran April 2015")
-        self.canvas.create_line(0, 0, random.random() * 40, random.random() * 40, fill="#FF00FF")
         self.pile = Queue.Queue()
         self.tree_main.protocol("WM_DELETE_WINDOW", self.tree_main.destroy)
 
@@ -47,22 +45,22 @@ class TreeView(Thread):
         self.pile.put(path)
 
     def num_waiting(self):
-        self.canvas.create_text(0, 40, text=str(len(self.GUI.scanned_paths)))
+        self.canvas.create_text(20, 40, text=str(self.GUI.scanned_paths.qsize()))
 
     def burn_pile(self):
-        while not self.GUI.scanned_paths.empty():
-            path = self.GUI.scanned_paths.get()
-            self.root.add_path(path)
-        self.root.draw(self.canvas, None, True)
-        self.tree_main.after(100, self.burn_pile)
+        if self.GUI:
+            self.num_waiting()
+            while not self.GUI.scanned_paths.empty():
+                path = self.GUI.scanned_paths.get()
+                self.root.add_path(path)
+            self.root.draw(self.canvas, None, True)
+            self.tree_main.after(100, self.burn_pile)
 
     def run(self):
-        self.canvas.create_line(0, 0, random.random() * 40, random.random() * 40, fill="#00FFFF")
+        # self.canvas.create_line(0, 0, random.random() * 40, random.random() * 40, fill="#00FFFF")
         self.running = True
         self.tree_main.after(100, self.burn_pile)
         self.tree_main.mainloop()
-
-
 
 
 if __name__ == "__main__":

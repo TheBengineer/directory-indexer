@@ -5,6 +5,7 @@ import math
 import random
 import Tkinter as tk
 
+
 class Limb():
     def __init__(self, path, limbs_dict, parent=None):
         """
@@ -20,17 +21,20 @@ class Limb():
         limbs_dict[path] = self
         self.parent = parent
         if self.parent:
-            self.location = (parent.location[0] + (parent.length * math.cos(parent.angle)),
-                             parent.location[1] + (parent.length * math.sin(parent.angle)))
-            self.angle = parent.angle + (random.random() *2.0) -1.0
+            self.location = (parent.end[0], parent.end[1])
+            self.angle = parent.angle + (random.random() * 2.0) - 1.0
         else:
             self.location = (0, 0)
-            self.angle = 3.14159*1.5
+            self.angle = 3.14159 * 1.5
         self.length = 20.0
+        self.end = (self.location[0] + (self.length * math.cos(self.angle)),
+                    self.location[1] + (self.length * math.sin(self.angle)))
         self.size = 1
         self.width = 1
         self.color = "black"
-        self.color = "#"+hex(int(random.random()*255))[2:].rjust(2,"0")+hex(int(random.random()*255))[2:].rjust(2,"0")+hex(int(random.random()*255))[2:].rjust(2,"0")
+        self.color = "#" + hex(int(random.random() * 255))[2:].rjust(2, "0") \
+                     + hex(int(random.random() * 255))[2:].rjust(2, "0") \
+                     + hex(int(random.random() * 255))[2:].rjust(2, "0")
         self.children = {}
 
     def draw(self, canvas, parent, recursive=False):
@@ -46,8 +50,8 @@ class Limb():
                 parent.draw(canvas, parent.parent)
         x1 = self.location[0]
         y1 = self.location[1]
-        x2 = self.location[0] + (self.length * math.cos(self.angle))
-        y2 = self.location[1] + (self.length * math.sin(self.angle))
+        x2 = self.end[0]
+        y2 = self.end[1]
         canvas.create_line(x1, y1, x2, y2, fill=self.color, width=self.width)
         if recursive:
             for l in self.children:
@@ -83,11 +87,13 @@ class Limb():
     def add_limb(self, limb):
         self.limbs_dict[limb.path] = limb
         self.children[limb.path] = limb
-        if self.parent:
-            self.location = (self.parent.location[0] + (self.parent.length * math.cos(self.parent.angle)),
-                             self.parent.location[1] + (self.parent.length * math.sin(self.parent.angle)))
-            self.angle = self.parent.angle + (random.random()*.6) -0.3
-            self.length = 20
+        # if self.parent:
+        # self.location = (self.parent.location[0] + (self.parent.length * math.cos(self.parent.angle)),
+        #                     self.parent.location[1] + (self.parent.length * math.sin(self.parent.angle)))
+        #self.end = (self.location[0] + (self.length * math.cos(self.angle)),
+        #            self.location[1] + (self.length * math.sin(self.angle)))
+        self.angle = self.parent.angle + (random.random() * .6) - 0.3
+        self.length = 20
         limb.grow()
 
     def split_path(self, p):
@@ -96,11 +102,13 @@ class Limb():
         c[0] = os.path.splitdrive(p)[0]
         return c
 
+
     def grow(self):
         self.size += 1
-        self.width = (math.sqrt(self.size)/2) + 1
+        self.width = (math.sqrt(self.size) / 2) + 1
         if self.parent:
             self.parent.grow()
+
 
     def fatten(self):
         self.size += 1

@@ -89,7 +89,7 @@ class Scanner(Thread):
             print "adding path", folder_to_scan
             if folder_to_scan not in self.directory_dictionary:
                 self.directory_dictionary[folder_to_scan] = Directory.Directory(folder_to_scan, 0.0,
-                                                                            self.directory_dictionary)  # Create Root and reset time.
+                                                                                self.directory_dictionary)  # Create Root and reset time.
             self.update_pool.apply_async(self.directory_dictionary[folder_to_scan].update,
                                          args=(self.update_pool, self.directory_database,))  # Go. Scan. Be Free.
             if self.GUI:

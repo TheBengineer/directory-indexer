@@ -18,7 +18,6 @@ from os.path import join
 from stat import S_IFDIR, S_IFLNK, S_IFREG
 import collections
 import ctypes
-import os
 import sys
 
 __version__ = '0.9'
@@ -189,7 +188,7 @@ if sys.platform == 'win32':
         else:
             st_mode |= 0o666
         if (attributes & FILE_ATTRIBUTE_REPARSE_POINT and
-                data.dwReserved0 == IO_REPARSE_TAG_SYMLINK):
+                    data.dwReserved0 == IO_REPARSE_TAG_SYMLINK):
             st_mode ^= st_mode & 0o170000
             st_mode |= S_IFLNK
 
@@ -275,7 +274,7 @@ if sys.platform == 'win32':
 
         def is_symlink(self):
             return (self._find_data.dwFileAttributes &
-                        FILE_ATTRIBUTE_REPARSE_POINT != 0 and
+                    FILE_ATTRIBUTE_REPARSE_POINT != 0 and
                     self._find_data.dwReserved0 == IO_REPARSE_TAG_SYMLINK)
 
         def __str__(self):
