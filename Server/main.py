@@ -73,5 +73,6 @@ class FindIt(Thread):
 if __name__ == '__main__':
     version = "2.0.0"
     F = FindIt(version)
+    F.scanner.scan_dir("/home")
     F.start()
 
