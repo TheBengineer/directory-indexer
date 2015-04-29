@@ -95,6 +95,8 @@ class Scanner(Thread):
             time.sleep(.1)  # Poll
             if self.GUI:
                 self.GUI.set_status("Done Scanning.")
+            else:
+                print "Done Scanning"
             if time.time() > self.last_update + self.update_interval:
                 self.freshen()
         self.update_pool.close()
@@ -113,6 +115,8 @@ class Scanner(Thread):
                                          args=(self.update_pool, self.directory_database,))  # Go. Scan. Be Free.
             if self.GUI:
                 self.GUI.set_status("Scanning: " + folder_to_scan)
+            else:
+                print "Scanning:", folder_to_scan
 
     def backup_db(self, pathToDB):
         try:
