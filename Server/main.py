@@ -18,7 +18,7 @@ class FindIt(Thread):
         """
         :type self.socket: socket.socket
         """
-        self.socket_start(self.socket, ("BOH001", 9091))
+        self.socket_start(self.socket, ("10.196.112.99", 9091))
         self.go = True
         self.clients = {}
         self.scanner = Scanner.Scanner()
