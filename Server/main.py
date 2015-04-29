@@ -5,6 +5,25 @@ import socket
 
 import Scanner
 
+def getlocalip():
+    import os
+    c4 = ""
+    if os.sys.platform == "win32":
+        back = os.popen("ipconfig /all")
+        cmd = back.read(2000)
+        cmd2 = cmd[cmd.find("IP Address"):cmd.find("IP Address")+70]
+        cmd3 = cmd2[cmd2.find(":")+2:cmd2.find(":")+19]
+        c4 = cmd3[0:cmd3.find(" ")-2]
+    elif os.sys.platform == "linux2":
+        back = os.popen("ifconfig")
+        cmd = back.read(2000)
+        cmd2 = cmd[cmd.find("Ethernet"):cmd.find("Ethernet")+300]
+        cmd3 = cmd2[cmd2.find("inet addr:")+10:cmd2.find("inet addr:")+50]
+        c4 = cmd3[0:cmd3.find(" ")]
+    if c4 != "":
+        return c4
+    else:
+        return "localhost"
 
 class FindIt(Thread):
     def __init__(self, version):
@@ -18,7 +37,7 @@ class FindIt(Thread):
         """
         :type self.socket: socket.socket
         """
-        self.socket_start(self.socket, ("10.196.112.99", 9091))
+        self.socket_start(self.socket, (getlocalip(), 9091))
         self.go = True
         self.clients = {}
         self.scanner = Scanner.Scanner()
@@ -38,7 +57,7 @@ class FindIt(Thread):
         :return:
         """
         my_socket.bind(address)
-        my_socket.listen(5)
+        my_socket.listen(50)
 
     def socket_accept(self, my_socket):
         """
