@@ -77,7 +77,8 @@ class Scanner(Thread):
             while not self.update_pool.messages.empty():
                 self.log += self.update_pool.messages.get()
             time.sleep(.1)  # Poll
-            self.GUI.set_status("Done Scanning.")
+            if self.GUI:
+                self.GUI.set_status("Done Scanning.")
         self.update_pool.close()
         self.update_pool.join()
         self.directory_database.go = 0

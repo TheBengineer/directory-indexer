@@ -40,7 +40,7 @@ class FindIt(Thread):
         my_socket.bind(address)
         my_socket.listen(5)
 
-    def socket_accept(my_socket):
+    def socket_accept(self, my_socket):
         """
 
         :param my_socket: A socket to accept connections on
@@ -51,7 +51,7 @@ class FindIt(Thread):
 
     def run(self):
         while self.go:
-            client, address = self.socket_accept()
+            client, address = self.socket_accept(self.socket)
             data = ""
             while 1:
                 try:
@@ -61,8 +61,10 @@ class FindIt(Thread):
                     break
                 if data:
                     result = self.scanner.directory_database.get_folders("%" + data + "%")
-                    print result
-                    client.send(result)
+                    data_to_send = ""
+                    for i in result:
+                        data_to_send += i[0] +"\\" +  i[1] + "\n"
+                    client.send(data_to_send)
 
 
 if __name__ == '__main__':
