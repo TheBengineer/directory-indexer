@@ -10,7 +10,7 @@ import Queue
 # Needed for backup
 import datetime, shutil
 
-import os, time
+import os, time, sys
 
 import DirectoryDB
 import Directory
@@ -55,14 +55,27 @@ class Scanner(Thread):
 
 
     def create_FindIt_folder(self):
-        appdata = os.getenv('APPDATA')
-        FindIt = os.path.join(appdata, "FindIt")
-        if not os.path.isdir(FindIt):
-            os.mkdir(FindIt)
-        if os.path.isdir(FindIt):
-            return FindIt
+        if sys.platform == "win32":
+            appdata = os.getenv('APPDATA')
+            FindIt = os.path.join(appdata, "FindIt")
+            if not os.path.isdir(FindIt):
+                os.mkdir(FindIt)
+            if os.path.isdir(FindIt):
+                return FindIt
+            else:
+                return False
+        elif sys.platform == "linux2":
+            home = os.getenv('HOME')
+            FindIt = os.path.join(home, "FindIt")
+            if not os.path.isdir(FindIt):
+                os.mkdir(FindIt)
+            if os.path.isdir(FindIt):
+                return FindIt
+            else:
+                return False
         else:
-            return False
+            print "Crashing. Not made to run on mac"
+
 
     def load_preferences(self):
         # import csv
