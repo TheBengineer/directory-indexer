@@ -56,6 +56,8 @@ class FindIt(Thread):
             while 1:
                 try:
                     data = client.recv(10000)
+                    if not data:
+                        break
                     print "Got data", data
                 except:
                     break
@@ -63,8 +65,9 @@ class FindIt(Thread):
                     result = self.scanner.directory_database.get_folders("%" + data + "%")
                     data_to_send = ""
                     for i in result:
-                        data_to_send += i[0] +"\\" +  i[1] + "\n"
+                        data_to_send += i[0] + "\\" + i[1] + "\n"
                     client.send(data_to_send)
+                    client.close()
 
 
 if __name__ == '__main__':
