@@ -5,7 +5,7 @@ import socket
 go = True
 while go:
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.connect(("localhost", 9091))
+    s.connect(("BOH001", 9091))
     msg = raw_input()
     if msg == "q":
         g = 0
