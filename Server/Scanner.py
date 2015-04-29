@@ -144,6 +144,8 @@ class Scanner(Thread):
             path = f[0].strip("\"")
             mfile = f[1].strip("\"")
             s_time = 0.0
+            if not os.sep in path:
+                self.roots.append(path)
             if f[2]:
                 s_time = f[2]
             if path not in tmpDirectoryDictionary:
