@@ -38,6 +38,8 @@ class Scanner(Thread):
 
         self.go = 1
         self.log = ""
+        self.last_update = time.time()
+        self.update_interval = 1 # Seconds
 
 
     def init_database(self):
@@ -79,6 +81,8 @@ class Scanner(Thread):
             time.sleep(.1)  # Poll
             if self.GUI:
                 self.GUI.set_status("Done Scanning.")
+            if time.time() > self.last_update + self.update_interval:
+                self.freshen()
         self.update_pool.close()
         self.update_pool.join()
         self.directory_database.go = 0
@@ -106,6 +110,8 @@ class Scanner(Thread):
         except ValueError:
             print "Output file not backed up. File may not exist, permissions, etc. This might be a problem later"
 
+    def freshen(self):
+        self.directory_dictionary["C:\\tmp"].update(self.update_pool, self.directory_database)
 
     def importOldScanFromDB(self, DB, tmpDirectoryDictionary):
         """
