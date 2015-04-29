@@ -98,6 +98,7 @@ class Scanner(Thread):
             else:
                 print "Done Scanning"
             if time.time() > self.last_update + self.update_interval:
+                self.last_update = time.time()
                 self.freshen()
         self.update_pool.close()
         self.update_pool.join()
