@@ -27,6 +27,7 @@ class Scanner(Thread):
 
         self.directory_dictionary = {}
         self.directory_database = self.init_database()
+        self.roots = []
         """ :type self.directory_dictionary: dict of Directory.Directory"""
         self.start_time = time.time()
 
@@ -124,7 +125,9 @@ class Scanner(Thread):
             print "Output file not backed up. File may not exist, permissions, etc. This might be a problem later"
 
     def freshen(self):
-        self.directory_dictionary["C:\\tmp"].update(self.update_pool, self.directory_database)
+        for i in self.roots:
+            if i in self.directory_dictionary:
+                self.directory_dictionary[i].update(self.update_pool, self.directory_database)
 
     def importOldScanFromDB(self, DB, tmpDirectoryDictionary):
         """
