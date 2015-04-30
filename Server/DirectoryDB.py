@@ -5,6 +5,7 @@ from threading import Thread
 from threading import Lock
 import time
 import os
+import sys
 
 
 """
@@ -81,6 +82,11 @@ class DirectoryDB(Thread):
             self.local_lock.acquire()
             if len(self.files_to_add):
                 for path, filename in self.files_to_add:
+                    if path.startswith("/media/"):
+                        path2 = path[7:] # Slice off the leading "/media/"
+                        drive = path2[:path2.find("/")]
+                        path = drive + ":\\"+path[8:] # TODO this is hardcoded to my drive system
+                    path.replace("/", "\\")
                     query = "INSERT OR REPLACE INTO files (path, filename, scan_time) VALUES(\"{path}\", " \
                             " \"{filename}\", \"{time}\");".format(path=path, filename=filename,
                                                                    time=time.time())
