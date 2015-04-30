@@ -40,7 +40,7 @@ class Scanner(Thread):
         self.go = 1
         self.log = ""
         self.last_update = time.time()
-        self.update_interval = 10 # Seconds
+        self.update_interval = 3600 # Seconds
 
 
     def init_database(self):
