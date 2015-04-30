@@ -133,6 +133,7 @@ class Scanner(Thread):
     def freshen(self):
         for i in self.roots:
             if i in self.directory_dictionary:
+                print "Rescanning", i
                 self.directory_dictionary[i].update(self.update_pool, self.directory_database)
 
     def importOldScanFromDB(self, DB, tmpDirectoryDictionary):
