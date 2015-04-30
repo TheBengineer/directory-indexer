@@ -86,7 +86,9 @@ class DirectoryDB(Thread):
                         path2 = path[7:] # Slice off the leading "/media/"
                         drive = path2[:path2.find("/")]
                         path = drive + ":\\"+path[8:] # TODO this is hardcoded to my drive system
+                    print path
                     path.replace("/", "\\")
+                    print path
                     query = "INSERT OR REPLACE INTO files (path, filename, scan_time) VALUES(\"{path}\", " \
                             " \"{filename}\", \"{time}\");".format(path=path, filename=filename,
                                                                    time=time.time())
