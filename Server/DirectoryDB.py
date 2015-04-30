@@ -72,23 +72,24 @@ class DirectoryDB(Thread):
         if filename and path:
             self.files_to_delete.append([path, filename])
 
+
     def run(self):
         """
         Does nothing at this point
         May need to be polling instead of event based to make the DB happy
         :return:
         """
+        def fix_path(path):
+            if path.startswith("/media/"):
+                path2 = path[7:] # Slice off the leading "/media/"
+                drive = path2[:path2.find("/")]
+                path = drive + ":\\"+path[8:] # TODO this is hardcoded to my drive system
+            return path.replace("/", "\\")
         while self.go:
             self.local_lock.acquire()
             if len(self.files_to_add):
                 for path, filename in self.files_to_add:
-                    if path.startswith("/media/"):
-                        path2 = path[7:] # Slice off the leading "/media/"
-                        drive = path2[:path2.find("/")]
-                        path = drive + ":\\"+path[8:] # TODO this is hardcoded to my drive system
-                    print path
-                    path.replace("\\", "/")
-                    print path
+                    path = fix_path(path)
                     query = "INSERT OR REPLACE INTO files (path, filename, scan_time) VALUES(\"{path}\", " \
                             " \"{filename}\", \"{time}\");".format(path=path, filename=filename,
                                                                    time=time.time())
@@ -102,6 +103,7 @@ class DirectoryDB(Thread):
             self.files_to_add = []
             if len(self.files_to_delete):
                 for path, filename in self.files_to_delete:
+                    path = fix_path(path)
                     query = "DELETE FROM files WHERE path ='{path}' AND filename ='{filename}'" \
                             " ;".format(path=path, filename=filename)
                     self.lock.acquire()
@@ -110,6 +112,7 @@ class DirectoryDB(Thread):
             self.files_to_delete = []
             if len(self.folders_to_delete):
                 for path in self.folders_to_delete:
+                    path = fix_path(path)
                     query = "DELETE FROM files WHERE path LIKE '{path}%'".format(path=path)
                     self.lock.acquire()
                     self.DB_cursor.execute(query)
