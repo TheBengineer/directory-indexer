@@ -36,7 +36,7 @@ class Window(Thread):
         self.window.config(menu=self.menu)
         self.file_menu = tk.Menu(self.menu)
         self.menu.add_cascade(label="File", menu=self.file_menu)
-        self.file_menu.add_command(label="Exit", command=self.window.quit)
+        self.file_menu.add_command(label="Exit", command=self.onQuit)
 
         # self.edit_menu = tk.Menu(self.menu)
         # self.menu.add_cascade(label="Edit", menu=self.edit_menu)
