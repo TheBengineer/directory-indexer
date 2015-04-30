@@ -86,17 +86,18 @@ class Scanner(Thread):
     def run(self):
         self.importOldScanFromDB(self.directory_database, self.directory_dictionary)
         while self.go:
-            while self.update_pool.thread_count > 0:
+            if self.update_pool.thread_count > 0:
+                while self.update_pool.thread_count > 0:
+                    while not self.update_pool.messages.empty():
+                        self.log += self.update_pool.messages.get()
+                    time.sleep(.1)
                 while not self.update_pool.messages.empty():
                     self.log += self.update_pool.messages.get()
-                time.sleep(.1)
-            while not self.update_pool.messages.empty():
-                self.log += self.update_pool.messages.get()
+                if self.GUI:
+                    self.GUI.set_status("Done Scanning.")
+                else:
+                    print "Done Scanning"
             time.sleep(.1)  # Poll
-            if self.GUI:
-                self.GUI.set_status("Done Scanning.")
-            else:
-                print "Done Scanning"
             if time.time() > self.last_update + self.update_interval:
                 self.last_update = time.time()
                 self.freshen()
