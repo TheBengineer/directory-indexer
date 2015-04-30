@@ -5,7 +5,6 @@ from threading import Thread
 from threading import Lock
 import time
 import os
-import sys
 
 
 """
@@ -79,12 +78,14 @@ class DirectoryDB(Thread):
         May need to be polling instead of event based to make the DB happy
         :return:
         """
+
         def fix_path(path):
             if path.startswith("/media/"):
-                path2 = path[7:] # Slice off the leading "/media/"
+                path2 = path[7:]  # Slice off the leading "/media/"
                 drive = path2[:path2.find("/")]
-                path = drive + ":\\"+path[8:] # TODO this is hardcoded to my drive system
+                path = drive + ":" + path[8:]  # TODO this is hardcoded to my drive system
             return path.replace("/", "\\")
+
         while self.go:
             self.local_lock.acquire()
             if len(self.files_to_add):
