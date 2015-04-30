@@ -151,7 +151,10 @@ class Scanner(Thread):
             mfile = f[1].strip("\"")
             s_time = 0.0
             if sys.platform == "linux2":
-                pass # TODO Undo path fix
+                if path[1] == ":":
+                    drive = path[0]
+                    path = "/media/"+drive+path[2:]
+                    path = os.path.normpath(path)
             if not os.sep in path:
                 self.roots.append(path)
             if f[2]:
