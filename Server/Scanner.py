@@ -106,6 +106,8 @@ class Scanner(Thread):
         self.directory_database.go = 0
 
     def scan_dir(self, folder_to_scan):
+        if folder_to_scan not in self.roots:
+            self.roots.append(folder_to_scan)
         if not os.path.isdir(folder_to_scan):  # Make sure the folder exists
             print "Cannot access the folder to be scanned:", folder_to_scan
         else:
@@ -156,8 +158,6 @@ class Scanner(Thread):
                     drive = path[0]
                     path = "/media/"+drive+path[2:]
                     path = os.path.normpath(path)
-            if not os.sep in path:
-                self.roots.append(path)
             if f[2]:
                 s_time = f[2]
             if path not in tmpDirectoryDictionary:
