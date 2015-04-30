@@ -150,6 +150,8 @@ class Scanner(Thread):
             path = f[0].strip("\"")
             mfile = f[1].strip("\"")
             s_time = 0.0
+            if sys.platform == "linux2":
+                pass # TODO Undo path fix
             if not os.sep in path:
                 self.roots.append(path)
             if f[2]:
