@@ -201,15 +201,13 @@ class MultiListbox(Frame):
 
     def _sort(self, e):
         # get the listbox to sort by (mapped by the header button)
+        import copy
         b = e.widget
         col, direction = self.colmapping[b]
 
         # get the entire table data into mem
         tableData = self.get(0, END)
-        if self.origData == None:
-            import copy
-
-            self.origData = copy.deepcopy(tableData)
+        self.origData = copy.deepcopy(tableData)
 
         rowcount = len(tableData)
 
