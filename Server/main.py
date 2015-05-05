@@ -4,6 +4,17 @@ from threading import Thread
 import socket
 
 import Scanner
+import time
+
+def log(*args):
+    print "[Main]",
+    print time.strftime("%c"),
+    print " ",
+    for arg in args:
+        print arg,
+    print ""
+
+
 
 def getlocalip():
     import os
@@ -77,7 +88,7 @@ class FindIt(Thread):
                     data = client.recv(10000)
                     if not data:
                         break
-                    print "From", address, "Got data", data
+                    log("From ", address, " Got data ", data)
                 except:
                     break
                 if data:

@@ -12,6 +12,14 @@ This database will hold all the files and paths that are normally written to a C
 
 """
 
+def log(*args):
+    print "[DirectoryDB]",
+    print time.strftime("%c"),
+    print " ",
+    for arg in args:
+        print arg,
+    print ""
+
 
 class DirectoryDB(Thread):
     def __init__(self, file_path, GUI=None):
@@ -98,8 +106,7 @@ class DirectoryDB(Thread):
                     try:
                         self.DB_cursor.execute(query)
                     except lite.OperationalError:
-                        print "ERROR, could not add file:"
-                        print query
+                        log("ERROR, could not add file: ", query)
                     self.lock.release()
             self.files_to_add = []
             if len(self.files_to_delete):

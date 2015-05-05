@@ -16,6 +16,16 @@ import DirectoryDB
 import Directory
 
 
+def log(*args):
+    print "[Scanner]",
+    print time.strftime("%c"),
+    print " ",
+    for arg in args:
+        print arg,
+    print ""
+
+
+
 class Scanner(Thread):
     def __init__(self, GUI=None):
         Thread.__init__(self)
@@ -46,7 +56,7 @@ class Scanner(Thread):
     def init_database(self):
         FindIt = self.create_FindIt_folder()
         if not FindIt:
-            print "Could not create the FindIt directory. Will now crash."
+            log("Could not create the FindIt directory. Will now crash.")
             quit()
         database_filename = os.path.join(FindIt, "FindIt.db")
         # self.backup_db(database_filename)
@@ -75,7 +85,7 @@ class Scanner(Thread):
             else:
                 return False
         else:
-            print "Crashing. Not made to run on mac"
+            log("Crashing. Not made to run on mac")
 
 
     def load_preferences(self):
@@ -96,7 +106,7 @@ class Scanner(Thread):
                 if self.GUI:
                     self.GUI.set_status("Done Scanning.")
                 else:
-                    print "Done Scanning"
+                    log("Done Scanning")
             time.sleep(.1)  # Poll
             if time.time() > self.last_update + self.update_interval:
                 self.last_update = time.time()
@@ -109,9 +119,9 @@ class Scanner(Thread):
         if folder_to_scan not in self.roots:
             self.roots.append(folder_to_scan)
         if not os.path.isdir(folder_to_scan):  # Make sure the folder exists
-            print "Cannot access the folder to be scanned:", folder_to_scan
+            log("Cannot access the folder to be scanned: ", folder_to_scan)
         else:
-            print "adding path", folder_to_scan
+            log("adding path ", folder_to_scan)
             if folder_to_scan not in self.directory_dictionary:
                 self.directory_dictionary[folder_to_scan] = Directory.Directory(folder_to_scan, 0.0,
                                                                                 self.directory_dictionary)  # Create Root and reset time.
@@ -120,22 +130,22 @@ class Scanner(Thread):
             if self.GUI:
                 self.GUI.set_status("Scanning: " + folder_to_scan)
             else:
-                print "Scanning:", folder_to_scan
+                log("Scanning: ", folder_to_scan)
 
     def backup_db(self, pathToDB):
         try:
             nm = pathToDB + str(datetime.datetime.now()).replace(":", "-") + ".backup"
-            print nm
+            log(nm)
             if os.path.isfile(pathToDB):
                 shutil.copy(pathToDB, nm)  # Move old database to a backup location
-                print "Output file backed up."
+                log("Output file backed up.")
         except ValueError:
-            print "Output file not backed up. File may not exist, permissions, etc. This might be a problem later"
+            log("Output file not backed up. File may not exist, permissions, etc. This might be a problem later")
 
     def freshen(self):
         for i in self.roots:
             if i in self.directory_dictionary:
-                print "Rescanning", i
+                log("Rescanning ", i)
                 self.directory_dictionary[i].update(self.update_pool, self.directory_database)
 
     def importOldScanFromDB(self, DB, tmpDirectoryDictionary):
@@ -147,7 +157,7 @@ class Scanner(Thread):
         :type tmpDirectoryDictionary: dict of Directory.Directory
         :return: Does not return anything.
         """
-        print "Attempting to import old Database from", DB.file_path
+        log("Attempting to import old Database from ", DB.file_path)
         data = DB.dump()
         for f in data:
             path = f[0].strip("\"")
@@ -165,5 +175,5 @@ class Scanner(Thread):
                 tmpDirectoryDictionary[path].files.append(mfile)
             else:
                 tmpDirectoryDictionary[path].files.append(mfile)
-        print "Done Importing"
+        log("Done Importing")
 

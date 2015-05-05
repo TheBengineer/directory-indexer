@@ -9,6 +9,14 @@ import Queue
 gc.disable()  # about to play with 200MB+ data structure. No GC please.
 
 
+def log(*args):
+    print "[Directory]",
+    print time.strftime("%c"),
+    print " ",
+    for arg in args:
+        print arg,
+    print ""
+
 class Directory(object):
     """
     This class holds a directory in memory, all the files it has, and a dictionary of the directories it has under it.
@@ -48,9 +56,9 @@ class Directory(object):
             if self.root in DirDict:
                 DirDict[self.root].dirClasses[self.path] = self  # linking
             else:
-                print "Assuming", self.root, "to be the global root"
+                log("Assuming ", self.root, " to be the global root")
         else:
-            print "Assuming", self.root, "to be the global root because there are no slashes"
+            log("Assuming ", self.root, " to be the global root because there are no slashes")
 
     def printFiles(self, thread_pool, recursive=True):
         """
@@ -62,7 +70,7 @@ class Directory(object):
         if self.scanned == 0:
             self.update(thread_pool)
         for i in self.files:
-            print self.path + "\\" + i
+            log(self.path + "\\" + i)
         if recursive:
             for i in self.dirClasses:
                 self.dirClasses[i].printFiles(thread_pool)
@@ -131,7 +139,7 @@ class Directory(object):
         if os.path.isdir(self.path):
             if type(self.timeUpdated) == "date":
                 self.timeUpdated = 0.0
-                print "fixed"
+                log("fixed")
             if os.path.getmtime(self.path) > self.timeUpdated:
                 thread_pool.messages.put("Updating " + str(self.path))
                 # Needs an update
@@ -199,7 +207,7 @@ def importOldScanCSV(oldScanFile, tmpDirectoryDictionary):
     """
     import csv
 
-    print "Attempting to import old Database"
+    log("Attempting to import old Database")
     try:
         with open(oldScanFile, 'rb') as csvfile:
             spamreader = csv.reader(csvfile, delimiter=',', quotechar="\"")
@@ -207,11 +215,11 @@ def importOldScanCSV(oldScanFile, tmpDirectoryDictionary):
                 daterow = spamreader.next()
                 time_updated = datetime.datetime(int(daterow[1]), int(daterow[2]), int(daterow[3]))
             except StopIteration:
-                print "Existing database file is empty."
+                log("Existing database file is empty.")
                 return
             for row in spamreader:
                 if spamreader.line_num % 10000 == 0:
-                    print "reading line:", spamreader.line_num
+                    log("reading line: ", spamreader.line_num)
                 path = row[0].strip("\"")
                 mfile = row[1].strip("\"")
                 if path not in tmpDirectoryDictionary:
@@ -220,8 +228,7 @@ def importOldScanCSV(oldScanFile, tmpDirectoryDictionary):
                 else:
                     tmpDirectoryDictionary[path].files.append(mfile)
     except IOError:
-        print "Could not read existing database. Scanning from scratch."
-        print oldScanFile
+        log("Could not read existing database. Scanning from scratch. ", oldScanFile)
 
 
 
