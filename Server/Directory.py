@@ -72,26 +72,6 @@ class Directory(object):
             for i in self.dirClasses:
                 self.dirClasses[i].printFiles(thread_pool)
 
-    def writeFiles(self, mfile, thread_pool, recursive=True):
-        """
-        Writes the files in this directory to the provided FILE object. Recursive can be turned off.
-        :param mfile: A FILE object where the files names will be written in CSV format
-        :type mfile: file
-        :param recursive: Flag for recursion
-        :type recursive: bool
-        :return: does not return anything
-        """
-        if self.scanned == 0:
-            self.update(thread_pool)
-        self.files.sort()
-        for i in self.files:
-            mfile.write("\"" + self.path + "\",\"" + i + "\"\n")
-        sortedKeys = self.dirClasses.keys()
-        sortedKeys.sort()
-        if recursive:
-            for i in sortedKeys:
-                self.dirClasses[i].writeFiles(mfile, thread_pool)
-
     def markLower(self):
         """
         Marks directory and subdirectories scanned. Usually used when a directory has not been updated
@@ -143,21 +123,18 @@ class Directory(object):
                 (pathS, directoriesS, filesS) = ([], [], [])
                 for (pathS, directoriesS, filesS) in myScandir.walk(self.path):
                     break
-                if filesS:
-                    self.files = filesS
-                if directoriesS:
-                    self.directories = directoriesS
+
             else:
                 thread_pool.messages.put("Path is all up to date: " + str(self.path))
                 self.markLower()
-            for folder in self.directories:
+            for folder in directoriesS:
                 fullfolder = os.path.join(self.path, folder)
                 if fullfolder not in self.dirClasses:
                     tmpDir = Directory(fullfolder, 0.0, self.DirectoryDictionary)
                     self.DirectoryDictionary[fullfolder] = tmpDir
                     self.dirClasses[fullfolder] = tmpDir
             thread_pool.messages.put("Writing " + str(self.path))
-            for f in self.files:
+            for f in filesS:
                 DB.add_fileB(self.path, f)
             if recursive:
                 for i in self.dirClasses:
@@ -170,62 +147,6 @@ class Directory(object):
         thread_pool.thread_lock.acquire()
         thread_pool.thread_count -= 1
         thread_pool.thread_lock.release()
-
-
-    def writeFilesDB(self, thread_pool, DB, recursive=True, verify=False):
-        """
-        Writes the files in this directory to the provided Database object. Recursive can be turned off.
-        :param thread_pool: A threaded pool to parallelize the update function
-        :type thread_pool: Pool
-        :param DB: A Database object where the files names will be stored
-        :type DB: DirectoryDB.DirectoryDB
-        :param recursive: Flag for recursion
-        :type recursive: bool
-        :return: does not return anything
-        """
-        if verify:
-            if self.scanned == 0:
-                self.update(thread_pool, DB)
-        for i in self.files:
-            DB.add_fileB(self.path, i)
-        if recursive:
-            for i in self.dirClasses:
-                self.dirClasses[i].writeFilesDB(thread_pool, DB)
-
-
-def importOldScanCSV(oldScanFile, tmpDirectoryDictionary):
-    """
-    Used to import a .csv file generated from the last scan.
-    :param oldScanFile: The path to the .csv file
-    :type oldScanFile: str
-    :param tmpDirectoryDictionary: A dictionary to hold all the imported Directory classes
-    :type tmpDirectoryDictionary: dict of Directory
-    :return: Does not return anything.
-    """
-    import csv
-
-    log("Attempting to import old Database")
-    try:
-        with open(oldScanFile, 'rb') as csvfile:
-            spamreader = csv.reader(csvfile, delimiter=',', quotechar="\"")
-            try:
-                daterow = spamreader.next()
-                time_updated = datetime.datetime(int(daterow[1]), int(daterow[2]), int(daterow[3]))
-            except StopIteration:
-                log("Existing database file is empty.")
-                return
-            for row in spamreader:
-                if spamreader.line_num % 10000 == 0:
-                    log("reading line: ", spamreader.line_num)
-                path = row[0].strip("\"")
-                mfile = row[1].strip("\"")
-                if path not in tmpDirectoryDictionary:
-                    tmpDirectoryDictionary[path] = Directory(path, time_updated, tmpDirectoryDictionary)
-                    tmpDirectoryDictionary[path].files.append(mfile)
-                else:
-                    tmpDirectoryDictionary[path].files.append(mfile)
-    except IOError:
-        log("Could not read existing database. Scanning from scratch. ", oldScanFile)
 
 
 
