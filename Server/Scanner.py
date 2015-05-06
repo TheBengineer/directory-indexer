@@ -98,6 +98,8 @@ class Scanner(Thread):
         gc.disable()
         self.importOldScanFromDB(self.directory_database, self.directory_dictionary)
         gc.enable()
+        gc.collect()
+        self.directory_dictionary = {}
         while self.go:
             if self.update_pool.thread_count > 0:
                 while self.update_pool.thread_count > 0:

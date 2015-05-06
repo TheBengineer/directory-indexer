@@ -1,7 +1,6 @@
 __author__ = 'Wild_Doogy'
 import os
 import time
-import datetime
 
 import Queue
 
@@ -13,6 +12,7 @@ def log(*args):
     for arg in args:
         print arg,
     print ""
+
 
 class Directory(object):
     """
@@ -123,19 +123,21 @@ class Directory(object):
                 (pathS, directoriesS, filesS) = ([], [], [])
                 for (pathS, directoriesS, filesS) in myScandir.walk(self.path):
                     break
-
             else:
                 thread_pool.messages.put("Path is all up to date: " + str(self.path))
                 self.markLower()
+            pathS = []
             for folder in directoriesS:
                 fullfolder = os.path.join(self.path, folder)
                 if fullfolder not in self.dirClasses:
                     tmpDir = Directory(fullfolder, 0.0, self.DirectoryDictionary)
                     self.DirectoryDictionary[fullfolder] = tmpDir
                     self.dirClasses[fullfolder] = tmpDir
+            directoriesS = []
             thread_pool.messages.put("Writing " + str(self.path))
             for f in filesS:
                 DB.add_fileB(self.path, f)
+            filesS = []
             if recursive:
                 for i in self.dirClasses:
                     thread_pool.apply_async(self.dirClasses[i].update, args=(thread_pool, DB,))

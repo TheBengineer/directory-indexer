@@ -105,11 +105,5 @@ if __name__ == '__main__':
     F = FindIt(version)
     F.scanner.scan_dir("/media/M/Drawings")
     F.start()
-    raw_input()
-    print len(F.scanner.directory_dictionary)
-    import sys
-    print sys.getsizeof(F.scanner.directory_dictionary)
-    size = 0
-    print sys.getsizeof(F.scanner.directory_dictionary.keys())
 
 
