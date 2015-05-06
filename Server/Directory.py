@@ -31,8 +31,6 @@ class Directory(object):
         :return: Does not return anything
         """
         self.path = path
-        self.files = []
-        self.directories = []
         self.dirClasses = {}
         self.timeUpdated = timeUpdated
         self.DirectoryDictionary = DirDict
@@ -57,20 +55,6 @@ class Directory(object):
         else:
             log("Assuming ", self.root, " to be the global root because there are no slashes")
 
-    def printFiles(self, thread_pool, recursive=True):
-        """
-        Prints the files of this folder, and all subfolders recursively depending on the flag
-        :param recursive: If this is true, then all files are printed recursively. Defaults to true
-        :type recursive: bool
-        :return: Does not return anything
-        """
-        if self.scanned == 0:
-            self.update(thread_pool)
-        for i in self.files:
-            log(self.path + "\\" + i)
-        if recursive:
-            for i in self.dirClasses:
-                self.dirClasses[i].printFiles(thread_pool)
 
     def markLower(self):
         """

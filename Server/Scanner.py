@@ -164,6 +164,7 @@ class Scanner(Thread):
         """
         log("Attempting to import old Database from ", DB.file_path)
         data = DB.dump()
+        log("Got ", sys.getsizeof(data)/1024000.0," MB of data")
         for f in data:
             path = f[0].strip("\"")
             mfile = f[1].strip("\"")
@@ -177,8 +178,9 @@ class Scanner(Thread):
                 s_time = f[2]
             if path not in tmpDirectoryDictionary:
                 tmpDirectoryDictionary[path] = Directory.Directory(path, s_time, tmpDirectoryDictionary)
-                tmpDirectoryDictionary[path].files.append(mfile)
+                #tmpDirectoryDictionary[path].files.append(mfile)
             else:
-                tmpDirectoryDictionary[path].files.append(mfile)
+                pass
+                #tmpDirectoryDictionary[path].files.append(mfile)
         log("Done Importing")
 
