@@ -2,11 +2,8 @@ __author__ = 'Wild_Doogy'
 import os
 import time
 import datetime
-import gc
+
 import Queue
-
-
-gc.disable()  # about to play with 200MB+ data structure. No GC please.
 
 
 def log(*args):

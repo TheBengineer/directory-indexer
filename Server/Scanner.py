@@ -10,6 +10,7 @@ import Queue
 # Needed for backup
 import datetime, shutil
 
+import gc
 import os, time, sys
 
 import DirectoryDB
@@ -23,7 +24,6 @@ def log(*args):
     for arg in args:
         print arg,
     print ""
-
 
 
 class Scanner(Thread):
@@ -50,7 +50,7 @@ class Scanner(Thread):
         self.go = 1
         self.log = ""
         self.last_update = time.time()
-        self.update_interval = 60*60*12  # Seconds
+        self.update_interval = 60 * 60 * 12  # Seconds
         # TODO make this scan at a time, say 8 PM
 
 
@@ -95,7 +95,9 @@ class Scanner(Thread):
         pass
 
     def run(self):
+        gc.disable()
         self.importOldScanFromDB(self.directory_database, self.directory_dictionary)
+        gc.enable()
         while self.go:
             if self.update_pool.thread_count > 0:
                 while self.update_pool.thread_count > 0:
@@ -167,7 +169,7 @@ class Scanner(Thread):
             if sys.platform == "linux2":
                 if path[1] == ":":
                     drive = path[0]
-                    path = "/media/"+drive+path[2:]
+                    path = "/media/" + drive + path[2:]
                     path = os.path.normpath(path)
             if f[2]:
                 s_time = f[2]
