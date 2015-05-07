@@ -7,9 +7,17 @@ import tkFileDialog
 import subprocess
 import Queue
 import socket
+import time
 
 import mhMultiListBox
 
+def log(*args):
+    print "[GUI]",
+    print time.strftime("%c"),
+    print " ",
+    for arg in args:
+        print arg,
+    print ""
 
 class Window(Thread):
     def __init__(self):
@@ -129,11 +137,13 @@ class Window(Thread):
             result_string = s.recv(100000)
             results = result_string.split("\n")
             self.multi_list_box.delete(0, tk.END)
-            for result in results:
+            i = 0
+            for i, result in enumerate(results):
                 text = (
                     result[result.rfind("\\") + 1:], result[result.rfind(".") + 1:].upper(),
                     result)
                 self.multi_list_box.insert(0, text)
+            log("Got ", i, "Results")
 
     def open_file(self, event=""):
         try:

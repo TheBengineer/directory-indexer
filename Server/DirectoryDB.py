@@ -131,9 +131,16 @@ class DirectoryDB(Thread):
             # TODO is 30 seconds a good time for the database to be written to?
             time.sleep(.1)
 
-
     def get_folders(self, filename):
         query = "SELECT path, filename FROM files WHERE filename LIKE '{filename}';".format(filename=filename)
+        self.lock.acquire()
+        self.DB_cursor.execute(query)
+        data = self.DB_cursor.fetchall()
+        self.lock.release()
+        return data
+
+    def get_folders_500(self, filename):
+        query = "SELECT TOP 510 path, filename FROM files WHERE filename LIKE '{filename}';".format(filename=filename)
         self.lock.acquire()
         self.DB_cursor.execute(query)
         data = self.DB_cursor.fetchall()

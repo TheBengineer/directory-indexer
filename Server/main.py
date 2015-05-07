@@ -94,11 +94,12 @@ class FindIt(Thread):
                 except:
                     break
                 if data:
-                    result = self.scanner.directory_database.get_folders("%" + data + "%")
+                    result = self.scanner.directory_database.get_folders_500("%" + data + "%")
                     data_to_send = ""
                     for i, r in enumerate(result):
-                        if i > 10000:
+                        if i > 500:
                             log("Too many results for search term", data)
+                            data_to_send += "Displaying only first 500 results\n"
                             break
                         data_to_send += r[0] + "\\" + r[1] + "\n"
                     client.send(data_to_send)
