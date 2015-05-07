@@ -1,5 +1,5 @@
-__author__ = 'boh01'
 from __future__ import print_function
+__author__ = 'boh01'
 from sys import getsizeof, stderr
 from itertools import chain
 from collections import deque

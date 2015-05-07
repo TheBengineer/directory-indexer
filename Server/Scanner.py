@@ -15,6 +15,7 @@ import os, time, sys
 
 import DirectoryDB
 import Directory
+import SizeOf
 
 
 def log(*args):
@@ -185,4 +186,5 @@ class Scanner(Thread):
                 # tmpDirectoryDictionary[path].files.append(mfile)
         log("Done Importing, got ", lines, "files, and ", len(tmpDirectoryDictionary), " unique folders")
         log("Size of directory:", sys.getsizeof(tmpDirectoryDictionary))
+        log("Total size of dictionary:", SizeOf.total_size(tmpDirectoryDictionary))
 
