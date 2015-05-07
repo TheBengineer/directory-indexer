@@ -98,7 +98,6 @@ class Scanner(Thread):
         gc.disable()
         self.importOldScanFromDB(self.directory_database, self.directory_dictionary)
         gc.enable()
-        gc.collect()
         self.directory_dictionary = {}
         while self.go:
             if self.update_pool.thread_count > 0:
@@ -164,8 +163,10 @@ class Scanner(Thread):
         """
         log("Attempting to import old Database from ", DB.file_path)
         data = DB.dump()
-        log("Got ", sys.getsizeof(data)/1024000.0," MB of data")
+        log("Got ", sys.getsizeof(data) / 1024000.0, " MB of data")
+        lines = 0
         for f in data:
+            lines += 1
             path = f[0].strip("\"")
             mfile = f[1].strip("\"")
             s_time = 0.0
@@ -178,9 +179,9 @@ class Scanner(Thread):
                 s_time = f[2]
             if path not in tmpDirectoryDictionary:
                 tmpDirectoryDictionary[path] = Directory.Directory(path, s_time, tmpDirectoryDictionary)
-                #tmpDirectoryDictionary[path].files.append(mfile)
+                # tmpDirectoryDictionary[path].files.append(mfile)
             else:
                 pass
-                #tmpDirectoryDictionary[path].files.append(mfile)
-        log("Done Importing")
+                # tmpDirectoryDictionary[path].files.append(mfile)
+        log("Done Importing, got ", lines, "files")
 

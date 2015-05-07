@@ -65,6 +65,18 @@ class Directory(object):
             self.dirClasses[i].markLower()
         self.scanned = 1
 
+    def size(self):
+        import sys
+        s = 0
+        s += sys.getsizeof(self)
+        log("Object size ", s)
+        for i in dir(self):
+            s += sys.getsizeof(i)
+        log("Object attributes", dir(self))
+        log("Object+ size ", s)
+
+
+
     def delLower(self, DB):
         """
         Breaks the links associating this class with it's subdirectories. This is used when a folder does not exist.
