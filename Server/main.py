@@ -2,9 +2,10 @@ __author__ = 'Wild_Doogy'
 
 from threading import Thread
 import socket
+import time
 
 import Scanner
-import time
+
 
 def log(*args):
     print "[Main]",
@@ -15,26 +16,27 @@ def log(*args):
     print ""
 
 
-
 def getlocalip():
     import os
+
     c4 = ""
     if os.sys.platform == "win32":
         back = os.popen("ipconfig /all")
         cmd = back.read(2000)
-        cmd2 = cmd[cmd.find("IP Address"):cmd.find("IP Address")+70]
-        cmd3 = cmd2[cmd2.find(":")+2:cmd2.find(":")+19]
-        c4 = cmd3[0:cmd3.find(" ")-2]
+        cmd2 = cmd[cmd.find("IP Address"):cmd.find("IP Address") + 70]
+        cmd3 = cmd2[cmd2.find(":") + 2:cmd2.find(":") + 19]
+        c4 = cmd3[0:cmd3.find(" ") - 2]
     elif os.sys.platform == "linux2":
         back = os.popen("ifconfig")
         cmd = back.read(2000)
-        cmd2 = cmd[cmd.find("Ethernet"):cmd.find("Ethernet")+300]
-        cmd3 = cmd2[cmd2.find("inet addr:")+10:cmd2.find("inet addr:")+50]
+        cmd2 = cmd[cmd.find("Ethernet"):cmd.find("Ethernet") + 300]
+        cmd3 = cmd2[cmd2.find("inet addr:") + 10:cmd2.find("inet addr:") + 50]
         c4 = cmd3[0:cmd3.find(" ")]
     if c4 != "":
         return c4
     else:
         return "localhost"
+
 
 class FindIt(Thread):
     def __init__(self, version):
@@ -94,8 +96,11 @@ class FindIt(Thread):
                 if data:
                     result = self.scanner.directory_database.get_folders("%" + data + "%")
                     data_to_send = ""
-                    for i in result:
-                        data_to_send += i[0] + "\\" + i[1] + "\n"
+                    for i, r in enumerate(result):
+                        if i > 10000:
+                            log("Too many results for search term", data)
+                            break
+                        data_to_send += r[0] + "\\" + r[1] + "\n"
                     client.send(data_to_send)
                     client.close()
 

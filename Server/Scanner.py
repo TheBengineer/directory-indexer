@@ -164,7 +164,7 @@ class Scanner(Thread):
         """
         log("Attempting to import old Database from ", DB.file_path)
         data = DB.dump()
-        log("Got ", sys.getsizeof(data) / 1024000.0, " MB of data")
+        log("Got ", sys.getsizeof(data) / 1000000.0, " MB of data")
         lines = 0
         for f in data:
             lines += 1
@@ -186,5 +186,5 @@ class Scanner(Thread):
                 # tmpDirectoryDictionary[path].files.append(mfile)
         log("Done Importing, got ", lines, "files, and ", len(tmpDirectoryDictionary), " unique folders")
         log("Size of directory:", sys.getsizeof(tmpDirectoryDictionary))
-        log("Total size of dictionary:", SizeOf.total_size(tmpDirectoryDictionary))
+        log("Total size of dictionary:", SizeOf.asizeof(tmpDirectoryDictionary))
 

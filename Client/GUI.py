@@ -124,7 +124,7 @@ class Window(Thread):
     def search(self, event=""):
         search_text = self.search_text.get()
         if search_text:
-            s = self.socket_connect(self.socket_init(), ("BOH001", 9091))
+            s = self.socket_connect(self.socket_init(), ("localhost", 9091))
             s.send(search_text) # Need to add some checks here
             result_string = s.recv(100000)
             results = result_string.split("\n")
