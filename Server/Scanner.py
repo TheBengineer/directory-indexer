@@ -183,5 +183,6 @@ class Scanner(Thread):
             else:
                 pass
                 # tmpDirectoryDictionary[path].files.append(mfile)
-        log("Done Importing, got ", lines, "files")
+        log("Done Importing, got ", lines, "files, and ", len(tmpDirectoryDictionary), " unique folders")
+        log("Size of directory:", sys.getsizeof(tmpDirectoryDictionary))
 

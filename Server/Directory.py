@@ -18,7 +18,7 @@ class Directory(object):
     """
     This class holds a directory in memory, all the files it has, and a dictionary of the directories it has under it.
     """
-
+    __slots__ = 'path','root','dirClasses','timeUpdated','DirectoryDictionary','scanned'
     def __init__(self, path, timeUpdated, DirDict):
         """
 
@@ -69,9 +69,11 @@ class Directory(object):
         import sys
         s = 0
         s += sys.getsizeof(self)
-        log("Object size ", s)
+        log("Size ", s, " For object", self.root)
         for i in dir(self):
-            s += sys.getsizeof(i)
+            if i != "DirectoryDictionary":
+                s += sys.getsizeof(i)
+            log(i, sys.getsizeof(i))
         log("Object attributes", dir(self))
         log("Object+ size ", s)
 
