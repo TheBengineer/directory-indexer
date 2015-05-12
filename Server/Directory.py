@@ -2,16 +2,16 @@ __author__ = 'Wild_Doogy'
 import os
 import time
 
-import Queue
+import queue
 
 
 def log(*args):
-    print "[Directory]",
-    print time.strftime("%c"),
-    print " ",
+    print("[Directory]", end=' ')
+    print(time.strftime("%c"), end=' ')
+    print(" ", end=' ')
     for arg in args:
-        print arg,
-    print ""
+        print(arg, end=' ')
+    print("")
 
 
 class Directory(object):

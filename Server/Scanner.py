@@ -5,7 +5,7 @@ from threading import Thread
 # Needed for scanning
 from multiprocessing.dummy import Pool as ThreadPool
 from threading import Lock
-import Queue
+import queue
 
 # Needed for backup
 import datetime, shutil
@@ -19,12 +19,12 @@ import SizeOf
 
 
 def log(*args):
-    print "[Scanner]",
-    print time.strftime("%c"),
-    print " ",
+    print("[Scanner]", end=' ')
+    print(time.strftime("%c"), end=' ')
+    print(" ", end=' ')
     for arg in args:
-        print arg,
-    print ""
+        print(arg, end=' ')
+    print("")
 
 
 class Scanner(Thread):
@@ -46,7 +46,7 @@ class Scanner(Thread):
         self.update_pool = ThreadPool(self.number_of_threads)
         self.update_pool.thread_count = 0
         self.update_pool.thread_lock = Lock()
-        self.update_pool.messages = Queue.Queue()
+        self.update_pool.messages = queue.Queue()
 
         self.go = 1
         self.log = ""

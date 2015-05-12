@@ -8,12 +8,12 @@ import Scanner
 
 
 def log(*args):
-    print "[Main]",
-    print time.strftime("%c"),
-    print " ",
+    print("[Main]", end=' ')
+    print(time.strftime("%c"), end=' ')
+    print(" ", end=' ')
     for arg in args:
-        print arg,
-    print ""
+        print(arg, end=' ')
+    print("")
 
 
 def getlocalip():
@@ -115,8 +115,8 @@ if __name__ == '__main__':
     d = []
     while not len(d):
         time.sleep(.1)
-        d = F.scanner.directory_dictionary.keys()
-        print d
+        d = list(F.scanner.directory_dictionary.keys())
+        print(d)
     F.scanner.directory_dictionary[d[0]].size()
 
 

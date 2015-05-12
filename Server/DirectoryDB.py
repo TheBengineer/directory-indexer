@@ -13,12 +13,12 @@ This database will hold all the files and paths that are normally written to a C
 """
 
 def log(*args):
-    print "[DirectoryDB]",
-    print time.strftime("%c"),
-    print " ",
+    print("[DirectoryDB]", end=' ')
+    print(time.strftime("%c"), end=' ')
+    print(" ", end=' ')
     for arg in args:
-        print arg,
-    print ""
+        print(arg, end=' ')
+    print("")
 
 
 class DirectoryDB(Thread):
