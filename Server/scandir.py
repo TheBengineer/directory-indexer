@@ -10,7 +10,7 @@ scandir is released under the new BSD 3-clause license. See LICENSE.txt for
 the full license text.
 """
 
-from __future__ import division
+
 
 from errno import ENOENT
 from os import listdir, lstat, stat, strerror
@@ -46,7 +46,7 @@ FILE_ATTRIBUTE_VIRTUAL = 65536
 IS_PY3 = sys.version_info >= (3, 0)
 
 if not IS_PY3:
-    str = unicode
+    str = str
 
 _scandir = None
 
@@ -110,7 +110,7 @@ class GenericDirEntry(object):
     __repr__ = __str__
 
 
-def scandir_generic(path=u'.'):
+def scandir_generic(path='.'):
     """Like os.listdir(), but yield DirEntry objects instead of returning
     a list of names.
     """
@@ -287,7 +287,7 @@ if sys.platform == 'win32':
         exc.filename = filename
         return exc
 
-    def scandir_python(path=u'.'):
+    def scandir_python(path='.'):
         """Like os.listdir(), but yield DirEntry objects instead of returning
         a list of names.
         """
@@ -395,7 +395,7 @@ if sys.platform == 'win32':
 
             __repr__ = __str__
 
-        def scandir_c(path=u'.'):
+        def scandir_c(path='.'):
             if isinstance(path, bytes):
                 for name, stat in scandir_helper(path.decode('mbcs', 'replace')):
                     name = name.encode('mbcs', 'replace')
@@ -540,7 +540,7 @@ elif sys.platform.startswith(('linux', 'darwin')) or 'bsd' in sys.platform:
         exc.filename = filename
         return exc
 
-    def scandir_python(path=u'.'):
+    def scandir_python(path='.'):
         """Like os.listdir(), but yield DirEntry objects instead of returning
         a list of names.
         """
@@ -575,7 +575,7 @@ elif sys.platform.startswith(('linux', 'darwin')) or 'bsd' in sys.platform:
 
         scandir_helper = _scandir.scandir_helper
 
-        def scandir_c(path=u'.'):
+        def scandir_c(path='.'):
             is_bytes = isinstance(path, bytes)
             for name, d_type in scandir_helper(path):
                 if not is_bytes:
