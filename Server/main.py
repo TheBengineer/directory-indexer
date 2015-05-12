@@ -102,6 +102,7 @@ class FindIt(Thread):
                             data_to_send += "Displaying only first 500 results\n"
                             break
                         data_to_send += r[0] + "\\" + r[1] + "\n"
+                    log("Sending ", len(data_to_send), "Results to ", address)
                     client.send(data_to_send)
                     client.close()
 

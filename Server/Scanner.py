@@ -96,10 +96,13 @@ class Scanner(Thread):
         pass
 
     def run(self):
-        gc.disable()
+        #gc.disable()
+        gc.set_threshold(10)
         self.importOldScanFromDB(self.directory_database, self.directory_dictionary)
-        gc.enable()
+        # This is not technically needed for anything except updating
+        #gc.enable()
         self.directory_dictionary = {}
+        self.freshen()
         while self.go:
             if self.update_pool.thread_count > 0:
                 while self.update_pool.thread_count > 0:
