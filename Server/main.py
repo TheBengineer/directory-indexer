@@ -95,15 +95,16 @@ class FindIt(Thread):
                     data = client.recv(10000)
                     if not data:
                         break
-                    log("From ", address, " Got data ", data)
+                    data_string = str.decode(data)
+                    log("From ", address, " Got data ", data_string)
                 except:
                     break
                 if data:
-                    result = self.scanner.directory_database.get_folders_500("%" + data + "%")
+                    result = self.scanner.directory_database.get_folders_500("%" + data_string + "%")
                     data_to_send = ""
                     for i, r in enumerate(result):
                         if i > 500:
-                            log("Too many results for search term", data)
+                            log("Too many results for search term", data_string)
                             data_to_send += "Displaying only first 500 results\n"
                             break
                         data_to_send += r[0] + "\\" + r[1] + "\n"
@@ -120,7 +121,7 @@ if __name__ == '__main__':
     F.start()
     d = []
     while not len(d):
-        time.sleep(.1)
+        time.sleep(3)
         d = list(F.scanner.directory_dictionary.keys())
         print(d)
     F.scanner.directory_dictionary[d[0]].size()

@@ -30,7 +30,8 @@ class DirectoryDB(Thread):
         self.lock.acquire()
         self.file_path = file_path
         self.DB = lite.connect(self.file_path, check_same_thread=False)
-        self.DB.text_factory = str
+        #self.DB.text_factory = str
+        self.DB.text_factory = lambda x: str(x, 'latin1')
         self.DB_cursor = self.DB.cursor()
         self.lock.release()
         self.create_table()
