@@ -95,8 +95,9 @@ class FindIt(Thread):
                     data = client.recv(10000)
                     if not data:
                         break
-                    data_string = str.decode(data)
-                    log("From ", address, " Got data ", data_string)
+                    log("From ", address, " Got raw data ", data)
+                    data_string = data.decode("utf-8")
+                    log("Data converted:", data_string)
                 except:
                     break
                 if data:
