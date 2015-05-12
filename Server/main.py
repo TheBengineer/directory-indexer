@@ -2,7 +2,7 @@ __author__ = 'Wild_Doogy'
 
 from threading import Thread
 import socket
-import time
+import time, os
 
 import Scanner
 
@@ -17,7 +17,6 @@ def log(*args):
 
 
 def getlocalip():
-    import os
 
     c4 = ""
     if os.sys.platform == "win32":
@@ -32,6 +31,12 @@ def getlocalip():
         cmd2 = cmd[cmd.find("Ethernet"):cmd.find("Ethernet") + 300]
         cmd3 = cmd2[cmd2.find("inet addr:") + 10:cmd2.find("inet addr:") + 50]
         c4 = cmd3[0:cmd3.find(" ")]
+    elif os.sys.platform == "cygwin":
+        back = os.popen("ipconfig /all")
+        cmd = back.read(2000)
+        cmd2 = cmd[cmd.find("IP Address"):cmd.find("IP Address") + 70]
+        cmd3 = cmd2[cmd2.find(":") + 2:cmd2.find(":") + 19]
+        c4 = cmd3[0:cmd3.find(" ") - 2]
     if c4 != "":
         return c4
     else:
@@ -108,6 +113,7 @@ class FindIt(Thread):
 
 
 if __name__ == '__main__':
+    log("System type:", os.sys.platform)
     version = "2.0.0"
     F = FindIt(version)
     F.scanner.scan_dir("/media/M/Drawings")

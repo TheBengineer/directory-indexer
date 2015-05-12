@@ -77,6 +77,15 @@ class Scanner(Thread):
                 return FindIt
             else:
                 return False
+        elif sys.platform == "cygwin":
+            appdata = os.getenv('APPDATA')
+            FindIt = os.path.join(appdata, "FindIt")
+            if not os.path.isdir(FindIt):
+                os.mkdir(FindIt)
+            if os.path.isdir(FindIt):
+                return FindIt
+            else:
+                return False
         elif sys.platform == "linux2":
             home = os.getenv('HOME')
             FindIt = os.path.join(home, "FindIt")
