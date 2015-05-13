@@ -140,7 +140,7 @@ class DirectoryDB(Thread):
         return data
 
     def get_folders_500(self, filename):
-        query = "SELECT path, filename FROM files WHERE filename LIKE '{filename}' LIMIT 510;".format(filename=filename)
+        query = "SELECT path, filename FROM files WHERE filename LIKE '{filename}' LIMIT 500".format(filename=filename)
         log("Getting results for ", query)
         self.lock.acquire()
         self.DB_cursor.execute(query)
