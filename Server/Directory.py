@@ -32,6 +32,10 @@ class Directory(object):
         """
         self.path = os.path.normpath(path)
         self.path = self.path.replace("/", "\\")
+        if ":\\" not in self.path:
+            self.path = self.path.replace(":", ":\\")
+        while "\\\\" in self.path:
+            self.path = self.path.replace("\\\\", "\\")
         self.dirClasses = {}
         self.timeUpdated = timeUpdated
         self.DirectoryDictionary = DirDict
