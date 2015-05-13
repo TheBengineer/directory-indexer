@@ -56,10 +56,7 @@ class Directory(object):
             if self.root in DirDict:
                 DirDict[self.root].dirClasses[self.path] = self  # linking
             else:
-                if Scanner:
-                    if self.root not in Scanner.roots:
-                        Scanner.roots.append(self.root)
-                log("Assuming ", self.root, " to be a global root, adding to scanner roots")
+                log("Assuming ", self.root, " to be a global root")
         else:
             log("Assuming ", self.root, " to be a global root because there are no slashes")
 
