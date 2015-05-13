@@ -101,7 +101,7 @@ class Scanner(Thread):
         self.importOldScanFromDB(self.directory_database, self.directory_dictionary)
         # This is not technically needed for anything except updating
         #gc.enable()
-        self.directory_dictionary = {}
+        #self.directory_dictionary = {}
         self.freshen()
         while self.go:
             if self.update_pool.thread_count > 0:
@@ -165,29 +165,29 @@ class Scanner(Thread):
         :type tmpDirectoryDictionary: dict of Directory.Directory
         :return: Does not return anything.
         """
-        log("Attempting to import old Database from ", DB.file_path)
-        data = DB.dump()
-        log("Got ", sys.getsizeof(data) / 1000000.0, " MB of data")
-        lines = 0
-        for f in data:
-            lines += 1
-            path = f[0].strip("\"")
-            mfile = f[1].strip("\"")
+        def test(file_path, directory_dict):
+            path = file_path[0].strip("\"")
+            #mfile = f[1].strip("\"")
             s_time = 0.0
             if sys.platform == "linux2":
                 if path[1] == ":":
                     drive = path[0]
                     path = "/media/" + drive + path[2:]
                     path = os.path.normpath(path)
-            if f[2]:
-                s_time = f[2]
-            if path not in tmpDirectoryDictionary:
-                tmpDirectoryDictionary[path] = Directory.Directory(path, s_time, tmpDirectoryDictionary)
-                # tmpDirectoryDictionary[path].files.append(mfile)
+            if file_path[2]:
+                s_time = file_path[2]
+            if path not in directory_dict:
+                directory_dict[path] = Directory.Directory(path, s_time, directory_dict)
             else:
                 pass
-                # tmpDirectoryDictionary[path].files.append(mfile)
-        log("Done Importing, got ", lines, "files, and ", len(tmpDirectoryDictionary), " unique folders")
+
+        log("Attempting to import old Database from ", DB.file_path)
+        data = DB.dump_paths()
+        log("Got ", sys.getsizeof(data) / 1000000.0, " MB of data")
+        for line in xrange(len(data)):
+            pass
+            test(data[line], tmpDirectoryDictionary)
+        log("Done Importing, got ", line, "files, and ", len(tmpDirectoryDictionary), " unique folders")
         log("Size of directory:", sys.getsizeof(tmpDirectoryDictionary))
         log("Total size of dictionary:", SizeOf.asizeof(tmpDirectoryDictionary))
 

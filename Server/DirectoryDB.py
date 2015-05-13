@@ -160,6 +160,16 @@ class DirectoryDB(Thread):
         self.lock.release()
         return data
 
+    def dump_paths(self):
+        query = "SELECT DISTINCT path, scan_time FROM files;"
+        log("Starting to dump all stored paths. This may take a while.")
+        self.lock.acquire()
+        self.DB_cursor.execute(query)
+        data = self.DB_cursor.fetchall()
+        self.lock.release()
+        log("Done dumping all paths.")
+        return data
+
     def nuke(self):
         query = "DELETE FROM files;"
         self.lock.acquire()
