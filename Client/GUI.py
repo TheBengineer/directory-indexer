@@ -134,7 +134,7 @@ class Window(Thread):
         if search_text:
             s = self.socket_connect(self.socket_init(), ("BOH001", 9091))
             s.send(search_text) # Need to add some checks here
-            result_string = s.recv(1000000000)
+            result_string = s.recv(100000000)
             num_results = 0
             self.multi_list_box.delete(0, tk.END)
             while result_string != "":
@@ -146,7 +146,7 @@ class Window(Thread):
                         result)
                     self.multi_list_box.insert(0, text)
                 num_results += i
-                result_string = s.recv(1000000000)
+                result_string = s.recv(100000000)
             log("Got ", num_results, "Results")
 
     def open_file(self, event=""):
