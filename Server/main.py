@@ -112,11 +112,6 @@ if __name__ == '__main__':
     F = FindIt(version)
     F.scanner.scan_dir("/media/M/Drawings")
     F.start()
-    d = []
-    while not len(d):
-        time.sleep(.1)
-        d = F.scanner.directory_dictionary.keys()
-        print d
-    F.scanner.directory_dictionary[d[0]].size()
+
 
 

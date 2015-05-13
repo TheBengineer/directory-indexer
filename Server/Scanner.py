@@ -102,6 +102,8 @@ class Scanner(Thread):
         # This is not technically needed for anything except updating
         #gc.enable()
         #self.directory_dictionary = {}
+        for i in self.directory_dictionary[""].dirClasses:
+            log("Roots: ",i.path)
         self.freshen()
         while self.go:
             if self.update_pool.thread_count > 0:
@@ -174,12 +176,10 @@ class Scanner(Thread):
                     drive = path[0]
                     path = "/media/" + drive + path[2:]
                     path = os.path.normpath(path)
-            if file_path[2]:
-                s_time = file_path[2]
+            if file_path[1]:
+                s_time = file_path[1]
             if path not in directory_dict:
                 directory_dict[path] = Directory.Directory(path, s_time, directory_dict)
-            else:
-                pass
 
         log("Attempting to import old Database from ", DB.file_path)
         data = DB.dump_paths()
@@ -188,6 +188,6 @@ class Scanner(Thread):
             pass
             test(data[line], tmpDirectoryDictionary)
         log("Done Importing, got ", line, "files, and ", len(tmpDirectoryDictionary), " unique folders")
-        log("Size of directory:", sys.getsizeof(tmpDirectoryDictionary))
-        log("Total size of dictionary:", SizeOf.asizeof(tmpDirectoryDictionary))
+        #log("Size of directory:", sys.getsizeof(tmpDirectoryDictionary))
+        #log("Total size of dictionary:", SizeOf.asizeof(tmpDirectoryDictionary))
 
