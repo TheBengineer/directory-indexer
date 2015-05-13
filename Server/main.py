@@ -106,6 +106,8 @@ class FindIt(Thread):
                     log("Sending ", i, "Results to ", address)
                     client.send(data_to_send)
                     client.close()
+                else:
+                    client.send("No results")
 
 
 if __name__ == '__main__':
