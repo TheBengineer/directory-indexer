@@ -42,13 +42,13 @@ class Directory(object):
         self.root = self.path
         self.scanned = 0
         if "\\" in self.path:
-            self.root = self.path[:self.path.rfind(os.sep)]
+            self.root = self.path[:self.path.rfind("\\")]
             tmp_root = self.root
             paths = []
             while os.sep in tmp_root:
                 if tmp_root not in DirDict:
                     paths.append(tmp_root)
-                    tmp_root = tmp_root[:tmp_root.rfind(os.sep)]
+                    tmp_root = tmp_root[:tmp_root.rfind("\\")]
                 else:
                     break
             for i in paths:
