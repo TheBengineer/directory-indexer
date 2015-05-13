@@ -45,7 +45,7 @@ class Directory(object):
             self.root = self.path[:self.path.rfind("\\")]
             tmp_root = self.root
             paths = []
-            while os.sep in tmp_root:
+            while "\\" in tmp_root:
                 if tmp_root not in DirDict:
                     paths.append(tmp_root)
                     tmp_root = tmp_root[:tmp_root.rfind("\\")]
