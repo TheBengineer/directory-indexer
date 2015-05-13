@@ -31,6 +31,7 @@ class Directory(object):
         :return: Does not return anything
         """
         self.path = os.path.normpath(path)
+        self.path = self.path.replace("/", "\\")
         self.dirClasses = {}
         self.timeUpdated = timeUpdated
         self.DirectoryDictionary = DirDict
