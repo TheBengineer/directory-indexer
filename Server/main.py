@@ -96,6 +96,7 @@ class FindIt(Thread):
                 if data:
                     result = self.scanner.directory_database.get_folders_500("%" + data + "%")
                     data_to_send = ""
+                    i = 0
                     for i, r in enumerate(result):
                         if i > 510:
                             log("Too many results for search term", data)
