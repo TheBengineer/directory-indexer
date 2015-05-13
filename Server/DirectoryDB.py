@@ -141,6 +141,7 @@ class DirectoryDB(Thread):
 
     def get_folders_500(self, filename):
         query = "SELECT TOP 510 path, filename FROM files WHERE filename LIKE '{filename}';".format(filename=filename)
+        log("Getting results for ", query)
         self.lock.acquire()
         self.DB_cursor.execute(query)
         data = self.DB_cursor.fetchall()
