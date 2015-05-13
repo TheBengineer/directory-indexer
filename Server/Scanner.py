@@ -101,9 +101,7 @@ class Scanner(Thread):
         self.importOldScanFromDB(self.directory_database, self.directory_dictionary)
         # This is not technically needed for anything except updating
         #gc.enable()
-        #self.directory_dictionary = {}
-        for i in self.directory_dictionary[""].dirClasses:
-            log("Roots: ",i.path)
+        log("Roots:", self.roots)
         self.freshen()
         while self.go:
             if self.update_pool.thread_count > 0:
@@ -134,7 +132,7 @@ class Scanner(Thread):
             log("adding path ", folder_to_scan)
             if folder_to_scan not in self.directory_dictionary:
                 self.directory_dictionary[folder_to_scan] = Directory.Directory(folder_to_scan, 0.0,
-                                                                                self.directory_dictionary)  # Create Root and reset time.
+                                                                                self.directory_dictionary, self)  # Create Root and reset time.
             self.update_pool.apply_async(self.directory_dictionary[folder_to_scan].update,
                                          args=(self.update_pool, self.directory_database,))  # Go. Scan. Be Free.
             if self.GUI:
@@ -179,7 +177,7 @@ class Scanner(Thread):
             if file_path[1]:
                 s_time = file_path[1]
             if path not in directory_dict:
-                directory_dict[path] = Directory.Directory(path, s_time, directory_dict)
+                directory_dict[path] = Directory.Directory(path, s_time, directory_dict, self)
 
         log("Attempting to import old Database from ", DB.file_path)
         data = DB.dump_paths()

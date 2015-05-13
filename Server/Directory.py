@@ -19,7 +19,7 @@ class Directory(object):
     This class holds a directory in memory, all the files it has, and a dictionary of the directories it has under it.
     """
     __slots__ = 'path','root','dirClasses','timeUpdated','DirectoryDictionary','scanned'
-    def __init__(self, path, timeUpdated, DirDict):
+    def __init__(self, path, timeUpdated, DirDict, Scanner=None):
         """
 
         :param path: This parameter is the file system path that this directory represents
@@ -30,13 +30,13 @@ class Directory(object):
         :type DirDict: dict of Directory
         :return: Does not return anything
         """
-        self.path = path
+        self.path = os.path.normpath(path)
         self.dirClasses = {}
         self.timeUpdated = timeUpdated
         self.DirectoryDictionary = DirDict
         self.root = self.path
         self.scanned = 0
-        if os.sep in self.path:
+        if "\\" in self.path:
             self.root = self.path[:self.path.rfind(os.sep)]
             tmp_root = self.root
             paths = []
@@ -51,9 +51,12 @@ class Directory(object):
             if self.root in DirDict:
                 DirDict[self.root].dirClasses[self.path] = self  # linking
             else:
-                log("Assuming ", self.root, " to be the global root")
+                if Scanner:
+                    if self.root not in Scanner.roots:
+                        Scanner.roots.append(self.root)
+                log("Assuming ", self.root, " to be a global root, adding to scanner roots")
         else:
-            log("Assuming ", self.root, " to be the global root because there are no slashes")
+            log("Assuming ", self.root, " to be a global root because there are no slashes")
 
 
     def markLower(self):
@@ -115,6 +118,9 @@ class Directory(object):
             if type(self.timeUpdated) == "date":
                 self.timeUpdated = 0.0
                 log("fixed")
+            directoriesS = []
+            filesS = []
+            pathS = []
             if os.path.getmtime(self.path) > self.timeUpdated:
                 thread_pool.messages.put("Updating " + str(self.path))
                 # Needs an update
@@ -131,8 +137,8 @@ class Directory(object):
                     tmpDir = Directory(fullfolder, 0.0, self.DirectoryDictionary)
                     self.DirectoryDictionary[fullfolder] = tmpDir
                     self.dirClasses[fullfolder] = tmpDir
-            directoriesS = []
             thread_pool.messages.put("Writing " + str(self.path))
+            directoriesS = []
             for f in filesS:
                 DB.add_fileB(self.path, f)
             filesS = []
