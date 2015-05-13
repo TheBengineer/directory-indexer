@@ -111,9 +111,11 @@ class FindIt(Thread):
                         message_length += 1
                     log("Sending ", i, "Results to ", address)
                     client.send(data_to_send)
-                    client.close()
+                    client.send("")
                 else:
                     client.send("No results")
+                    client.send("")
+                client.close()
 
 
 if __name__ == '__main__':
