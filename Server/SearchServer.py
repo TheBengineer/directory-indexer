@@ -3,6 +3,7 @@ __author__ = 'boh01'
 from threading import Thread
 import time
 import socket
+import errno
 
 
 def log(*args):
@@ -74,36 +75,42 @@ class SearchServer(Thread):
 
     def run(self):
         while self.go:
-            client, address = self.socket_accept(self.socket)
-            data = ""
-            while 1:
-                try:
-                    data = client.recv(10000)
-                    if not data:
-                        break
-                    log("From ", address, " Got data ", data)
-                except:
-                    break
-                if data:
-                    result = self.scanner.directory_database.get_folders_500("%" + data + "%")
-                    data_to_send = ""
-                    i = 0
-                    message_length = 0
-                    for i, r in enumerate(result):
-                        if i > 510:
-                            log("Too many results for search term", data)
-                            data_to_send += "Displaying only first 500 results\n"
+            try:
+                client, address = self.socket_accept(self.socket)
+                data = ""
+                while 1:
+                    try:
+                        data = client.recv(10000)
+                        if not data:
                             break
-                        if message_length > 25:
-                            client.send(data_to_send)
-                            data_to_send = ""
-                            message_length = 0
-                        data_to_send += r[0] + "\\" + r[1] + "\n"
-                        message_length += 1
-                    log("Sending ", i, "Results to ", address)
-                    client.send(data_to_send)
-                    client.send("")
-                else:
-                    client.send("No results")
-                    client.send("")
-                client.close()
+                        log("From ", address, " Got data ", data)
+                    except:
+                        break
+                    if data:
+                        result = self.scanner.directory_database.get_folders_500("%" + data + "%")
+                        data_to_send = ""
+                        i = 0
+                        message_length = 0
+                        for i, r in enumerate(result):
+                            if i > 510:
+                                log("Too many results for search term", data)
+                                data_to_send += "Displaying only first 500 results\n"
+                                break
+                            if message_length > 25:
+                                client.send(data_to_send)
+                                data_to_send = ""
+                                message_length = 0
+                            data_to_send += r[0] + "\\" + r[1] + "\n"
+                            message_length += 1
+                        log("Sending ", i, "Results to ", address)
+                        client.send(data_to_send)
+                        client.send("")
+                    else:
+                        client.send("No results")
+                        client.send("")
+                    client.close()
+            except socket.error, v:
+                errorcode=v[0]
+                if errorcode==errno.ECONNRESET:
+                    print "Connection Reset"
+
