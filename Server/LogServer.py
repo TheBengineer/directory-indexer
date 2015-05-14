@@ -105,4 +105,4 @@ class LogServer(Thread):
             except socket.error, v:
                 errorcode=v[0]
                 if errorcode==errno.ECONNRESET:
-                    print "Connection Reset"
+                    log("Connection Reset")
