@@ -66,8 +66,10 @@ def mainprog(client):
     while 1:
         i += 1
         try:
+            print "Asking for log"
             client.send("log")
             data = client.recv(20000000)
+            print "got", len(data), "bytes of data"
             while data:
                 print data
                 data = client.recv(20000000)
@@ -76,15 +78,12 @@ def mainprog(client):
             break
         if data == "":
             break
-        print data, " ", i
-        if len(data) > 40:
-            print "Sending"
-            client.send(data)
+        print data,
 
 
 while 1:
     client = setup(("BOH001", 9092))
+    raw_input("Enter to continue")
     mainprog(client)
-
 
 
