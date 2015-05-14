@@ -118,7 +118,7 @@ class Directory(object):
 
         """
         thread_pool.messages.put(
-            "Processing " + str(self.path) + " Folder Time:" + str(self.timeUpdated) + " Now:" + str(time.time()))
+            " Folder Time:" + str(self.timeUpdated) + " Now:" + str(time.time())) + "Processing " + str(self.path)
         import scandir as myScandir
 
         thread_pool.thread_lock.acquire()
