@@ -36,7 +36,11 @@ class FindIt(Thread):
 
     def run(self):
         while self.go:
-            time.sleep(1)
+            command = raw_input()
+            if command.upper() == "Q":
+                exit()
+            elif command.upper() == "A":
+                pass
 
 
 if __name__ == '__main__':
