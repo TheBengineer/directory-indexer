@@ -83,7 +83,15 @@ class LogServer(Thread):
                         data = client.recv(10000)
                     except:
                         break
-                    if "log" in data:
+                    if "last" in data:
+                        log("From ", address, " Got request for last log data ")
+                        if len(self.scanner.log) > 200:
+                            tmp = self.scanner.log[-190:]
+                            tmp = tmp[:tmp.rfind("\n")]
+                            last = tmp[tmp.rfind("\n"):]
+                            client.send(last)
+                            client.send("")
+                    elif "log" in data:
                         log("From ", address, " Got request for log data ")
                         data_to_send = ""
                         i = 0
