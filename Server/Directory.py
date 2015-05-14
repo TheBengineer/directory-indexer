@@ -34,6 +34,7 @@ class Directory(object):
         :return: Does not return anything
         """
         # self.path = os.path.normpath(path) # Optimizing out
+        self.path = path
 
         # Final Checks
         if ":\\" not in self.path:
