@@ -4,6 +4,7 @@ from threading import Thread
 import time
 import socket
 
+
 def log(*args):
     print "[LogServer]",
     print time.strftime("%c"),
@@ -11,7 +12,6 @@ def log(*args):
     for arg in args:
         print arg,
     print ""
-
 
 
 def getlocalip():
@@ -34,7 +34,6 @@ def getlocalip():
         return c4
     else:
         return "localhost"
-
 
 
 class LogServer(Thread):
@@ -87,14 +86,14 @@ class LogServer(Thread):
                     data_to_send = ""
                     i = 0
                     message_length = 0
-                    for i, r in enumerate(self.scanner.log):
-                        if message_length > 25:
+                    for i, char in enumerate(self.scanner.log):
+                        if message_length > 2500:
                             client.send(data_to_send)
                             data_to_send = ""
                             message_length = 0
-                        data_to_send += r[0] + "\\" + r[1] + "\n"
+                        data_to_send += char
                         message_length += 1
-                    log("Sending ", i, "Results to ", address)
+                    log("Sending ", i, "bytes to ", address)
                     client.send(data_to_send)
                     client.send("")
                 else:

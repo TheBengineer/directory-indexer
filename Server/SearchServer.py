@@ -4,6 +4,7 @@ from threading import Thread
 import time
 import socket
 
+
 def log(*args):
     print "[SearchServer]",
     print time.strftime("%c"),
@@ -11,7 +12,6 @@ def log(*args):
     for arg in args:
         print arg,
     print ""
-
 
 
 def getlocalip():
@@ -34,7 +34,6 @@ def getlocalip():
         return c4
     else:
         return "localhost"
-
 
 
 class SearchServer(Thread):

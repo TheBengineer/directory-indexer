@@ -107,10 +107,10 @@ class Scanner(Thread):
             if self.update_pool.thread_count > 0:
                 while self.update_pool.thread_count > 0:
                     while not self.update_pool.messages.empty():
-                        self.log += self.update_pool.messages.get()
+                        self.log += self.update_pool.messages.get() + "\n"
                     time.sleep(.1)
                 while not self.update_pool.messages.empty():
-                    self.log += self.update_pool.messages.get()
+                    self.log += self.update_pool.messages.get() + "\n"
                 if self.GUI:
                     self.GUI.set_status("Done Scanning.")
                 else:
