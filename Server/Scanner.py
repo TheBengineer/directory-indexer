@@ -183,7 +183,6 @@ class Scanner(Thread):
         data = DB.dump_paths()
         log("Got ", sys.getsizeof(data) / 1000000.0, " MB of data")
         for line in xrange(len(data)):
-            pass
             test(data[line], tmpDirectoryDictionary)
         log("Done Importing, got ", line, "files, and ", len(tmpDirectoryDictionary), " unique folders")
         #log("Size of directory:", sys.getsizeof(tmpDirectoryDictionary))

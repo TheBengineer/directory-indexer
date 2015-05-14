@@ -22,6 +22,9 @@ class Directory(object):
     def __init__(self, path, timeUpdated, DirDict, Scanner=None):
         """
 
+        ALL PATHS IN MEMORY WILL BE STORED IN OS NATIVE FORM.
+        ALL PATHS IN DB WILL BE STORED IN WINDOWS FORM.
+
         :param path: This parameter is the file system path that this directory represents
         :type path: str
         :param timeUpdated: The time the directory was last scanned. If the folder was modified after this, update will rescan
@@ -30,25 +33,29 @@ class Directory(object):
         :type DirDict: dict of Directory
         :return: Does not return anything
         """
-        self.path = os.path.normpath(path)
-        self.path = self.path.replace("/", "\\")
+        # self.path = os.path.normpath(path) # Optimizing out
+
+        # Final Checks
         if ":\\" not in self.path:
             self.path = self.path.replace(":", ":\\")
         while "\\\\" in self.path:
             self.path = self.path.replace("\\\\", "\\")
+        while "//" in self.path:
+            self.path = self.path.replace("//", "/")
+        # TODO may want to take this section out
         self.dirClasses = {}
         self.timeUpdated = timeUpdated
         self.DirectoryDictionary = DirDict
         self.root = self.path
         self.scanned = 0
-        if "\\" in self.path:
-            self.root = self.path[:self.path.rfind("\\")]
+        if os.sep in self.path:
+            self.root = self.path[:self.path.rfind(os.sep)]
             tmp_root = self.root
             paths = []
-            while "\\" in tmp_root:
+            while os.sep in tmp_root:
                 if tmp_root not in DirDict:
                     paths.append(tmp_root)
-                    tmp_root = tmp_root[:tmp_root.rfind("\\")]
+                    tmp_root = tmp_root[:tmp_root.rfind(os.sep)]
                 else:
                     break
             for i in paths:
