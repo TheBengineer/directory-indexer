@@ -39,7 +39,7 @@ def getlocalip():
 
 class SearchServer(Thread):
     def __init__(self, scanner):
-        Thread.__init__()
+        Thread.__init__(self)
         self.scanner = scanner
         self.socket = self.socket_init()
         """
