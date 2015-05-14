@@ -95,7 +95,7 @@ class LogServer(Thread):
                                 message_length = 0
                             data_to_send += char
                             message_length += 1
-                        log("Sending ", i, "bytes to ", address)
+                        log("Sending ", i/1000.0, "KB to ", address)
                         client.send(data_to_send)
                         client.send("")
                     else:
