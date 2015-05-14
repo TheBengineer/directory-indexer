@@ -6,6 +6,7 @@ import time
 
 import Scanner
 import SearchServer
+import LogServer
 
 def log(*args):
     print "[Main]",
@@ -32,6 +33,8 @@ class FindIt(Thread):
         self.scanner.start()
         self.search_server = SearchServer.SearchServer(self.scanner)
         self.search_server.start()
+        self.log_server = LogServer.LogServer(self.scanner)
+        self.log_server.start()
 
 
     def run(self):
