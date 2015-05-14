@@ -101,8 +101,8 @@ class Scanner(Thread):
         self.importOldScanFromDB(self.directory_database, self.directory_dictionary)
         # This is not technically needed for anything except updating
         #gc.enable()
-        log("Roots:", self.roots)
         self.freshen()
+        log("Roots:", self.roots)
         while self.go:
             if self.update_pool.thread_count > 0:
                 while self.update_pool.thread_count > 0:

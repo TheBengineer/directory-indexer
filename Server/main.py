@@ -103,7 +103,7 @@ class FindIt(Thread):
                             log("Too many results for search term", data)
                             data_to_send += "Displaying only first 500 results\n"
                             break
-                        if message_length > 100:
+                        if message_length > 25:
                             client.send(data_to_send)
                             data_to_send = ""
                             message_length = 0
