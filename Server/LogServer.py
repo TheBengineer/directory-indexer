@@ -4,6 +4,7 @@ from threading import Thread
 import time
 import socket
 
+import errno
 
 def log(*args):
     print "[LogServer]",
@@ -74,29 +75,34 @@ class LogServer(Thread):
 
     def run(self):
         while self.go:
-            client, address = self.socket_accept(self.socket)
-            data = ""
-            while 1:
-                try:
-                    data = client.recv(10000)
-                except:
-                    break
-                if "log" in data:
-                    log("From ", address, " Got request for log data ")
-                    data_to_send = ""
-                    i = 0
-                    message_length = 0
-                    for i, char in enumerate(self.scanner.log):
-                        if message_length > 2500:
-                            client.send(data_to_send)
-                            data_to_send = ""
-                            message_length = 0
-                        data_to_send += char
-                        message_length += 1
-                    log("Sending ", i, "bytes to ", address)
-                    client.send(data_to_send)
-                    client.send("")
-                else:
-                    client.send("No results")
-                    client.send("")
-                client.close()
+            try:
+                client, address = self.socket_accept(self.socket)
+                data = ""
+                while 1:
+                    try:
+                        data = client.recv(10000)
+                    except:
+                        break
+                    if "log" in data:
+                        log("From ", address, " Got request for log data ")
+                        data_to_send = ""
+                        i = 0
+                        message_length = 0
+                        for i, char in enumerate(self.scanner.log):
+                            if message_length > 2500:
+                                client.send(data_to_send)
+                                data_to_send = ""
+                                message_length = 0
+                            data_to_send += char
+                            message_length += 1
+                        log("Sending ", i, "bytes to ", address)
+                        client.send(data_to_send)
+                        client.send("")
+                    else:
+                        client.send("No results")
+                        client.send("")
+                    client.close()
+            except socket.error, v:
+                errorcode=v[0]
+                if errorcode==errno.ECONNRESET:
+                    print "Connection Reset"
