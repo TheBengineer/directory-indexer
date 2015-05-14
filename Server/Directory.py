@@ -117,9 +117,9 @@ class Directory(object):
         :return: Does not return anything.
 
         """
-        if self.timeUpdated and self.path:
+        if str(self.timeUpdated) and str(self.path):
             thread_pool.messages.put(
-            " Folder Time:" + str(self.timeUpdated) + " Now:" + str(time.time())) + "Processing " + str(self.path)
+            " Folder Time:" + str(self.timeUpdated) + " Now: " + str(time.time())) + " Processing " + str(self.path)
         import scandir as myScandir
 
         thread_pool.thread_lock.acquire()
