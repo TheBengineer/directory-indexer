@@ -15,7 +15,6 @@ import os, time, sys
 
 import DirectoryDB
 import Directory
-import SizeOf
 
 
 def log(*args):
@@ -54,7 +53,6 @@ class Scanner(Thread):
         self.update_interval = 60 * 60 * 12  # Seconds
         # TODO make this scan at a time, say 8 PM
 
-
     def init_database(self):
         FindIt = self.create_FindIt_folder()
         if not FindIt:
@@ -65,7 +63,6 @@ class Scanner(Thread):
         directory_database = DirectoryDB.DirectoryDB(database_filename, self.GUI)
         directory_database.start()
         return directory_database
-
 
     def create_FindIt_folder(self):
         if sys.platform == "win32":
@@ -89,18 +86,17 @@ class Scanner(Thread):
         else:
             log("Crashing. Not made to run on mac")
 
-
     def load_preferences(self):
         # import csv
         # TODO need to create a config file
         pass
 
     def run(self):
-        #gc.disable()
+        # gc.disable()
         gc.set_threshold(10)
         self.importOldScanFromDB(self.directory_database, self.directory_dictionary)
         # This is not technically needed for anything except updating
-        #gc.enable()
+        # gc.enable()
         self.freshen()
         log("Roots:", self.roots)
         while self.go:
@@ -132,7 +128,8 @@ class Scanner(Thread):
             log("adding path ", folder_to_scan)
             if folder_to_scan not in self.directory_dictionary:
                 self.directory_dictionary[folder_to_scan] = Directory.Directory(folder_to_scan, 0.0,
-                                                                                self.directory_dictionary, self)  # Create Root and reset time.
+                                                                                self.directory_dictionary,
+                                                                                self)  # Create Root and reset time.
             self.update_pool.apply_async(self.directory_dictionary[folder_to_scan].update,
                                          args=(self.update_pool, self.directory_database,))  # Go. Scan. Be Free.
             if self.GUI:
@@ -165,9 +162,10 @@ class Scanner(Thread):
         :type tmpDirectoryDictionary: dict of Directory.Directory
         :return: Does not return anything.
         """
+
         def test(file_path, directory_dict):
             path = file_path[0].strip("\"")
-            #mfile = f[1].strip("\"")
+            # mfile = f[1].strip("\"")
             s_time = 0.0
             if sys.platform == "linux2":
                 if path[1] == ":":
@@ -186,6 +184,5 @@ class Scanner(Thread):
         for line in xrange(len(data)):
             test(data[line], tmpDirectoryDictionary)
         log("Done Importing, got ", line, "files, and ", len(tmpDirectoryDictionary), " unique folders")
-        #log("Size of directory:", sys.getsizeof(tmpDirectoryDictionary))
-        #log("Total size of dictionary:", SizeOf.asizeof(tmpDirectoryDictionary))
-
+        # log("Size of directory:", sys.getsizeof(tmpDirectoryDictionary))
+        # log("Total size of dictionary:", SizeOf.asizeof(tmpDirectoryDictionary))
