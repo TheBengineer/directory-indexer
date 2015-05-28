@@ -46,7 +46,7 @@ class DirectoryDB(Thread):
 
     def create_table(self):
         create_table = "CREATE TABLE files " \
-                       "(path TEXT, filename TEXT, scan_time REAL, mod_time REAL, CONSTRAINT unq UNIQUE (path, filename));"
+                       "(path TEXT, filename TEXT, scan_time REAL, CONSTRAINT unq UNIQUE (path, filename));"
         self.lock.acquire()
         tables = self.DB_cursor.execute("SELECT name FROM sqlite_master"
                                         " WHERE type='table' AND name='files';").fetchall()
