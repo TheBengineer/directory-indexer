@@ -80,7 +80,8 @@ class Window(Thread):
         # ################ Results Scroll Box
         self.multi_list_box = mhMultiListBox.MultiListbox(self.results_frame, (('File', 170),
                                                                                ('Type', 70),
-                                                                               ('Path', 400)), height=20,
+                                                                               ('Path', 400),
+                                                                               ('Modified', 100)), height=20,
                                                           command=self.open_folder, commandRC=self.open_file)
         # self.results_options_frame.pack()
 
