@@ -112,7 +112,6 @@ class Scanner(Thread):
                 else:
                     log("Done Scanning")
             else:
-                log("Pool count", time.time(), self.last_update + self.update_interval)
                 if time.time() > self.last_update + self.update_interval:
                     self.last_update = time.time()
                     self.freshen()
