@@ -111,10 +111,11 @@ class Scanner(Thread):
                     self.GUI.set_status("Done Scanning.")
                 else:
                     log("Done Scanning")
+            else:
+                if time.time() > self.last_update + self.update_interval:
+                    self.last_update = time.time()
+                    self.freshen()
             time.sleep(.1)  # Poll
-            if time.time() > self.last_update + self.update_interval:
-                self.last_update = time.time()
-                self.freshen()
         self.update_pool.close()
         self.update_pool.join()
         self.directory_database.go = 0
