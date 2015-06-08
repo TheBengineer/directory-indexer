@@ -41,9 +41,9 @@ class Scanner(Thread):
         """ :type self.directory_dictionary: dict of Directory.Directory"""
         self.start_time = time.time()
 
-        self.number_of_threads = 16
+        self.number_of_threads = 160
         self.update_pool = ThreadPool(self.number_of_threads)
-        self.update_pool.thread_count = 0
+        self.update_pool.thread_count = 1
         self.update_pool.thread_lock = Lock()
         self.update_pool.messages = Queue.Queue()
 
