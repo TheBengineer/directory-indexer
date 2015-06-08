@@ -82,7 +82,7 @@ def mainprog(client):
 
 
 while 1:
-    client = setup(("BOH001", 9092))
+    client = setup(("localhost", 9092))
     raw_input("Enter to continue")
     mainprog(client)
 
