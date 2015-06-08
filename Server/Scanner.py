@@ -157,10 +157,13 @@ class Scanner(Thread):
             log("Output file not backed up. File may not exist, permissions, etc. This might be a problem later")
 
     def freshen(self):
+        log("Freshening ", self.roots)
         for i in self.roots:
             if i in self.directory_dictionary:
                 log("Rescanning ", i)
                 self.directory_dictionary[i].update(self.update_pool, self.directory_database)
+            else:
+                log("Directory ", i, "not in dictionary:", self.directory_dictionary.keys())
 
     def importOldScanFromDB(self, DB, tmpDirectoryDictionary):
         """
