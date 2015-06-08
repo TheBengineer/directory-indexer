@@ -101,21 +101,20 @@ class Scanner(Thread):
         self.freshen()
         log("Roots:", self.roots)
         while self.go:
-            if self.update_pool.thread_count > 0:
-                while self.update_pool.thread_count > 0:
-                    while not self.update_pool.messages.empty():
-                        self.log += self.update_pool.messages.get() + "\n"
-                    time.sleep(.1)
+            log("Waiting thread count:", self.update_pool.thread_count)
+            while self.update_pool.thread_count > 0:
                 while not self.update_pool.messages.empty():
                     self.log += self.update_pool.messages.get() + "\n"
-                if self.GUI:
-                    self.GUI.set_status("Done Scanning.")
-                else:
-                    log("Done Scanning")
+                time.sleep(.1)
+            while not self.update_pool.messages.empty():
+                self.log += self.update_pool.messages.get() + "\n"
+            if self.GUI:
+                self.GUI.set_status("Not Scanning.")
             else:
-                if time.time() > self.last_update + self.update_interval:
-                    self.last_update = time.time()
-                    self.freshen()
+                log("Not Scanning")
+            if time.time() > self.last_update + self.update_interval:
+                self.last_update = time.time()
+                self.freshen()
             time.sleep(.1)  # Poll
         self.update_pool.close()
         self.update_pool.join()
