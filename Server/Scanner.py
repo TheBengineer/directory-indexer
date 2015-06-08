@@ -97,6 +97,7 @@ class Scanner(Thread):
         self.importOldScanFromDB(self.directory_database, self.directory_dictionary)
         # This is not technically needed for anything except updating
         # gc.enable()
+        self.last_update = time.time()
         self.freshen()
         log("Roots:", self.roots)
         while self.go:
@@ -134,7 +135,7 @@ class Scanner(Thread):
     def scan_dir(self, folder_to_scan):
         self.add_to_roots(folder_to_scan)
         if os.path.isdir(folder_to_scan):  # Make sure the folder exists
-            log("Scanning path ", folder_to_scan)
+            #log("Attempting to scan path ", folder_to_scan) # Not needed
             if folder_to_scan not in self.directory_dictionary:
                 self.directory_dictionary[folder_to_scan] = Directory.Directory(folder_to_scan, 0.0,
                                                                                 self.directory_dictionary,
@@ -157,10 +158,9 @@ class Scanner(Thread):
             log("Output file not backed up. File may not exist, permissions, etc. This might be a problem later")
 
     def freshen(self):
-        log("Freshening ", self.roots)
         for i in self.roots:
             if i in self.directory_dictionary:
-                log("Rescanning ", i)
+                log("Freshening ", i)
                 self.directory_dictionary[i].update(self.update_pool, self.directory_database)
             else:
                 log("Directory ", i, "not in dictionary. Scanning.")
