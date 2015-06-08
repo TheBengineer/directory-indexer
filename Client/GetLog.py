@@ -67,7 +67,7 @@ def mainprog(client):
         i += 1
         try:
             print "Asking for log"
-            client.send("last")
+            client.send("log")
             data = client.recv(20000000)
             print "got", len(data), "bytes of data"
             while data:

@@ -119,7 +119,7 @@ class Directory(object):
         """
         thread_pool.messages.put(
             " Folder Time:" + str(self.timeUpdated) + " Now: " + str(time.time()) + " Processing " + str(self.path))
-        log(" Folder Time:" + str(self.timeUpdated) + " Now: " + str(time.time()) + " Processing " + str(self.path))
+        #log(" Folder Time:" + str(self.timeUpdated) + " Now: " + str(time.time()) + " Processing " + str(self.path))
         import scandir as myScandir
 
         thread_pool.thread_lock.acquire()
@@ -128,20 +128,21 @@ class Directory(object):
         if os.path.isdir(self.path):
             if type(self.timeUpdated) == "date":
                 self.timeUpdated = 0.0
-                log("fixed scantime to be time instead of date")
+                #log("fixed scantime to be time instead of date")
             directoriesS = []
             filesS = []
             pathS = []
             if os.path.getmtime(self.path) > self.timeUpdated:
                 thread_pool.messages.put("Updating " + str(self.path))
-                log("Updating " + str(self.path))
+                #log("Updating " + str(self.path))
                 # Needs an update
-                (pathS, directoriesS, filesS) = ([], [], [])
-                for (pathS, directoriesS, filesS) in myScandir.walk(self.path):
-                    break
             else:
                 thread_pool.messages.put("Path is all up to date: " + str(self.path))
-                log("Path is all up to date: " + str(self.path))
+                #log("Path is all up to date: " + str(self.path))
+            (pathS, directoriesS, filesS) = ([], [], [])
+            for (pathS, directoriesS, filesS) in myScandir.walk(self.path):
+                break
+
                 #self.markLower()  # unfortunately this does not work. :-(
             pathS = []
             for folder in directoriesS:
@@ -160,7 +161,7 @@ class Directory(object):
                     thread_pool.apply_async(self.dirClasses[i].update, args=(thread_pool, DB,))
         else:
             thread_pool.messages.put("Detected deleted path: " + str(self.path))
-            log("Detected deleted path: " + str(self.path))
+            #log("Detected deleted path: " + str(self.path))
             self.delLower(DB)
         self.scanned = 1
         self.timeUpdated = time.time()
