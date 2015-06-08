@@ -163,7 +163,8 @@ class Scanner(Thread):
                 log("Rescanning ", i)
                 self.directory_dictionary[i].update(self.update_pool, self.directory_database)
             else:
-                log("Directory ", i, "not in dictionary:", self.directory_dictionary.keys())
+                log("Directory ", i, "not in dictionary. Scanning.")
+                self.scan_dir(i)
 
     def importOldScanFromDB(self, DB, tmpDirectoryDictionary):
         """
