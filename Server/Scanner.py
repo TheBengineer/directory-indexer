@@ -97,7 +97,6 @@ class Scanner(Thread):
         self.importOldScanFromDB(self.directory_database, self.directory_dictionary)
         # This is not technically needed for anything except updating
         # gc.enable()
-        self.last_update = time.time()
         self.freshen()
         log("Roots:", self.roots)
         while self.go:
