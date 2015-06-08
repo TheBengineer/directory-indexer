@@ -43,7 +43,7 @@ class Scanner(Thread):
 
         self.number_of_threads = 160
         self.update_pool = ThreadPool(self.number_of_threads)
-        self.update_pool.thread_count = 1
+        self.update_pool.thread_count = 0
         self.update_pool.thread_lock = Lock()
         self.update_pool.messages = Queue.Queue()
 
@@ -160,7 +160,8 @@ class Scanner(Thread):
         for i in self.roots:
             if i in self.directory_dictionary:
                 log("Freshening ", i)
-                self.directory_dictionary[i].update(self.update_pool, self.directory_database)
+                self.update_pool.apply_async(self.directory_dictionary[i].update,
+                                         args=(self.update_pool, self.directory_database,))  # Go. Scan. Be Free.
             else:
                 log("Directory ", i, "not in dictionary. Scanning.")
                 self.scan_dir(i)

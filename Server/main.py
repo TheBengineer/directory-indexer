@@ -51,10 +51,12 @@ if __name__ == '__main__':
     version = "2.0.0"
     F = FindIt(version)
     F.start()
+    F.scanner.scan_dir("M:\\")
     if sys.platform == "linux2":
         F.scanner.add_to_roots("/media/M/")
     elif sys.platform == "win32":
         F.scanner.add_to_roots("M:\\")
+
 
 
 
