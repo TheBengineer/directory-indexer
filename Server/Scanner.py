@@ -120,13 +120,21 @@ class Scanner(Thread):
         self.update_pool.join()
         self.directory_database.go = 0
 
-    def scan_dir(self, folder_to_scan):
-        if folder_to_scan not in self.roots:
-            self.roots.append(folder_to_scan)
+
+    def add_to_roots(self, folder_to_scan):
         if not os.path.isdir(folder_to_scan):  # Make sure the folder exists
             log("Cannot access the folder to be scanned: ", folder_to_scan)
         else:
-            log("adding path ", folder_to_scan)
+            if folder_to_scan not in self.roots:
+                self.roots.append(folder_to_scan)
+                log("Adding path ", folder_to_scan, " to roots")
+            else:
+                log("Path ", folder_to_scan, " already in roots")
+
+    def scan_dir(self, folder_to_scan):
+        self.add_to_roots(folder_to_scan)
+        if os.path.isdir(folder_to_scan):  # Make sure the folder exists
+            log("Scanning path ", folder_to_scan)
             if folder_to_scan not in self.directory_dictionary:
                 self.directory_dictionary[folder_to_scan] = Directory.Directory(folder_to_scan, 0.0,
                                                                                 self.directory_dictionary,

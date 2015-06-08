@@ -3,6 +3,7 @@ __author__ = 'Wild_Doogy'
 from threading import Thread
 import socket
 import time
+import sys
 
 import Scanner
 import SearchServer
@@ -49,7 +50,10 @@ class FindIt(Thread):
 if __name__ == '__main__':
     version = "2.0.0"
     F = FindIt(version)
-    F.scanner.scan_dir("/media/M/")
+    if sys.platform == "linux2":
+        F.scanner.scan_dir("/media/M/")
+    elif sys.platform == "win32":
+        F.scanner.scan_dir("M:\\")
     F.start()
 
 
