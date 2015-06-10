@@ -20,13 +20,17 @@ def main():
         scan(path)
         return time.time() - t
 
-    for i in range(20):
+    for i in range(0,25,5):
         children = []
         for x in range(i):
-            children.append(subprocess.Popen("python Node.py"))
+            children.append(subprocess.Popen("python Node.py").pid)
         print i, scan_dir()
         for c in children:
-            os.kill(c, signal.SIGTERM)
+            if c:
+                try:
+                    os.kill(c, signal.SIGTERM)
+                except:
+                    pass
 
 
 if __name__ == "__main__":
