@@ -14,4 +14,4 @@ def scan(directory):
 
 t = time.time()
 scan(path)
-print time.time() - t
+#print time.time() - t

@@ -1,26 +1,14 @@
-#from memory_profiler import profile
-import random
-import string
-import sys
+# from memory_profiler import profile
+import os
 import time
-from multiprocessing.dummy import Pool as ThreadPool
+import signal
+import subprocess
+
 import scandir as sd
-
-import multiprocessing as mp
-
-from multiprocessing import Pool
-
 
 
 def main():
-    pool = Pool()
-
-
-    def scan_dir(a):
-        return a + 1
-
-
-    def scan_dira(a):
+    def scan_dir(a=0):
         path = "O:\\Technical_Support\\Applications_Engineering\\Customer Archives"
 
         def scan(directory):
@@ -28,17 +16,18 @@ def main():
                 for d in directoriesS:
                     scan(d)
 
-
         t = time.time()
         scan(path)
         return time.time() - t
 
-
-
-    print pool.map(scan_dir, range(3))
-
+    for i in range(20):
+        children = []
+        for x in range(i):
+            children.append(subprocess.Popen("python Node.py"))
+        print i, scan_dir()
+        for c in children:
+            os.kill(c, signal.SIGTERM)
 
 
 if __name__ == "__main__":
-    mp.freeze_support()
     main()
