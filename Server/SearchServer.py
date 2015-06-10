@@ -92,10 +92,10 @@ class SearchServer(Thread):
                         i = 0
                         message_length = 0
                         for i, r in enumerate(result):
-                            if i > 510:
-                                log("Too many results for search term", data)
-                                data_to_send += "Displaying only first 500 results\n"
-                                break
+                            #if i > 510:
+                            #    log("Too many results for search term", data)
+                            #    data_to_send += "Displaying only first 500 results\n"
+                            #    break
                             if message_length > 25:
                                 client.send(data_to_send)
                                 data_to_send = ""
