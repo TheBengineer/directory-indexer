@@ -6,18 +6,36 @@ import time
 from multiprocessing.dummy import Pool as ThreadPool
 import scandir as sd
 
-path = "O:\\Technical_Support\\Applications_Engineering\\Customer Archives"
-
-def scan(directory):
-    for (pathS, directoriesS, filesS) in sd.walk(directory):
-        for d in directoriesS:
-            scan(d)
-t = time.time()
-scan(path)
-print time.time() - t
+import multiprocessing as mp
 
 
+def scan_dir(output):
+    path = "O:\\Technical_Support\\Applications_Engineering\\Customer Archives"
 
+    def scan(directory):
+        for (pathS, directoriesS, filesS) in sd.walk(directory):
+            for d in directoriesS:
+                scan(d)
+
+
+    t = time.time()
+    scan(path)
+    output.put(time.time() - t)
+
+
+output = mp.Queue()
+
+processes = []
+for i in range(3):
+    processes += [mp.Process(target=scan_dir, args=(output,))]
+
+for p in processes:
+    p.start()
+
+for p in processes:
+    p.join()
+
+print [output.get() for p in processes]
 
 asdf = """
 @profile(precision = 16)
