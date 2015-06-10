@@ -20,7 +20,7 @@ def main():
         scan(path)
         return time.time() - t
 
-    for i in range(0,25,5):
+    for i in range(0, 25, 5):
         children = []
         for x in range(i):
             children.append(subprocess.Popen("python Node.py").pid)

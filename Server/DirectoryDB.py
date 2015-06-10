@@ -148,6 +148,16 @@ class DirectoryDB(Thread):
         self.lock.release()
         return data
 
+    def get_folders_limit(self, filename, limit=500):
+        query = "SELECT path, filename FROM files WHERE filename LIKE '{filename}' LIMIT {limit]".format(filename=filename, limit=limit)
+        log("Getting results for ", query)
+        self.lock.acquire()
+        self.DB_cursor.execute(query)
+        data = self.DB_cursor.fetchall()
+        self.lock.release()
+        return data
+
+
     def writeout(self):
         self.lock.acquire()
         self.DB.commit()
