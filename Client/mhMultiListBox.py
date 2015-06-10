@@ -125,10 +125,11 @@ class MultiListbox(Frame):
 
         #  Keyboard navigation.
 
+        self.bind('<MouseWheel>', self._on_mousewheel)
+
+
         self.bind('<Up>', lambda e, s=self: s._move(-1, MOVE_LINES))
-        self.bind('<4>', lambda e, s=self: s._move(-1, MOVE_LINES))
         self.bind('<Down>', lambda e, s=self: s._move(+1, MOVE_LINES))
-        self.bind('<5>', lambda e, s=self: s._move(+1, MOVE_LINES))
         self.bind('<Prior>', lambda e, s=self: s._move(-1, MOVE_PAGES))
         self.bind('<Next>', lambda e, s=self: s._move(+1, MOVE_PAGES))
         self.bind('<Home>', lambda e, s=self: s._move(-1, MOVE_TOEND))
@@ -196,6 +197,8 @@ class MultiListbox(Frame):
 
         return
 
+    def _on_mousewheel(self, event):
+        self._move(-1*(event.delta/120), MOVE_PAGES)
 
     # MH (05/2004)
     # Sort function, adopted from Rick Lawson 
