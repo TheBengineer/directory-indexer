@@ -8,67 +8,37 @@ import scandir as sd
 
 import multiprocessing as mp
 
-
-def scan_dir(output):
-    path = "O:\\Technical_Support\\Applications_Engineering\\Customer Archives"
-
-    def scan(directory):
-        for (pathS, directoriesS, filesS) in sd.walk(directory):
-            for d in directoriesS:
-                scan(d)
+from multiprocessing import Pool
 
 
-    t = time.time()
-    scan(path)
-    output.put(time.time() - t)
+
+def main():
+    pool = Pool()
 
 
-output = mp.Queue()
+    def scan_dir(a):
+        return a + 1
 
-processes = []
-for i in range(3):
-    processes += [mp.Process(target=scan_dir, args=(output,))]
 
-for p in processes:
-    p.start()
+    def scan_dira(a):
+        path = "O:\\Technical_Support\\Applications_Engineering\\Customer Archives"
 
-for p in processes:
-    p.join()
+        def scan(directory):
+            for (pathS, directoriesS, filesS) in sd.walk(directory):
+                for d in directoriesS:
+                    scan(d)
 
-print [output.get() for p in processes]
 
-asdf = """
-@profile(precision = 16)
-def my_func():
+        t = time.time()
+        scan(path)
+        return time.time() - t
 
-    for j in xrange(1000*100):
-        pass
 
-    d = {}
-    for i in xrange(1000*10):
-        d = make(d)
-    print sys.getsizeof(d)
-    time.sleep(3)
-    d = {}
-    time.sleep(3)
-    for i in xrange(1000*10):
-        d = make(d)
-    time.sleep(3)
-    del d
-    d = {}
-    time.sleep(3)
 
-@profile(precision = 16)
-def make(d):
-    s = ''
-    for _ in xrange(10):
-        c = random.choice(string.ascii_uppercase + string.digits)
-        s = s.join(c)
-    v = random.random()
-    d[s] = v
-    return d
+    print pool.map(scan_dir, range(3))
 
-if __name__ == '__main__':
-    my_func()
-"""
 
+
+if __name__ == "__main__":
+    mp.freeze_support()
+    main()
