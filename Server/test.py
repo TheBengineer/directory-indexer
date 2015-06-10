@@ -33,5 +33,71 @@ def main():
                     pass
 
 
+def main2():
+    from multiprocessing.dummy import Pool as ThreadPool
+    from threading import Lock
+    import Queue
+
+    import Directory
+    import DirectoryDB
+
+    def create_FindIt_folder():
+        import sys
+
+        if sys.platform == "win32":
+            appdata = os.getenv('APPDATA')
+            FindIt = os.path.join(appdata, "FindIt")
+            if not os.path.isdir(FindIt):
+                os.mkdir(FindIt)
+            if os.path.isdir(FindIt):
+                return FindIt
+            else:
+                return False
+        elif sys.platform == "linux2":
+            home = os.getenv('HOME')
+            FindIt = os.path.join(home, "FindIt")
+            if not os.path.isdir(FindIt):
+                os.mkdir(FindIt)
+            if os.path.isdir(FindIt):
+                return FindIt
+            else:
+                return False
+        else:
+            print "Crashing. Not made to run on mac"
+
+    def init_database():
+        FindIt = create_FindIt_folder()
+        if not FindIt:
+            print "Could not create the FindIt directory. Will now crash."
+            quit()
+        database_filename = os.path.join(FindIt, "FindIt.db")
+        # self.backup_db(database_filename)
+        directory_database = DirectoryDB.DirectoryDB(database_filename)
+        directory_database.start()
+        return directory_database
+
+    directory_database = init_database()
+    directory_dictionary = {}
+    number_of_threads = 16
+    update_pool = ThreadPool(number_of_threads)
+    update_pool.thread_count = 0
+    update_pool.thread_lock = Lock()
+    update_pool.messages = Queue.Queue()
+
+    path = "O:\\Technical_Support\\Applications_Engineering\\Customer Archives"
+    t = time.time()
+    if path not in directory_dictionary:
+        directory_dictionary[path] = Directory.Directory(path, 0.0, directory_dictionary)  # Create Root and reset time.
+    update_pool.apply_async(directory_dictionary[path].update,
+                            args=(update_pool, directory_database,))  # Go. Scan. Be Free.
+    time.sleep(.1)
+    while update_pool.thread_count > 0:
+        time.sleep(.001)
+
+    update_pool.close()
+    update_pool.join()
+    print time.time() - t
+
+
 if __name__ == "__main__":
-    main()
+    main2()
