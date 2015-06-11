@@ -90,7 +90,7 @@ def main2():
             drive = path[0]
             path = "/media/"+drive.upper()+path[2]
             path.replace("\\", "/")
-        pass
+        return path
 
     directory_database = init_database()
     directory_dictionary = {}
