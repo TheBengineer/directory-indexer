@@ -91,18 +91,17 @@ def main2():
             path = "/media/"+drive.upper()+path[2:]
             path = path.replace("\\", "/")
         return path
-
-    directory_database = init_database()
-    directory_dictionary = {}
-    number_of_threads = 16
-    update_pool = ThreadPool(number_of_threads)
-    update_pool.thread_count = 0
-    update_pool.thread_lock = Lock()
-
-    update_pool.messages = Queue.Queue()
-
     import sys
     for times in range(10):
+
+        directory_database = init_database()
+        directory_dictionary = {}
+        number_of_threads = 16
+        update_pool = ThreadPool(number_of_threads)
+        update_pool.thread_count = 0
+        update_pool.thread_lock = Lock()
+        update_pool.messages = Queue.Queue()
+
         path = "O:\\Technical_Support\\Applications_Engineering"
         if sys.platform == "linux2":
             path = linux_path(path)
@@ -143,6 +142,7 @@ def main2():
         pool.map(lambda (path, scan_time): os.path.getmtime(path) > scan_time, paths)
         tt = time.time() - t
         log("Time to scan all folders:", tt, "(", len(paths) / tt, "Folder/ second)")
+
 
 
 if __name__ == "__main__":
