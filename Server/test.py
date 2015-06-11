@@ -89,7 +89,7 @@ def main2():
         if ":" in path:
             drive = path[0]
             path = "/media/"+drive.upper()+path[2:]
-            path.replace("\\", "/")
+            path = path.replace("\\", "/")
         return path
 
     directory_database = init_database()
