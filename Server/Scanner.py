@@ -47,6 +47,9 @@ class Scanner(Thread):
         self.update_pool.thread_lock = Lock()
         self.update_pool.messages = Queue.Queue()
 
+        self.directories_to_refresh = []
+        self.directories_to_scan = []
+
         self.go = 1
         self.log = ""
         self.last_update = time.time()

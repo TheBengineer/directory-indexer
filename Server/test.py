@@ -137,9 +137,9 @@ def main2():
 
         from multiprocessing.pool import ThreadPool as Pool
 
-        pool = Pool()
+        pool = Pool(100)
         t = time.time()
-        pool.map(lambda (path, scan_time): os.path.getmtime(path) > scan_time, paths)
+        pool.map(lambda (path, scan_time): os.path.getmtime(path) > scan_time, paths)  # This is very fast.
         tt = time.time() - t
         log("Time to scan all folders:", tt, "(", len(paths) / tt, "Folder/ second)")
 
