@@ -104,6 +104,8 @@ def main2():
     import sys
 
     path = "O:\\Technical_Support\\Applications_Engineering\\Customer Archives"
+    if sys.platform == "linux2":
+        path = linux_path(path)
 
     t = time.time()
 
@@ -145,4 +147,4 @@ def main2():
 
 if __name__ == "__main__":
     main2()
-    exit(0)
+    exit()
