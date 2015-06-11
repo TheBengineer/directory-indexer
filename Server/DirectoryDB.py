@@ -6,11 +6,11 @@ from threading import Lock
 import time
 import os
 
-
 """
 This database will hold all the files and paths that are normally written to a CSV file.
 
 """
+
 
 def log(*args):
     print "[DirectoryDB]",
@@ -46,15 +46,16 @@ class DirectoryDB(Thread):
 
     def create_tables(self):
         create_table_files = "CREATE TABLE files " \
-            "(directory INTEGER, filename TEXT, scan_time REAL, CONSTRAINT unq UNIQUE (directory, filename));"
+                             "(directory INTEGER, filename TEXT, scan_time REAL, CONSTRAINT unq UNIQUE (directory, filename));"
         create_table_directories = "CREATE TABLE directories " \
-                       "(id INTERGER, path TEXT, scan_time REAL, CONSTRAINT unq UNIQUE (path));"
+                                   "(id INTERGER, path TEXT, scan_time REAL, CONSTRAINT unq UNIQUE (path));"
         self.lock.acquire()
         tables = self.DB_cursor.execute("SELECT name FROM sqlite_master"
-                                        " WHERE type='table' AND name='files';").fetchall()
-        if "files" not in tables:
+                                        " WHERE type='table'").fetchall()
+        log("Found tables:", tables, "in the DB.")
+        if ("files",) not in tables[0]:
             self.DB_cursor.execute(create_table_files)
-        if "directories" not in tables:
+        if ("directories",) not in tables[0]:
             self.DB_cursor.execute(create_table_directories)
         self.lock.release()
 
@@ -82,7 +83,6 @@ class DirectoryDB(Thread):
         path, filename = os.path.split(file_path)
         if filename and path:
             self.files_to_delete.append([path, filename])
-
 
     def run(self):
         """
@@ -153,14 +153,14 @@ class DirectoryDB(Thread):
         return data
 
     def get_folders_limit(self, filename, limit=500):
-        query = "SELECT directories.path, files.filename FROM files WHERE filename LIKE '{filename}' LIMIT {limit}".format(filename=filename, limit=limit)
+        query = "SELECT directories.path, files.filename FROM files WHERE filename LIKE '{filename}' LIMIT {limit}".format(
+            filename=filename, limit=limit)
         log("Getting results for ", query)
         self.lock.acquire()
         self.DB_cursor.execute(query)
         data = self.DB_cursor.fetchall()
         self.lock.release()
         return data
-
 
     def writeout(self):
         self.lock.acquire()

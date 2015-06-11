@@ -51,9 +51,10 @@ class Scanner(Thread):
 
         self.directories_to_refresh = []
         self.directories_to_scan = []
+        self.scan_results = [[],[],[]]
 
 
-        scan_pool = Pool_for_map(128)
+        self.scan_pool = Pool_for_map(128)
 
         self.go = 1
         self.log = ""
@@ -99,6 +100,16 @@ class Scanner(Thread):
         # TODO need to create a config file
         pass
 
+    def refresh_folder(self, path, scan_time=0):
+        try:
+            if  os.path.getmtime(path) > scan_time:
+                return 0
+            else:
+                return 1
+        except os.error:  # Not accessible.
+            return 2
+
+
     def run(self):
         # gc.disable()
         gc.set_threshold(10)
@@ -107,6 +118,7 @@ class Scanner(Thread):
         # gc.enable()
         #self.freshen()
         log("Roots:", self.roots)
+        self.directories_to_refresh.append(("O:\\Technical_Support\\Applications_Engineering",0.0)) # TODO remove debug
         while self.go:
             tmp_to_freshen = []
             for i in xrange(min(len(self.directories_to_refresh), 512)): # Get the next 512 directories to freshen
@@ -114,7 +126,8 @@ class Scanner(Thread):
                     tmp_to_freshen.append(self.directories_to_refresh.pop())
                 except IndexError:
                     break
-            
+            results  = self.scan_pool.map(self.refresh_folder, tmp_to_freshen)
+            log(results)
             #log("Waiting thread count:", self.update_pool.thread_count)
             while self.update_pool.thread_count > 0:
                 while not self.update_pool.messages.empty():
