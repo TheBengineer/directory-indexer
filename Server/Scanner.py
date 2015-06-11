@@ -18,6 +18,8 @@ import os, time, sys
 import DirectoryDB
 import Directory
 
+import scandir as myScandir
+
 
 def log(*args):
     print "[Scanner]",
@@ -51,8 +53,7 @@ class Scanner(Thread):
 
         self.directories_to_refresh = []
         self.directories_to_scan = []
-        self.scan_results = [[],[],[]]
-
+        self.scan_results = [[], [], []]
 
         self.scan_pool = Pool_for_map(128)
 
@@ -100,54 +101,68 @@ class Scanner(Thread):
         # TODO need to create a config file
         pass
 
-    def refresh_folder(self, path, scan_time=0):
+    def refresh_folder(self, (path, scan_time)):
         try:
-            if  os.path.getmtime(path) > scan_time:
-                return 0
+            if os.path.getmtime(path) > scan_time:
+                return 0  # The folder was updated.
             else:
-                return 1
+                return 1  # The folder was NOT updated.
         except os.error:  # Not accessible.
-            return 2
+            return 2  # The folder non-accessible.
 
+    def scan_folder(self, path):
+        try:
+            for (pathS, directoriesS, filesS) in myScandir.walk(path):
+                break
+            return (pathS, directoriesS, filesS)
+        except os.error:
+            pass
 
     def run(self):
         # gc.disable()
         gc.set_threshold(10)
-        self.importOldScanFromDB(self.directory_database, self.directory_dictionary)
-        # This is not technically needed for anything except updating
-        # gc.enable()
-        #self.freshen()
+
         log("Roots:", self.roots)
-        self.directories_to_refresh.append(("O:\\Technical_Support\\Applications_Engineering",0.0)) # TODO remove debug
+        self.directories_to_refresh.append(
+            ("O:\\Technical_Support", 1.2))  # TODO remove debug
         while self.go:
             tmp_to_freshen = []
-            for i in xrange(min(len(self.directories_to_refresh), 512)): # Get the next 512 directories to freshen
+            for i in xrange(min(len(self.directories_to_refresh), 512)):  # Get the next 512 directories to freshen
                 try:
                     tmp_to_freshen.append(self.directories_to_refresh.pop())
                 except IndexError:
                     break
-            results  = self.scan_pool.map(self.refresh_folder, tmp_to_freshen)
-            log(results)
-            #log("Waiting thread count:", self.update_pool.thread_count)
-            while self.update_pool.thread_count > 0:
-                while not self.update_pool.messages.empty():
-                    self.log += self.update_pool.messages.get() + "\n"
-                time.sleep(.1)
-            while not self.update_pool.messages.empty():
-                self.log += self.update_pool.messages.get() + "\n"
-            if self.GUI:
-                self.GUI.set_status("Not Scanning.")
-            else:
-                pass
-                #log("Not Scanning")
-            if time.time() > self.last_update + self.update_interval:
-                self.last_update = time.time()
-                self.freshen()
-            time.sleep(.1)  # Poll
-        self.update_pool.close()
-        self.update_pool.join()
-        self.directory_database.go = 0
-
+            log(tmp_to_freshen)
+            results_fresh = self.scan_pool.map(
+                lambda (path_scan_time): self.refresh_folder(path_scan_time),tmp_to_freshen)
+            log(results_fresh)
+            for result, index in enumerate(results_fresh):
+                if result == 0:
+                    self.directories_to_scan.append(tmp_to_freshen[index][0])
+                elif result == 1:
+                    pass  # Directory is up to date
+                    # TODO make this save the new scan time
+                elif result == 2:
+                    # directory needs to be deleted from DB.
+                    self.directory_database.del_folder(tmp_to_freshen[index][0])
+            log("To scan:", self.directories_to_scan)
+            # TODO add scanning here
+            tmp_to_scan = []
+            for i in xrange(min(len(self.directories_to_scan), 512)):  # Get the next 512 directories to freshen
+                try:
+                    tmp_to_scan.append(self.directories_to_scan.pop())
+                except IndexError:
+                    break
+            log(tmp_to_scan)
+            results_scan = self.scan_pool.map(self.scan_folder, tmp_to_scan)
+            log(results_scan)
+            for (path, directories, files) in results_scan:
+                for directory in directories:
+                    self.directories_to_refresh.append((os.path.join(path, directory), 0.0)) # TODO add a way to look up times.
+                for file in files:
+                    pass
+                    #self.directory_database.add_fileB(path, file)
+            self.directory_database.writeout()
 
     def add_to_roots(self, folder_to_scan):
         if not os.path.isdir(folder_to_scan):  # Make sure the folder exists
@@ -162,7 +177,7 @@ class Scanner(Thread):
     def scan_dir(self, folder_to_scan):
         self.add_to_roots(folder_to_scan)
         if os.path.isdir(folder_to_scan):  # Make sure the folder exists
-            #log("Attempting to scan path ", folder_to_scan) # Not needed
+            # log("Attempting to scan path ", folder_to_scan) # Not needed
             if folder_to_scan not in self.directory_dictionary:
                 self.directory_dictionary[folder_to_scan] = Directory.Directory(folder_to_scan, 0.0,
                                                                                 self.directory_dictionary,
@@ -189,7 +204,7 @@ class Scanner(Thread):
             if i in self.directory_dictionary:
                 log("Freshening ", i)
                 self.update_pool.apply_async(self.directory_dictionary[i].update,
-                                         args=(self.update_pool, self.directory_database,))  # Go. Scan. Be Free.
+                                             args=(self.update_pool, self.directory_database,))  # Go. Scan. Be Free.
             else:
                 log("Directory ", i, "not in dictionary. Scanning.")
                 self.scan_dir(i)
@@ -225,6 +240,7 @@ class Scanner(Thread):
         bench_time = time.time()
         for line in xrange(len(data)):
             test(data[line], tmpDirectoryDictionary)
-        log("Imported", line, "files in ", len(tmpDirectoryDictionary), " unique folders. (Parsed in", time.time()-bench_time, " Seconds)")
+        log("Imported", line, "files in ", len(tmpDirectoryDictionary), " unique folders. (Parsed in",
+            time.time() - bench_time, " Seconds)")
         # log("Size of directory:", sys.getsizeof(tmpDirectoryDictionary))
         # log("Total size of dictionary:", SizeOf.asizeof(tmpDirectoryDictionary))
