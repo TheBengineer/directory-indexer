@@ -106,7 +106,7 @@ def main2():
     path = "O:\\Technical_Support\\Applications_Engineering\\Customer Archives"
     if sys.platform == "linux2":
         path = linux_path(path)
-
+    log("Scanning:", path)
     t = time.time()
 
     if path not in directory_dictionary:
@@ -125,7 +125,7 @@ def main2():
         lpaths = []
         for path in paths:
             lpaths.append(linux_path(path))
-    paths = lpaths
+        paths = lpaths
     t = time.time()
     for path, scan_time in paths:
         if os.path.getmtime(path) > scan_time:
