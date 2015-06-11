@@ -96,7 +96,7 @@ def main2():
 
     import sys
 
-    if sys.platform == "linux":
+    if sys.platform == "linux2":
         path = "/media/o/Technical_Support/Applications_Engineering/Customer Archives"
     if sys.platform == "win32":
         path = "O:\\Technical_Support\\Applications_Engineering\\Customer Archives"
