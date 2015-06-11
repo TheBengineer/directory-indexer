@@ -123,8 +123,8 @@ def main2():
     paths = directory_database.dump_paths()
     if sys.platform == "linux2":
         lpaths = []
-        for path in paths:
-            lpaths.append(linux_path(path))
+        for path,t in paths:
+            lpaths.append((linux_path(path),t))
         paths = lpaths
     t = time.time()
     for path, scan_time in paths:
