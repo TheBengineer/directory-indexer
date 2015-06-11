@@ -102,47 +102,47 @@ def main2():
     update_pool.messages = Queue.Queue()
 
     import sys
+    for times in range(10):
+        path = "O:\\Technical_Support\\Applications_Engineering"
+        if sys.platform == "linux2":
+            path = linux_path(path)
+        log("Scanning:", path)
+        t = time.time()
 
-    path = "O:\\Technical_Support\\Applications_Engineering"
-    if sys.platform == "linux2":
-        path = linux_path(path)
-    log("Scanning:", path)
-    t = time.time()
+        if path not in directory_dictionary:
+            directory_dictionary[path] = Directory.Directory(path, 0.0, directory_dictionary)  # Create Root and reset time.
+        update_pool.apply_async(directory_dictionary[path].update,
+                                args=(update_pool, directory_database,))  # Go. Scan. Be Free.
+        time.sleep(.1)
+        while update_pool.thread_count > 0:
+            time.sleep(.001)
 
-    if path not in directory_dictionary:
-        directory_dictionary[path] = Directory.Directory(path, 0.0, directory_dictionary)  # Create Root and reset time.
-    update_pool.apply_async(directory_dictionary[path].update,
-                            args=(update_pool, directory_database,))  # Go. Scan. Be Free.
-    time.sleep(.1)
-    while update_pool.thread_count > 0:
-        time.sleep(.001)
+        update_pool.close()
+        update_pool.join()
+        log("Time to scan directory:", time.time() - t)
+        paths = directory_database.dump_paths()
+        if sys.platform == "linux2":
+            lpaths = []
+            for path,t in paths:
+                lpaths.append((linux_path(path),t))
+            paths = lpaths
+        t = time.time()
+        for path, scan_time in paths:
+            if os.path.getmtime(path) > scan_time:
+                print path
+        tt = time.time() - t
+        log("Time to scan all",len(paths),"folders:", tt, "(", len(paths) / tt, "Folder/ second)")
 
-    update_pool.close()
-    update_pool.join()
-    log("Time to scan directory:", time.time() - t)
-    paths = directory_database.dump_paths()
-    if sys.platform == "linux2":
-        lpaths = []
-        for path,t in paths:
-            lpaths.append((linux_path(path),t))
-        paths = lpaths
-    t = time.time()
-    for path, scan_time in paths:
-        if os.path.getmtime(path) > scan_time:
-            print path
-    tt = time.time() - t
-    log("Time to scan all",len(paths),"folders:", tt, "(", len(paths) / tt, "Folder/ second)")
+        def get_date(path, scan_time):
+            return os.path.getmtime(path) > scan_time
 
-    def get_date(path, scan_time):
-        return os.path.getmtime(path) > scan_time
+        from multiprocessing.pool import ThreadPool as Pool
 
-    from multiprocessing.pool import ThreadPool as Pool
-
-    pool = Pool()
-    t = time.time()
-    pool.map(lambda (path, scan_time): os.path.getmtime(path) > scan_time, paths)
-    tt = time.time() - t
-    log("Time to scan all folders:", tt, "(", len(paths) / tt, "Folder/ second)")
+        pool = Pool()
+        t = time.time()
+        pool.map(lambda (path, scan_time): os.path.getmtime(path) > scan_time, paths)
+        tt = time.time() - t
+        log("Time to scan all folders:", tt, "(", len(paths) / tt, "Folder/ second)")
 
 
 if __name__ == "__main__":
