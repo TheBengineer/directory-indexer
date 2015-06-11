@@ -85,6 +85,13 @@ def main2():
         directory_database.start()
         return directory_database
 
+    def linux_path(path):
+        if ":" in path:
+            drive = path[0]
+            path = "/media/"+drive.upper()+path[2]
+            path.replace("\\", "/")
+        pass
+
     directory_database = init_database()
     directory_dictionary = {}
     number_of_threads = 16
@@ -96,10 +103,8 @@ def main2():
 
     import sys
 
-    if sys.platform == "linux2":
-        path = "/media/O/Technical_Support/Applications_Engineering/Customer Archives"
-    if sys.platform == "win32":
-        path = "O:\\Technical_Support\\Applications_Engineering\\Customer Archives"
+    path = "O:\\Technical_Support\\Applications_Engineering\\Customer Archives"
+
     t = time.time()
 
     if path not in directory_dictionary:
@@ -114,6 +119,11 @@ def main2():
     update_pool.join()
     log("Time to scan directory:", time.time() - t)
     paths = directory_database.dump_paths()
+    if sys.platform == "linux2":
+        lpaths = []
+        for path in paths:
+            lpaths.append(linux_path(path))
+    paths = lpaths
     t = time.time()
     for path, scan_time in paths:
         if os.path.getmtime(path) > scan_time:
