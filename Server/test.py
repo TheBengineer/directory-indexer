@@ -126,7 +126,6 @@ def main2():
         for path,t in paths:
             lpaths.append((linux_path(path),t))
         paths = lpaths
-    log(sys.platform, paths)
     t = time.time()
     for path, scan_time in paths:
         if os.path.getmtime(path) > scan_time:
