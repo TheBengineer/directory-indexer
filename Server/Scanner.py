@@ -3,7 +3,9 @@ __author__ = 'boh01'
 from threading import Thread
 
 # Needed for scanning
+from multiprocessing.pool import ThreadPool as Pool_for_map
 from multiprocessing.dummy import Pool as ThreadPool
+
 from threading import Lock
 import Queue
 
@@ -50,6 +52,9 @@ class Scanner(Thread):
         self.directories_to_refresh = []
         self.directories_to_scan = []
 
+
+        scan_pool = Pool_for_map(128)
+
         self.go = 1
         self.log = ""
         self.last_update = time.time()
@@ -61,7 +66,7 @@ class Scanner(Thread):
         if not FindIt:
             log("Could not create the FindIt directory. Will now crash.")
             quit()
-        database_filename = os.path.join(FindIt, "FindIt.db")
+        database_filename = os.path.join(FindIt, "FindItV2.db")
         # self.backup_db(database_filename)
         directory_database = DirectoryDB.DirectoryDB(database_filename, self.GUI)
         directory_database.start()
@@ -100,9 +105,16 @@ class Scanner(Thread):
         self.importOldScanFromDB(self.directory_database, self.directory_dictionary)
         # This is not technically needed for anything except updating
         # gc.enable()
-        self.freshen()
+        #self.freshen()
         log("Roots:", self.roots)
         while self.go:
+            tmp_to_freshen = []
+            for i in xrange(min(len(self.directories_to_refresh), 512)): # Get the next 512 directories to freshen
+                try:
+                    tmp_to_freshen.append(self.directories_to_refresh.pop())
+                except IndexError:
+                    break
+            
             #log("Waiting thread count:", self.update_pool.thread_count)
             while self.update_pool.thread_count > 0:
                 while not self.update_pool.messages.empty():

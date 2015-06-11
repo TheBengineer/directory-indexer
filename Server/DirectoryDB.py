@@ -33,7 +33,7 @@ class DirectoryDB(Thread):
         self.DB.text_factory = str
         self.DB_cursor = self.DB.cursor()
         self.lock.release()
-        self.create_table()
+        self.create_tables()
         self.files_to_add = []
         self.files_to_delete = []
         self.folders_to_delete = []
@@ -44,14 +44,18 @@ class DirectoryDB(Thread):
         :type self.local_lock: threading.Lock
         """
 
-    def create_table(self):
-        create_table = "CREATE TABLE files " \
-                       "(path TEXT, filename TEXT, scan_time REAL, CONSTRAINT unq UNIQUE (path, filename));"
+    def create_tables(self):
+        create_table_files = "CREATE TABLE files " \
+            "(directory INTEGER, filename TEXT, scan_time REAL, CONSTRAINT unq UNIQUE (directory, filename));"
+        create_table_directories = "CREATE TABLE directories " \
+                       "(id INTERGER, path TEXT, scan_time REAL, CONSTRAINT unq UNIQUE (path));"
         self.lock.acquire()
         tables = self.DB_cursor.execute("SELECT name FROM sqlite_master"
                                         " WHERE type='table' AND name='files';").fetchall()
-        if tables == []:
-            self.DB_cursor.execute(create_table)
+        if "files" not in tables:
+            self.DB_cursor.execute(create_table_files)
+        if "directories" not in tables:
+            self.DB_cursor.execute(create_table_directories)
         self.lock.release()
 
     def add_file(self, file_path):
@@ -149,7 +153,7 @@ class DirectoryDB(Thread):
         return data
 
     def get_folders_limit(self, filename, limit=500):
-        query = "SELECT path, filename FROM files WHERE filename LIKE '{filename}' LIMIT {limit}".format(filename=filename, limit=limit)
+        query = "SELECT directories.path, files.filename FROM files WHERE filename LIKE '{filename}' LIMIT {limit}".format(filename=filename, limit=limit)
         log("Getting results for ", query)
         self.lock.acquire()
         self.DB_cursor.execute(query)
@@ -165,6 +169,7 @@ class DirectoryDB(Thread):
 
     def dump(self):
         query = "SELECT path, filename, scan_time FROM files;"
+        # TODO need a join here
         self.lock.acquire()
         self.DB_cursor.execute(query)
         data = self.DB_cursor.fetchall()
@@ -172,7 +177,7 @@ class DirectoryDB(Thread):
         return data
 
     def dump_paths(self):
-        query = "SELECT DISTINCT path, scan_time FROM files;"
+        query = "SELECT DISTINCT path, scan_time FROM directories;"
         log("Starting to dump all stored paths. This may take a while.")
         self.lock.acquire()
         self.DB_cursor.execute(query)
@@ -182,8 +187,10 @@ class DirectoryDB(Thread):
         return data
 
     def nuke(self):
-        query = "DELETE FROM files;"
+        query1 = "DELETE FROM files;"
+        query2 = "DELETE FROM directories;"
         self.lock.acquire()
-        self.DB_cursor.execute(query)
+        self.DB_cursor.execute(query1)
+        self.DB_cursor.execute(query2)
         self.DB_cursor.execute("VACUUM;")
         self.lock.release()
