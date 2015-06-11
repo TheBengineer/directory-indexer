@@ -88,7 +88,7 @@ def main2():
     def linux_path(path):
         if ":" in path:
             drive = path[0]
-            path = "/media/"+drive.upper()+path[2]
+            path = "/media/"+drive.upper()+path[2:]
             path.replace("\\", "/")
         return path
 
