@@ -53,9 +53,9 @@ class DirectoryDB(Thread):
         tables = self.DB_cursor.execute("SELECT name FROM sqlite_master"
                                         " WHERE type='table'").fetchall()
         log("Found tables:", tables, "in the DB.")
-        if ("files",) not in tables[0]:
+        if ("files",) not in tables:
             self.DB_cursor.execute(create_table_files)
-        if ("directories",) not in tables[0]:
+        if ("directories",) not in tables:
             self.DB_cursor.execute(create_table_directories)
         self.lock.release()
 
