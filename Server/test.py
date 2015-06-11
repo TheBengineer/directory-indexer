@@ -131,7 +131,7 @@ def main2():
         if os.path.getmtime(path) > scan_time:
             print path
     tt = time.time() - t
-    log("Time to scan all folders:", tt, "(", len(paths) / tt, "Folder/ second)")
+    log("Time to scan all",len(paths),"folders:", tt, "(", len(paths) / tt, "Folder/ second)")
 
     def get_date(path, scan_time):
         return os.path.getmtime(path) > scan_time
