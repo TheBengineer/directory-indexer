@@ -6,6 +6,7 @@ import subprocess
 
 import scandir as sd
 
+
 def log(*args):
     print "[Test]",
     print time.strftime("%c"),
@@ -90,10 +91,17 @@ def main2():
     update_pool = ThreadPool(number_of_threads)
     update_pool.thread_count = 0
     update_pool.thread_lock = Lock()
+
     update_pool.messages = Queue.Queue()
 
-    path = "O:\\Technical_Support\\Applications_Engineering\\Customer Archives"
+    import sys
+
+    if sys.platform == "linux":
+        path = "/media/o/Technical_Support/Applications_Engineering/Customer Archives"
+    if sys.platform == "win32":
+        path = "O:\\Technical_Support\\Applications_Engineering\\Customer Archives"
     t = time.time()
+
     if path not in directory_dictionary:
         directory_dictionary[path] = Directory.Directory(path, 0.0, directory_dictionary)  # Create Root and reset time.
     update_pool.apply_async(directory_dictionary[path].update,
@@ -111,17 +119,18 @@ def main2():
         if os.path.getmtime(path) > scan_time:
             print path
     tt = time.time() - t
-    log("Time to scan all folders:", tt, "(", len(paths)/tt, "Folder/ second)")
+    log("Time to scan all folders:", tt, "(", len(paths) / tt, "Folder/ second)")
 
-    def get_date(path,scan_time):
+    def get_date(path, scan_time):
         return os.path.getmtime(path) > scan_time
-    from multiprocessing import Pool
+
     from multiprocessing.pool import ThreadPool as Pool
+
     pool = Pool()
     t = time.time()
     print pool.map(lambda (path, scan_time): os.path.getmtime(path) > scan_time, paths)
     tt = time.time() - t
-    log("Time to scan all folders:", tt, "(", len(paths)/tt, "Folder/ second)")
+    log("Time to scan all folders:", tt, "(", len(paths) / tt, "Folder/ second)")
 
 
 if __name__ == "__main__":
