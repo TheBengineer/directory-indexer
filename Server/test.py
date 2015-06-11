@@ -6,6 +6,14 @@ import subprocess
 
 import scandir as sd
 
+def log(*args):
+    print "[Test]",
+    print time.strftime("%c"),
+    print " ",
+    for arg in args:
+        print arg,
+    print ""
+
 
 def main():
     def scan_dir(a=0):
@@ -70,7 +78,7 @@ def main2():
         if not FindIt:
             print "Could not create the FindIt directory. Will now crash."
             quit()
-        database_filename = os.path.join(FindIt, "FindIt.db")
+        database_filename = os.path.join(FindIt, "test.db")
         # self.backup_db(database_filename)
         directory_database = DirectoryDB.DirectoryDB(database_filename)
         directory_database.start()
@@ -96,8 +104,26 @@ def main2():
 
     update_pool.close()
     update_pool.join()
-    print time.time() - t
+    log("Time to scan directory:", time.time() - t)
+    paths = directory_database.dump_paths()
+    t = time.time()
+    for path, scan_time in paths:
+        if os.path.getmtime(path) > scan_time:
+            print path
+    tt = time.time() - t
+    log("Time to scan all folders:", tt, "(", len(paths)/tt, "Folder/ second)")
+
+    def get_date(path,scan_time):
+        return os.path.getmtime(path) > scan_time
+    from multiprocessing import Pool
+    from multiprocessing.pool import ThreadPool as Pool
+    pool = Pool()
+    t = time.time()
+    print pool.map(lambda (path, scan_time): os.path.getmtime(path) > scan_time, paths)
+    tt = time.time() - t
+    log("Time to scan all folders:", tt, "(", len(paths)/tt, "Folder/ second)")
 
 
 if __name__ == "__main__":
     main2()
+    exit(0)
