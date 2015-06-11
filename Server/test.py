@@ -140,7 +140,7 @@ def main2():
 
     pool = Pool()
     t = time.time()
-    print pool.map(lambda (path, scan_time): os.path.getmtime(path) > scan_time, paths)
+    pool.map(lambda (path, scan_time): os.path.getmtime(path) > scan_time, paths)
     tt = time.time() - t
     log("Time to scan all folders:", tt, "(", len(paths) / tt, "Folder/ second)")
 
