@@ -103,7 +103,7 @@ def main2():
 
     import sys
 
-    path = "O:\\Technical_Support\\Applications_Engineering\\Customer Archives"
+    path = "O:\\Technical_Support\\Applications_Engineering"
     if sys.platform == "linux2":
         path = linux_path(path)
     log("Scanning:", path)
