@@ -27,7 +27,6 @@ class FindIt(Thread):
         """
         Thread.__init__(self)
         self.version = version
-
         self.go = True
         self.clients = {}
         self.scanner = Scanner.Scanner()
@@ -40,6 +39,7 @@ class FindIt(Thread):
 
     def run(self):
         while self.go:
+
             command = raw_input()
             if command.upper() == "Q":
                 exit()
