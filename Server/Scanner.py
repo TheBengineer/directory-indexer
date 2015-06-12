@@ -116,76 +116,79 @@ class Scanner(Thread):
                 break
             return (pathS, directoriesS, filesS)
         except os.error:
-            pass
+            log("Path", path, "is not accessible.")
+            # except TypeError:
+            #    log("Path Seems to not exist:", path)
 
     def run(self):
         # gc.disable()
         gc.set_threshold(10)
 
         log("Roots:", self.roots)
-        self.directories_to_refresh.append(
-            ("O:\\Technical_Support", 1.2))  # TODO remove debug
+        self.directories_to_refresh = self.directory_database.dump_paths()
         while self.go:
-            tmp_to_freshen = []
-            for i in xrange(min(len(self.directories_to_refresh), 512)):  # Get the next 512 directories to freshen
-                try:
-                    tmp_to_freshen.append(self.directories_to_refresh.pop())
-                except IndexError:
-                    break
-            log("To freshen", tmp_to_freshen)
-            t = time.time()
-            results_fresh = self.scan_pool.map(
-                lambda (path_scan_time): self.refresh_folder(path_scan_time), tmp_to_freshen)
-            t2 = time.time()
-            log("Refreshed ", len(tmp_to_freshen), "in ", t2 - t, "Seconds (", len(tmp_to_freshen) / (t2 - t),
-                "Folders/Second)")
-            log("Fresh results", results_fresh)
-            for index, result in enumerate(results_fresh):
-                # log("Processing ", result, index, tmp_to_freshen[index][0])
-                if result == 0:
-                    # log("Adding", tmp_to_freshen[index][0])
-                    self.directories_to_scan.append(tmp_to_freshen[index][0])
-                elif result == 1:
-                    pass  # Directory is up to date
-                    # TODO make this save the new scan time
-                elif result == 2:
-                    # directory needs to be deleted from DB.
-                    self.directory_database.del_folder(tmp_to_freshen[index][0])
-            log("To scan:", self.directories_to_scan)
-            # TODO add scanning here
-            tmp_to_scan = []
-            for i in xrange(min(len(self.directories_to_scan), 512)):  # Get the next 512 directories to freshen
-                try:
-                    tmp_to_scan.append(self.directories_to_scan.pop())
-                except IndexError:
-                    break
-            log("To Scan", tmp_to_scan)
-            t = time.time()
-            results_scan = self.scan_pool.map(self.scan_folder, tmp_to_scan)
-            t2 = time.time()
-            log("Scanned ", len(tmp_to_freshen), "in ", t2 - t, "Seconds (", len(tmp_to_freshen) / (t2 - t),
-                "Folders/Second)")
-            log("Scan results", results_scan)
-            for (path, directories, files) in results_scan:
-                for directory in directories:
-                    self.directories_to_refresh.append(
-                        (os.path.join(path, directory), 0.0))  # TODO add a way to look up times.
-                for file in files:
-                    self.directory_database.add_fileB(path, file)
-            self.directory_database.writeout()
             if not len(self.directories_to_refresh) and not len(self.directories_to_scan):
-                self.go = 0
-
+                time.sleep(1)
+            else:
+                tmp_to_freshen = []
+                for i in xrange(min(len(self.directories_to_refresh), 512)):  # Get the next 512 directories to freshen
+                    try:
+                        tmp = self.directories_to_refresh.pop()
+                        if len(tmp) == 2:
+                            tmp_to_freshen.append(tmp)
+                        else:
+                            log("Malformed path", tmp)
+                    except IndexError:
+                        break
+                # log("To freshen", tmp_to_freshen)
+                t = time.time()
+                results_fresh = self.scan_pool.map(
+                    lambda (path_scan_time): self.refresh_folder(path_scan_time), tmp_to_freshen)
+                t2 = time.time()
+                delta = max(t2 - t, .001)
+                log("Refreshed ", len(tmp_to_freshen), "in ", delta, "Seconds (", len(tmp_to_freshen) / delta,
+                    "Folders/Second)")
+                # log("Fresh results", results_fresh)
+                for index, result in enumerate(results_fresh):
+                    # log("Processing ", result, index, tmp_to_freshen[index][0])
+                    if result == 0:
+                        # log("Adding", tmp_to_freshen[index][0])
+                        self.directories_to_scan.append(tmp_to_freshen[index][0])
+                    elif result == 1:
+                        pass  # Directory is up to date
+                        # TODO make this save the new scan time
+                    elif result == 2:
+                        # directory needs to be deleted from DB.
+                        self.directory_database.del_folder(tmp_to_freshen[index][0])
+                # log("To scan:", self.directories_to_scan)
+                # TODO add scanning here
+                tmp_to_scan = []
+                for i in xrange(min(len(self.directories_to_scan), 512)):  # Get the next 512 directories to freshen
+                    try:
+                        tmp_to_scan.append(self.directories_to_scan.pop())
+                    except IndexError:
+                        break
+                # log("To Scan", tmp_to_scan)
+                t = time.time()
+                results_scan = self.scan_pool.map(self.scan_folder, tmp_to_scan)
+                t2 = time.time()
+                delta = max(t2 - t, .001)
+                log("Scanned ", len(tmp_to_scan), "in ", delta, "Seconds (", len(tmp_to_scan) / delta,
+                    "Folders/Second)")
+                # log("Scan results", results_scan)
+                for (path, directories, files) in results_scan:
+                    for directory in directories:
+                        self.directories_to_refresh.append(
+                            (os.path.join(path, directory), 0.0))  # TODO add a way to look up times.
+                    for file in files:
+                        self.directory_database.add_fileB(path, file)
+                self.directory_database.writeout()
 
     def add_to_roots(self, folder_to_scan):
         if not os.path.isdir(folder_to_scan):  # Make sure the folder exists
             log("Cannot access the folder to be scanned: ", folder_to_scan)
         else:
-            if folder_to_scan not in self.roots:
-                self.roots.append(folder_to_scan)
-                log("Adding path ", folder_to_scan, " to roots")
-            else:
-                log("Path ", folder_to_scan, " already in roots")
+            self.directories_to_refresh.append((folder_to_scan, 0.0))
 
     def scan_dir(self, folder_to_scan):
         self.add_to_roots(folder_to_scan)

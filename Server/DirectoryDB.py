@@ -136,9 +136,12 @@ class DirectoryDB(Thread):
             if len(self.folders_to_delete):
                 for path in self.folders_to_delete:
                     path = fix_path(path)
-                    query = "DELETE FROM files WHERE path LIKE '{path}%'".format(path=path)
+                    path_id = self.get_path_id(path)
+                    query = "DELETE FROM files WHERE directory = '{0}%'".format(path_id)
+                    query2 = "DELETE FROM directories WHERE id = '{0}%'".format(path_id)
                     self.lock.acquire()
                     self.DB_cursor.execute(query)
+                    self.DB_cursor.execute(query2)
                     self.lock.release()
             self.folders_to_delete = []
             self.local_lock.release()
