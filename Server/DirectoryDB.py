@@ -48,7 +48,7 @@ class DirectoryDB(Thread):
         create_table_files = "CREATE TABLE files " \
                              "(directory INTEGER, filename TEXT, scan_time REAL, CONSTRAINT unq UNIQUE (directory, filename));"
         create_table_directories = "CREATE TABLE directories " \
-                                   "(id INTERGER, path TEXT, scan_time REAL, CONSTRAINT unq UNIQUE (path));"
+                                   "(id INTEGER PRIMARY KEY, path TEXT, scan_time REAL, CONSTRAINT unq UNIQUE (path));"
         self.lock.acquire()
         tables = self.DB_cursor.execute("SELECT name FROM sqlite_master"
                                         " WHERE type='table'").fetchall()
@@ -61,9 +61,7 @@ class DirectoryDB(Thread):
 
     def add_file(self, file_path):
         path, filename = os.path.split(file_path)
-        self.local_lock.acquire()
         self.add_fileB(path, filename)
-        self.local_lock.release()
 
     def add_fileB(self, path, filename):
         if filename and path:
@@ -84,6 +82,18 @@ class DirectoryDB(Thread):
         if filename and path:
             self.files_to_delete.append([path, filename])
 
+    def get_path_id(self, path, scan_time=0.0):
+        query = "INSERT OR IGNORE INTO directories(path, scan_time) VALUES(\"{0}\", {1});".format(path, scan_time)
+        query2 = "SELECT directories.id FROM directories WHERE path LIKE \"{0}\";".format(path)
+        self.lock.acquire()
+        self.DB_cursor.execute(query)
+        self.DB_cursor.execute(query2)
+        data = self.DB_cursor.fetchall()
+        self.lock.release()
+        return data
+
+
+
     def run(self):
         """
         Does nothing at this point
@@ -94,7 +104,7 @@ class DirectoryDB(Thread):
         def fix_path(path):
             if path.startswith("/media/"):
                 path2 = path[7:]  # Slice off the leading "/media/"
-                drive = path2[:path2.find("/")]
+                drive = path2[0] # Grab the next char
                 path = drive + ":" + path[8:]  # TODO this is hardcoded to my drive system
             return path.replace("/", "\\")
 
@@ -103,8 +113,9 @@ class DirectoryDB(Thread):
             if len(self.files_to_add):
                 for path, filename in self.files_to_add:
                     path = fix_path(path)
-                    query = "INSERT OR REPLACE INTO files (path, filename, scan_time) VALUES(\"{path}\", " \
-                            " \"{filename}\", \"{time}\");".format(path=path, filename=filename,
+                    path_id = self.get_path_id(path, time.time())
+                    query = "INSERT OR REPLACE INTO files (directory, filename, scan_time) VALUES(\"{path_id}\", " \
+                            " \"{filename}\", \"{time}\");".format(path_id=path_id, filename=filename,
                                                                    time=time.time())
                     self.lock.acquire()
                     try:
