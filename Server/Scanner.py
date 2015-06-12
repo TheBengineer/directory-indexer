@@ -161,7 +161,6 @@ class Scanner(Thread):
                         # directory needs to be deleted from DB.
                         self.directory_database.del_folder(tmp_to_freshen[index][0])
                 # log("To scan:", self.directories_to_scan)
-                # TODO add scanning here
                 tmp_to_scan = []
                 for i in xrange(min(len(self.directories_to_scan), 512)):  # Get the next 512 directories to freshen
                     try:
@@ -179,7 +178,7 @@ class Scanner(Thread):
                 for (path, directories, files) in results_scan:
                     for directory in directories:
                         self.directories_to_refresh.append(
-                            (os.path.join(path, directory), 0.0))  # TODO add a way to look up times.
+                            (os.path.join(path, directory), self.directory_database.get_path_time(path)))  # TODO add a way to look up times.
                     for file in files:
                         self.directory_database.add_fileB(path, file)
                 self.directory_database.writeout()

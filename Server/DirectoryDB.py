@@ -92,6 +92,14 @@ class DirectoryDB(Thread):
         self.lock.release()
         return data
 
+    def get_path_time(self, path):
+        query = "SELECT directories.scan_time FROM directories WHERE path LIKE \"{0}\";".format(path)
+        self.lock.acquire()
+        self.DB_cursor.execute(query)
+        data = self.DB_cursor.fetchall()
+        self.lock.release()
+        return data
+
 
 
     def run(self):
@@ -136,9 +144,10 @@ class DirectoryDB(Thread):
             if len(self.folders_to_delete):
                 for path in self.folders_to_delete:
                     path = fix_path(path)
-                    path_id = self.get_path_id(path)
-                    query = "DELETE FROM files WHERE directory = '{0}%'".format(path_id)
-                    query2 = "DELETE FROM directories WHERE id = '{0}%'".format(path_id)
+                    path_id = self.get_path_id(path)[0][0]
+                    query = "DELETE FROM files WHERE directory = {0}".format(path_id)
+                    query2 = "DELETE FROM directories WHERE id = {0}".format(path_id)
+                    log(query, query2)
                     self.lock.acquire()
                     self.DB_cursor.execute(query)
                     self.DB_cursor.execute(query2)
