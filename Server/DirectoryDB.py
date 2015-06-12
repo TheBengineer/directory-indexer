@@ -90,7 +90,7 @@ class DirectoryDB(Thread):
         self.DB_cursor.execute(query2)
         data = self.DB_cursor.fetchall()
         self.lock.release()
-        return data
+        return data[0][0]
 
     def get_path_time(self, path):
         query = "SELECT directories.scan_time FROM directories WHERE path LIKE \"{0}\";".format(path)
@@ -98,7 +98,7 @@ class DirectoryDB(Thread):
         self.DB_cursor.execute(query)
         data = self.DB_cursor.fetchall()
         self.lock.release()
-        return data
+        return data[0][0]
 
 
 
