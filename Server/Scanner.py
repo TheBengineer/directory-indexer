@@ -189,7 +189,7 @@ class Scanner(Thread):
                         if directory in self.time_cache:
                             scan_time = self.time_cache[directory]
                         else:
-                            scan_time = self.directory_database.get_path_time(path)
+                            scan_time = self.directory_database.get_path_time(directory)
                         self.directories_to_refresh.append(
                             (os.path.join(path, directory), scan_time))
                     for file in files:
