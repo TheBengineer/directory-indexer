@@ -219,7 +219,7 @@ class DirectoryDB(Thread):
         for path, time_ in data:
             path_fixed = self.fix_path(path)
             dict[path_fixed] = time_
-            result += (path_fixed, time_)
+            result.append((path_fixed, time_))
         return result
 
     def nuke(self):
