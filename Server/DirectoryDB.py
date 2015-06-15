@@ -167,7 +167,10 @@ class DirectoryDB(Thread):
         self.DB_cursor.execute(query)
         data = self.DB_cursor.fetchall()
         self.lock.release()
-        return data
+        results = []
+        for row in data:
+            results.append((os.path.join(row[0], row[1]),row[2]))
+        return results
 
     def get_folders_500(self, filename):
         query = "SELECT directories.path, f.filename , f.scan_time FROM files f JOIN directories ON f.directory=directories.id WHERE f.filename LIKE '{filename}' LIMIT 500;".format(
@@ -177,7 +180,10 @@ class DirectoryDB(Thread):
         self.DB_cursor.execute(query)
         data = self.DB_cursor.fetchall()
         self.lock.release()
-        return data
+        results = []
+        for row in data:
+            results.append((os.path.join(row[0], row[1]),row[2]))
+        return results
 
     def get_folders_limit(self, filename, limit=500):
         query = "SELECT directories.path, f.filename , f.scan_time FROM files f JOIN directories ON f.directory=directories.id WHERE f.filename LIKE '{filename}' LIMIT {limit};".format(
@@ -187,7 +193,10 @@ class DirectoryDB(Thread):
         self.DB_cursor.execute(query)
         data = self.DB_cursor.fetchall()
         self.lock.release()
-        return data
+        results = []
+        for row in data:
+            results.append((os.path.join(row[0], row[1]),row[2]))
+        return results
 
     def writeout(self):
         self.lock.acquire()
