@@ -106,7 +106,12 @@ class DirectoryDB(Thread):
         else:
             return 0.0
 
-
+    def fix_path(self, path):
+        if path.startswith("/media/"):
+            path2 = path[7:]  # Slice off the leading "/media/"
+            drive = path2[0]  # Grab the next char
+            path = drive + ":" + path[8:]  # TODO this is hardcoded to my drive system
+        return path.replace("/", "\\")
 
     def run(self):
         """
@@ -115,18 +120,11 @@ class DirectoryDB(Thread):
         :return:
         """
 
-        def fix_path(path):
-            if path.startswith("/media/"):
-                path2 = path[7:]  # Slice off the leading "/media/"
-                drive = path2[0] # Grab the next char
-                path = drive + ":" + path[8:]  # TODO this is hardcoded to my drive system
-            return path.replace("/", "\\")
-
         while self.go:
             self.local_lock.acquire()
             if len(self.files_to_add):
                 for path, filename in self.files_to_add:
-                    path = fix_path(path)
+                    path = self.fix_path(path)
                     path_id = self.get_path_id(path, time.time())
                     query = "INSERT OR REPLACE INTO files (directory, filename, scan_time) VALUES(\"{path_id}\", " \
                             " \"{filename}\", \"{time}\");".format(path_id=path_id, filename=filename,
@@ -140,7 +138,7 @@ class DirectoryDB(Thread):
             self.files_to_add = []
             if len(self.files_to_delete):
                 for path, filename in self.files_to_delete:
-                    path = fix_path(path)
+                    path = self.fix_path(path)
                     query = "DELETE FROM files WHERE path ='{path}' AND filename ='{filename}'" \
                             " ;".format(path=path, filename=filename)
                     self.lock.acquire()
@@ -149,7 +147,7 @@ class DirectoryDB(Thread):
             self.files_to_delete = []
             if len(self.folders_to_delete):
                 for path in self.folders_to_delete:
-                    path = fix_path(path)
+                    path = self.fix_path(path)
                     path_id = self.get_path_id(path)
                     query = "DELETE FROM files WHERE directory = {0}".format(path_id)
                     query2 = "DELETE FROM directories WHERE id = {0}".format(path_id)
@@ -217,9 +215,12 @@ class DirectoryDB(Thread):
 
     def dump_paths_dict(self, dict):
         data = self.dump_paths()
+        result = []
         for path, time_ in data:
-            dict[path] = time_
-        return data
+            path_fixed = self.fix_path(path)
+            dict[path_fixed] = time_
+            result += (path_fixed, time_)
+        return result
 
     def nuke(self):
         query1 = "DELETE FROM files;"
