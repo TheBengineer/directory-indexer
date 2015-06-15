@@ -111,6 +111,7 @@ class Scanner(Thread):
             return 2  # The folder non-accessible.
 
     def scan_folder(self, path):
+        (pathS, directoriesS, filesS) = ((), (), ())
         try:
             for (pathS, directoriesS, filesS) in myScandir.walk(path):
                 break
@@ -178,7 +179,8 @@ class Scanner(Thread):
                 for (path, directories, files) in results_scan:
                     for directory in directories:
                         self.directories_to_refresh.append(
-                            (os.path.join(path, directory), self.directory_database.get_path_time(path)))  # TODO add a way to look up times.
+                            (os.path.join(path, directory),
+                             self.directory_database.get_path_time(path)))  # TODO add a way to look up times.
                     for file in files:
                         self.directory_database.add_fileB(path, file)
                 self.directory_database.writeout()
@@ -193,7 +195,7 @@ class Scanner(Thread):
         else:
             self.directories_to_refresh.append((folder_to_scan, 0.0))
 
-    def scan_dir(self, folder_to_scan): # TODO Delete this
+    def scan_dir(self, folder_to_scan):  # TODO Delete this
         self.add_to_roots(folder_to_scan)
         if os.path.isdir(folder_to_scan):  # Make sure the folder exists
             # log("Attempting to scan path ", folder_to_scan) # Not needed
