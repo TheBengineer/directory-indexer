@@ -186,10 +186,15 @@ class Scanner(Thread):
                 # log("Scan results", results_scan)
                 for (path, directories, files) in results_scan:
                     for directory in directories:
-                        if directory in self.time_cache:
-                            scan_time = self.time_cache[directory]
+                        if not path[-1] == "\\":
+                            folderpath = path + "\\" + directory
                         else:
-                            scan_time = self.directory_database.get_path_time(directory)
+                            folderpath = path + directory
+                        #log("Debug", folderpath, self.time_cache) # This breaks all the things.
+                        if directory in self.time_cache:
+                            scan_time = self.time_cache[folderpath]
+                        else:
+                            scan_time = self.directory_database.get_path_time(folderpath)
                         self.directories_to_refresh.append(
                             (os.path.join(path, directory), scan_time))
                     for file in files:
