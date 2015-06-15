@@ -198,6 +198,7 @@ class Scanner(Thread):
                 t3 = time.time()
                 delta = t3 - t2
                 log("Post scan overhead: ", delta, "Seconds (", round(delta * 300), "~Folders)")
+                t2 = time.time()
             if time.time() - self.last_update > self.update_interval:
                 self.directories_to_refresh = self.directory_database.dump_paths()
                 for root_dir in self.roots:
