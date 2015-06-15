@@ -100,7 +100,10 @@ class SearchServer(Thread):
                                 client.send(data_to_send)
                                 data_to_send = ""
                                 message_length = 0
-                            data_to_send += r[0] + "\\" + r[1] + "\n"
+                            if not r[0][-1] == "\\":
+                                data_to_send += r[0] + "\\" + r[1] + "\n"
+                            else:
+                                data_to_send += r[0]  + r[1] + "\n"
                             message_length += 1
                         log("Sending ", i, "Results to ", address)
                         client.send(data_to_send)
