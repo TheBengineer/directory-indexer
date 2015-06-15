@@ -56,6 +56,8 @@ class Scanner(Thread):
         self.scan_results = [[], [], []]
         self.time_cache = {}
 
+        self.linux = (sys.platform == "linux2")
+
         self.scan_pool = Pool_for_map(128)
 
         self.go = 1
@@ -85,7 +87,7 @@ class Scanner(Thread):
                 return FindIt
             else:
                 return False
-        elif sys.platform == "linux2":
+        elif self.linux:
             home = os.getenv('HOME')
             FindIt = os.path.join(home, "FindIt")
             if not os.path.isdir(FindIt):
@@ -126,6 +128,7 @@ class Scanner(Thread):
         # gc.disable()
         gc.set_threshold(10)
 
+
         log("Roots:", self.roots)
         self.directories_to_refresh = self.directory_database.dump_paths_dict(self.time_cache)
         t2 = time.time()
@@ -138,7 +141,10 @@ class Scanner(Thread):
                     try:
                         tmp = self.directories_to_refresh.pop()
                         if len(tmp) == 2:
-                            tmp_to_freshen.append(tmp)
+                            if self.linux:
+                                pass # Fix this.
+                            else:
+                                tmp_to_freshen.append(tmp)
                         else:
                             log("Malformed path", tmp)
                     except IndexError:
