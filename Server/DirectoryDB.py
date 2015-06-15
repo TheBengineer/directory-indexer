@@ -215,6 +215,12 @@ class DirectoryDB(Thread):
         log("Done dumping all paths.")
         return data
 
+    def dump_paths_dict(self, dict):
+        data = self.dump_paths()
+        for path, time_ in data:
+            dict[path] = time_
+        return data
+
     def nuke(self):
         query1 = "DELETE FROM files;"
         query2 = "DELETE FROM directories;"

@@ -54,6 +54,7 @@ class Scanner(Thread):
         self.directories_to_refresh = []
         self.directories_to_scan = []
         self.scan_results = [[], [], []]
+        self.time_cache = {}
 
         self.scan_pool = Pool_for_map(128)
 
@@ -126,7 +127,7 @@ class Scanner(Thread):
         gc.set_threshold(10)
 
         log("Roots:", self.roots)
-        self.directories_to_refresh = self.directory_database.dump_paths()
+        self.directories_to_refresh = self.directory_database.dump_paths_dict(self.time_cache)
         t2 = time.time()
         while self.go:
             if not len(self.directories_to_refresh) and not len(self.directories_to_scan):
@@ -185,9 +186,12 @@ class Scanner(Thread):
                 # log("Scan results", results_scan)
                 for (path, directories, files) in results_scan:
                     for directory in directories:
+                        if directory in self.time_cache:
+                            scan_time = self.time_cache[directory]
+                        else:
+                            scan_time = self.directory_database.get_path_time(path)
                         self.directories_to_refresh.append(
-                            (os.path.join(path, directory),
-                             self.directory_database.get_path_time(path)))  # TODO add a way to look up times.
+                            (os.path.join(path, directory), scan_time))
                     for file in files:
                         self.directory_database.add_fileB(path, file)
                 self.directory_database.writeout()
