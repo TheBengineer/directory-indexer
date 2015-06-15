@@ -52,9 +52,13 @@ if __name__ == '__main__':
     F = FindIt(version)
     F.start()
     if sys.platform == "linux2":
-        F.scanner.add_to_roots("/media/O/Technical_Support//Applications_Engineering")
+        F.scanner.add_to_roots("/media/O/")
+        F.scanner.add_to_roots("/media/M/")
+        F.scanner.add_to_roots("/media/K/")
     elif sys.platform == "win32":
-        F.scanner.add_to_roots("O:\\Technical_Support\\Applications_Engineering")
+        F.scanner.add_to_roots("O:\\")
+        F.scanner.add_to_roots("M:\\")
+        F.scanner.add_to_roots("K:\\")
 
 
 
