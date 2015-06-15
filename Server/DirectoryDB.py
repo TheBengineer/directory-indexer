@@ -161,42 +161,33 @@ class DirectoryDB(Thread):
             time.sleep(.1)
 
     def get_folders(self, filename):
-        query = "SELECT directories.path, f.filename , f.scan_time FROM files f JOIN directories ON f.directory=directories.id WHERE f.filename LIKE '{filename}';".format(
+        query = "SELECT directories.path, f.filename FROM files f JOIN directories ON f.directory=directories.id WHERE f.filename LIKE '{filename}';".format(
             filename=filename)
         self.lock.acquire()
         self.DB_cursor.execute(query)
         data = self.DB_cursor.fetchall()
         self.lock.release()
-        results = []
-        for row in data:
-            results.append((os.path.join(row[0], row[1]),row[2]))
-        return results
+        return data
 
     def get_folders_500(self, filename):
-        query = "SELECT directories.path, f.filename , f.scan_time FROM files f JOIN directories ON f.directory=directories.id WHERE f.filename LIKE '{filename}' LIMIT 500;".format(
+        query = "SELECT directories.path, f.filename FROM files f JOIN directories ON f.directory=directories.id WHERE f.filename LIKE '{filename}' LIMIT 500;".format(
             filename=filename)
         log("Getting results for ", query)
         self.lock.acquire()
         self.DB_cursor.execute(query)
         data = self.DB_cursor.fetchall()
         self.lock.release()
-        results = []
-        for row in data:
-            results.append((os.path.join(row[0], row[1]),row[2]))
-        return results
+        return data
 
     def get_folders_limit(self, filename, limit=500):
-        query = "SELECT directories.path, f.filename , f.scan_time FROM files f JOIN directories ON f.directory=directories.id WHERE f.filename LIKE '{filename}' LIMIT {limit};".format(
+        query = "SELECT directories.path, f.filename  FROM files f JOIN directories ON f.directory=directories.id WHERE f.filename LIKE '{filename}' LIMIT {limit};".format(
             filename=filename, limit=limit)
         log("Getting results for ", query)
         self.lock.acquire()
         self.DB_cursor.execute(query)
         data = self.DB_cursor.fetchall()
         self.lock.release()
-        results = []
-        for row in data:
-            results.append((os.path.join(row[0], row[1]),row[2]))
-        return results
+        return data
 
     def writeout(self):
         self.lock.acquire()
