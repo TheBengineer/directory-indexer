@@ -127,6 +127,7 @@ class Scanner(Thread):
 
         log("Roots:", self.roots)
         self.directories_to_refresh = self.directory_database.dump_paths()
+        t2 = time.time()
         while self.go:
             if not len(self.directories_to_refresh) and not len(self.directories_to_scan):
                 time.sleep(1)
@@ -142,6 +143,10 @@ class Scanner(Thread):
                     except IndexError:
                         break
                 # log("To freshen", tmp_to_freshen)
+                t3 = time.time()
+                delta = t3- t2
+                log("Overhead: ", delta, "Seconds (", round(delta*300) ,
+                    "~Folders)")
                 t = time.time()
                 results_fresh = self.scan_pool.map(
                     lambda (path_scan_time): self.refresh_folder(path_scan_time), tmp_to_freshen)
@@ -169,6 +174,10 @@ class Scanner(Thread):
                     except IndexError:
                         break
                 # log("To Scan", tmp_to_scan)
+                t3 = time.time()
+                delta = t3- t2
+                log("Overhead: ", delta, "Seconds (", round(delta*300) ,
+                    "~Folders)")
                 t = time.time()
                 results_scan = self.scan_pool.map(self.scan_folder, tmp_to_scan)
                 t2 = time.time()
