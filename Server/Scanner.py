@@ -144,9 +144,8 @@ class Scanner(Thread):
                         break
                 # log("To freshen", tmp_to_freshen)
                 t3 = time.time()
-                delta = t3- t2
-                log("Overhead: ", delta, "Seconds (", round(delta*300) ,
-                    "~Folders)")
+                delta = t3 - t2
+                log("Refresh prep overhead: ", delta, "Seconds (", round(delta * 300), "~Folders)")
                 t = time.time()
                 results_fresh = self.scan_pool.map(
                     lambda (path_scan_time): self.refresh_folder(path_scan_time), tmp_to_freshen)
@@ -175,9 +174,8 @@ class Scanner(Thread):
                         break
                 # log("To Scan", tmp_to_scan)
                 t3 = time.time()
-                delta = t3- t2
-                log("Overhead: ", delta, "Seconds (", round(delta*300) ,
-                    "~Folders)")
+                delta = t3 - t2
+                log("Post refresh overhead: ", delta, "Seconds (", round(delta * 300), "~Folders)")
                 t = time.time()
                 results_scan = self.scan_pool.map(self.scan_folder, tmp_to_scan)
                 t2 = time.time()
@@ -193,6 +191,9 @@ class Scanner(Thread):
                     for file in files:
                         self.directory_database.add_fileB(path, file)
                 self.directory_database.writeout()
+                t3 = time.time()
+                delta = t3 - t2
+                log("Post scan overhead: ", delta, "Seconds (", round(delta * 300), "~Folders)")
             if time.time() - self.last_update > self.update_interval:
                 self.directories_to_refresh = self.directory_database.dump_paths()
                 for root_dir in self.roots:
