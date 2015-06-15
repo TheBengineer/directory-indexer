@@ -189,7 +189,7 @@ class Scanner(Thread):
         else:
             self.directories_to_refresh.append((folder_to_scan, 0.0))
 
-    def scan_dir(self, folder_to_scan):
+    def scan_dir(self, folder_to_scan): # TODO Delete this
         self.add_to_roots(folder_to_scan)
         if os.path.isdir(folder_to_scan):  # Make sure the folder exists
             # log("Attempting to scan path ", folder_to_scan) # Not needed
@@ -213,49 +213,3 @@ class Scanner(Thread):
                 log("Output file backed up.")
         except ValueError:
             log("Output file not backed up. File may not exist, permissions, etc. This might be a problem later")
-
-    def freshen(self):
-        for i in self.roots:
-            if i in self.directory_dictionary:
-                log("Freshening ", i)
-                self.update_pool.apply_async(self.directory_dictionary[i].update,
-                                             args=(self.update_pool, self.directory_database,))  # Go. Scan. Be Free.
-            else:
-                log("Directory ", i, "not in dictionary. Scanning.")
-                self.scan_dir(i)
-
-    def importOldScanFromDB(self, DB, tmpDirectoryDictionary):
-        """
-        Used to import from a sqlite file generated from the last scan.
-        :param DB: The path to the .csv file
-        :type DB: DirectoryDB.DirectoryDB
-        :param tmpDirectoryDictionary: A dictionary to hold all the imported Directory classes
-        :type tmpDirectoryDictionary: dict of Directory.Directory
-        :return: Does not return anything.
-        """
-
-        def test(file_path, directory_dict):
-            path = file_path[0].strip("\"")
-            # mfile = f[1].strip("\"")
-            s_time = 0.0
-            if sys.platform == "linux2":
-                if path[1] == ":":
-                    drive = path[0]
-                    path = "/media/" + drive + path[2:]
-                    path = os.path.normpath(path)
-            if file_path[1]:
-                s_time = file_path[1]
-            if path not in directory_dict:
-                directory_dict[path] = Directory.Directory(path, s_time, directory_dict, self)
-
-        log("Attempting to import old Database from ", DB.file_path)
-        data = DB.dump_paths()
-        log("Got ", sys.getsizeof(data) / 1000000.0, " MB of data")
-        line = ""
-        bench_time = time.time()
-        for line in xrange(len(data)):
-            test(data[line], tmpDirectoryDictionary)
-        log("Imported", line, "files in ", len(tmpDirectoryDictionary), " unique folders. (Parsed in",
-            time.time() - bench_time, " Seconds)")
-        # log("Size of directory:", sys.getsizeof(tmpDirectoryDictionary))
-        # log("Total size of dictionary:", SizeOf.asizeof(tmpDirectoryDictionary))
