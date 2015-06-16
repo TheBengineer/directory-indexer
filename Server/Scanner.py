@@ -58,8 +58,6 @@ class Scanner(Thread):
         self.scan_results = [[], [], []]
         self.time_cache = {}
 
-
-
         self.scan_pool = Pool_for_map(128)
 
         self.go = 1
@@ -218,6 +216,7 @@ class Scanner(Thread):
                     self.directories_to_refresh += (root_dir, 0.0)
 
     def add_to_roots(self, folder_to_scan):
+        self.roots.append(folder_to_scan)
         if not os.path.isdir(folder_to_scan):  # Make sure the folder exists
             log("Cannot access the folder to be scanned: ", folder_to_scan)
         else:
