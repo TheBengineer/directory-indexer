@@ -157,6 +157,7 @@ class Scanner(Thread):
                                     tmp_to_freshen.append(l_path)
                                 elif tmp[:7] == '/media/':
                                     tmp_to_freshen.append(tmp)  # Already in linux format.
+                                    log("Path seems to be already linux", tmp)
                                 else:
                                     log("Path could not be converted to linux.", tmp)
                             else:
