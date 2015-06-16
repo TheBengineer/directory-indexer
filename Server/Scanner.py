@@ -124,6 +124,12 @@ class Scanner(Thread):
             # except TypeError:
             #    log("Path Seems to not exist:", path)
 
+    def linux_path(self,(path, scan_time)):
+        if path[1] == ":":
+            drive = path[0].upper()
+            new_path = "/media/" + drive +"/" + path[2:].replace("\\", "/")
+
+
     def run(self):
         # gc.disable()
         gc.set_threshold(10)
@@ -142,7 +148,7 @@ class Scanner(Thread):
                         tmp = self.directories_to_refresh.pop()
                         if len(tmp) == 2:
                             if self.linux:
-                                pass  # Fix this.
+                                tmp_to_freshen.append(self.linux_path(tmp))
                             else:
                                 tmp_to_freshen.append(tmp)
                         else:
