@@ -128,6 +128,7 @@ class Scanner(Thread):
         # gc.disable()
         gc.set_threshold(10)
 
+        time.sleep(.1)
         log("Roots:", self.roots)
         self.directories_to_refresh = self.directory_database.dump_paths_dict(self.time_cache)
         t2 = time.time()
