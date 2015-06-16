@@ -206,10 +206,16 @@ class Scanner(Thread):
                 # log("Scan results", results_scan)
                 for (path, directories, files) in results_scan:
                     for directory in directories:
-                        if not path[-1] == "\\":
-                            folderpath = path + "\\" + directory
+                        if self.linux:
+                            if not path[-1] == "/":
+                                folderpath = path + "/" + directory
+                            else:
+                                folderpath = path + directory
                         else:
-                            folderpath = path + directory
+                            if not path[-1] == "\\":
+                                folderpath = path + "\\" + directory
+                            else:
+                                folderpath = path + directory
                         # log("Debug", folderpath, self.time_cache) # This breaks all the things.
                         log("Debug", folderpath)
                         if folderpath in self.time_cache:
