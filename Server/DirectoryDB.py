@@ -4,7 +4,7 @@ import sqlite3 as lite
 from threading import Thread
 from threading import Lock
 import time
-import os
+import os, sys
 
 """
 This database will hold all the files and paths that are normally written to a CSV file.
@@ -39,6 +39,7 @@ class DirectoryDB(Thread):
         self.folders_to_delete = []
         self.GUI = GUI
         self.go = 1
+        self.platform = sys.platform
         """
         :type self.lock: threading.Lock
         :type self.local_lock: threading.Lock
@@ -107,11 +108,19 @@ class DirectoryDB(Thread):
             return 0.0
 
     def fix_path(self, path):
-        if path.startswith("/media/"):
-            path2 = path[7:]  # Slice off the leading "/media/"
-            drive = path2[0]  # Grab the next char
-            path = drive + ":" + path[8:]  # TODO this is hardcoded to my drive system
-        return path.replace("/", "\\")
+        if self.platform == "win32":
+            if path.startswith("/media/"):
+                path2 = path[7:]  # Slice off the leading "/media/"
+                drive = path2[0]  # Grab the next char
+                path = drive + ":" + path[8:]  # TODO this is hardcoded to my drive system
+            return path.replace("/", "\\")
+        elif self.platform == "linux2":
+            if path[1]== ":":
+                drive = path[0].upper()  # Grab the next char
+                path = "/media/" + drive + "/" + path[8:]  # TODO this is hardcoded to my drive system
+            return path.replace("\\", "/")
+        else:
+            return path # TODO Make a Mac version?
 
     def run(self):
         """
@@ -123,7 +132,7 @@ class DirectoryDB(Thread):
             if len(self.files_to_add):
                 for path, filename in self.files_to_add:
                     path = self.fix_path(path)
-                    path_id = self.get_path_id(path, time.time()) # TODO this takes a long time. Fix this.
+                    path_id = self.get_path_id(path, time.time())  # TODO this takes a long time. Fix this.
                     query = "INSERT OR REPLACE INTO files (directory, filename, scan_time) VALUES(\"{path_id}\", " \
                             " \"{filename}\", \"{time}\");".format(path_id=path_id, filename=filename,
                                                                    time=time.time())
