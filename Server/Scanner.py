@@ -217,11 +217,11 @@ class Scanner(Thread):
                     self.directories_to_refresh += (root_dir, 0.0)
 
     def add_to_roots(self, folder_to_scan):
-        self.roots.append(folder_to_scan)
         if not os.path.isdir(folder_to_scan):  # Make sure the folder exists
             log("Cannot access the folder to be scanned: ", folder_to_scan)
         else:
             self.directories_to_refresh.append((folder_to_scan, 0.0))
+            self.roots.append(folder_to_scan)
 
     def scan_dir(self, folder_to_scan):  # TODO Delete this
         self.add_to_roots(folder_to_scan)
