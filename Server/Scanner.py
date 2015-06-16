@@ -150,20 +150,17 @@ class Scanner(Thread):
                 for i in xrange(min(len(self.directories_to_refresh), 512)):  # Get the next 512 directories to freshen
                     try:
                         (path, scan_time) = self.directories_to_refresh.pop()
-                        if len(path) == 2:
-                            if self.linux:
-                                l_path = self.linux_path(path)
-                                if l_path:
-                                    tmp_to_freshen.append(l_path)
-                                elif path[:7] == '/media/':
-                                    tmp_to_freshen.append(path)  # Already in linux format.
-                                    log("Path seems to be already linux", path)
-                                else:
-                                    log("Path could not be converted to linux.", path)
+                        if self.linux:
+                            l_path = self.linux_path(path)
+                            if l_path:
+                                tmp_to_freshen.append(l_path)
+                            elif path[:7] == '/media/':
+                                tmp_to_freshen.append(path)  # Already in linux format.
+                                log("Path seems to be already linux", path)
                             else:
-                                tmp_to_freshen.append((path, scan_time))
+                                log("Path could not be converted to linux.", path)
                         else:
-                            log("Malformed path", path)
+                            tmp_to_freshen.append((path, scan_time))
                     except IndexError:
                         break
                 # log("To freshen", tmp_to_freshen)
