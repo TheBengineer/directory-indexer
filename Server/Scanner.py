@@ -221,6 +221,7 @@ class Scanner(Thread):
                             scan_time = self.time_cache[folderpath]
                         else:
                             scan_time = self.directory_database.get_path_time(folderpath)
+                            log("Path not in cache", folderpath)
                         self.directories_to_refresh.append(
                             (os.path.join(path, directory), scan_time))
                     for file in files:
