@@ -128,6 +128,9 @@ class Scanner(Thread):
         if path[1] == ":":
             drive = path[0].upper()
             new_path = "/media/" + drive +"/" + path[2:].replace("\\", "/")
+            return (new_path, scan_time)
+        else:
+            return False
 
 
     def run(self):
@@ -148,7 +151,11 @@ class Scanner(Thread):
                         tmp = self.directories_to_refresh.pop()
                         if len(tmp) == 2:
                             if self.linux:
-                                tmp_to_freshen.append(self.linux_path(tmp))
+                                l_path = self.linux_path(tmp)
+                                if l_path:
+                                    tmp_to_freshen.append(l_path)
+                                else:
+                                    log("Path could not be converted to linux.", tmp)
                             else:
                                 tmp_to_freshen.append(tmp)
                         else:
