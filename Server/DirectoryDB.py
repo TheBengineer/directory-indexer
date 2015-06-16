@@ -123,7 +123,7 @@ class DirectoryDB(Thread):
             if len(self.files_to_add):
                 for path, filename in self.files_to_add:
                     path = self.fix_path(path)
-                    path_id = self.get_path_id(path, time.time())
+                    path_id = self.get_path_id(path, time.time()) # TODO this takes a long time. Fix this.
                     query = "INSERT OR REPLACE INTO files (directory, filename, scan_time) VALUES(\"{path_id}\", " \
                             " \"{filename}\", \"{time}\");".format(path_id=path_id, filename=filename,
                                                                    time=time.time())
