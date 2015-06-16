@@ -14,6 +14,7 @@ import datetime, shutil
 
 import gc
 import os, time, sys
+import string
 
 import DirectoryDB
 import Directory
@@ -124,14 +125,14 @@ class Scanner(Thread):
             # except TypeError:
             #    log("Path Seems to not exist:", path)
 
-    def linux_path(self,(path, scan_time)):
+    def linux_path(self, (path, scan_time)):
         if path[1] == ":":
             drive = path[0].upper()
-            new_path = "/media/" + drive +"/" + path[3:].replace("\\", "/")
+            new_path = "/media/" + drive + "/" + string.replace(path[3:], "\\", "/")
+            log("Debug", new_path)
             return (new_path, scan_time)
         else:
             return False
-
 
     def run(self):
         # gc.disable()
@@ -155,7 +156,7 @@ class Scanner(Thread):
                                 if l_path:
                                     tmp_to_freshen.append(l_path)
                                 elif tmp[:7] == '/media/':
-                                    tmp_to_freshen.append(tmp) # Already in linux format.
+                                    tmp_to_freshen.append(tmp)  # Already in linux format.
                                 else:
                                     log("Path could not be converted to linux.", tmp)
                             else:
