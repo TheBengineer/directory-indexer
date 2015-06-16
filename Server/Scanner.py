@@ -130,7 +130,7 @@ class Scanner(Thread):
 
         time.sleep(.1)
         log("Roots:", self.roots)
-        self.directories_to_refresh = self.directory_database.dump_paths_dict(self.time_cache)
+        self.directories_to_refresh += self.directory_database.dump_paths_dict(self.time_cache)
         t2 = time.time()
         while self.go:
             if not len(self.directories_to_refresh) and not len(self.directories_to_scan):
