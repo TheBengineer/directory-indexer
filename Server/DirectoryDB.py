@@ -117,7 +117,7 @@ class DirectoryDB(Thread):
         elif self.platform == "linux2":
             if path[1]== ":":
                 drive = path[0].upper()  # Grab the next char
-                path = "/media/" + drive + "/" + path[7:]  # TODO this is hardcoded to my drive system
+                path = "/media/" + drive + "/" + path[2:]  # TODO this is hardcoded to my drive system
             return path.replace("\\", "/")
         else:
             return path # TODO Make a Mac version?
