@@ -129,7 +129,6 @@ class Scanner(Thread):
         if path[1] == ":":
             drive = path[0].upper()
             new_path = "/media/" + drive + "/" + string.replace(path[3:], "\\", "/")
-            log("Debug", new_path)
             return new_path
         else:
             return False
@@ -156,7 +155,7 @@ class Scanner(Thread):
                                 tmp_to_freshen.append((l_path, scan_time))
                             elif path[:7] == '/media/':
                                 tmp_to_freshen.append((path, scan_time))  # Already in linux format.
-                                log("Path seems to be already linux", path)
+                                #log("Path seems to be already linux", path)
                             else:
                                 log("Path could not be converted to linux.", path)
                         else:
