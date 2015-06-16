@@ -125,12 +125,12 @@ class Scanner(Thread):
             # except TypeError:
             #    log("Path Seems to not exist:", path)
 
-    def linux_path(self, (path, scan_time)):
+    def linux_path(self, path):
         if path[1] == ":":
             drive = path[0].upper()
             new_path = "/media/" + drive + "/" + string.replace(path[3:], "\\", "/")
             log("Debug", new_path)
-            return (new_path, scan_time)
+            return new_path
         else:
             return False
 
@@ -149,21 +149,21 @@ class Scanner(Thread):
                 tmp_to_freshen = []
                 for i in xrange(min(len(self.directories_to_refresh), 512)):  # Get the next 512 directories to freshen
                     try:
-                        tmp = self.directories_to_refresh.pop()
-                        if len(tmp) == 2:
+                        (path, scan_time) = self.directories_to_refresh.pop()
+                        if len(path) == 2:
                             if self.linux:
-                                l_path = self.linux_path(tmp)
+                                l_path = self.linux_path(path)
                                 if l_path:
                                     tmp_to_freshen.append(l_path)
-                                elif tmp[:7] == '/media/':
-                                    tmp_to_freshen.append(tmp)  # Already in linux format.
-                                    log("Path seems to be already linux", tmp)
+                                elif path[:7] == '/media/':
+                                    tmp_to_freshen.append(path)  # Already in linux format.
+                                    log("Path seems to be already linux", path)
                                 else:
-                                    log("Path could not be converted to linux.", tmp)
+                                    log("Path could not be converted to linux.", path)
                             else:
-                                tmp_to_freshen.append(tmp)
+                                tmp_to_freshen.append((path, scan_time))
                         else:
-                            log("Malformed path", tmp)
+                            log("Malformed path", path)
                     except IndexError:
                         break
                 # log("To freshen", tmp_to_freshen)
