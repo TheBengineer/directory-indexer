@@ -216,7 +216,7 @@ class Scanner(Thread):
                             else:
                                 folderpath = path + directory
                         # log("Debug", folderpath, self.time_cache) # This breaks all the things.
-                        log("Debug", folderpath)
+                        # log("Debug", folderpath)
                         if folderpath in self.time_cache:
                             scan_time = self.time_cache[folderpath]
                         else:
