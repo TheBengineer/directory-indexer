@@ -39,10 +39,9 @@ class FindIt(Thread):
 
     def run(self):
         while self.go:
-
             command = raw_input()
             if command.upper() == "Q":
-                exit()
+                quit()
             elif command.upper() == "A":
                 pass
 
@@ -50,7 +49,6 @@ class FindIt(Thread):
 if __name__ == '__main__':
     version = "2.0.0"
     F = FindIt(version)
-    F.start()
     if sys.platform == "linux2":
         F.scanner.add_to_roots("/media/O/")
         F.scanner.add_to_roots("/media/M/")
@@ -59,8 +57,7 @@ if __name__ == '__main__':
         F.scanner.add_to_roots("O:\\")
         F.scanner.add_to_roots("M:\\")
         F.scanner.add_to_roots("K:\\")
-
-
+    F.start()
 
 
 
