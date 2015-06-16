@@ -37,6 +37,8 @@ class Scanner(Thread):
         :type GUI: GUI.Window
         :return:
         """
+        self.linux = (sys.platform == "linux2")
+
         self.GUI = GUI
 
         self.directory_dictionary = {}
@@ -56,7 +58,7 @@ class Scanner(Thread):
         self.scan_results = [[], [], []]
         self.time_cache = {}
 
-        self.linux = (sys.platform == "linux2")
+
 
         self.scan_pool = Pool_for_map(128)
 
@@ -128,7 +130,6 @@ class Scanner(Thread):
         # gc.disable()
         gc.set_threshold(10)
 
-
         log("Roots:", self.roots)
         self.directories_to_refresh = self.directory_database.dump_paths_dict(self.time_cache)
         t2 = time.time()
@@ -142,7 +143,7 @@ class Scanner(Thread):
                         tmp = self.directories_to_refresh.pop()
                         if len(tmp) == 2:
                             if self.linux:
-                                pass # Fix this.
+                                pass  # Fix this.
                             else:
                                 tmp_to_freshen.append(tmp)
                         else:
@@ -196,7 +197,7 @@ class Scanner(Thread):
                             folderpath = path + "\\" + directory
                         else:
                             folderpath = path + directory
-                        #log("Debug", folderpath, self.time_cache) # This breaks all the things.
+                        # log("Debug", folderpath, self.time_cache) # This breaks all the things.
                         log("Debug", folderpath)
                         if folderpath in self.time_cache:
                             scan_time = self.time_cache[folderpath]
