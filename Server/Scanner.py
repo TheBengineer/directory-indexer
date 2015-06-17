@@ -107,12 +107,13 @@ class Scanner(Thread):
 
     def refresh_folder(self, (path, scan_time)):
         try:
-            if os.path.getmtime(path) > scan_time:
-                return 0  # The folder was updated.
+            mtime = os.path.getmtime(path)
+            if mtime > scan_time:
+                return (0, mtime)  # The folder was updated.
             else:
-                return 1  # The folder was NOT updated.
+                return (1, mtime)  # The folder was NOT updated.
         except os.error:  # Not accessible.
-            return 2  # The folder non-accessible.
+            return (2, 0.0)  # The folder non-accessible.
 
     def scan_folder(self, path):
         (pathS, directoriesS, filesS) = ((), (), ())
