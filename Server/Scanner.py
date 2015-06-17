@@ -188,8 +188,10 @@ class Scanner(Thread):
                         # log("Adding", tmp_to_freshen[index][0])
                         self.directories_to_scan.append(path)
                         self.time_cache[path] = mtime
+                        #log("Adding path to cache:", path)
                     elif result == 1:
                         self.time_cache[path] = mtime
+                        #log("Adding path to cache:", path)
                     elif result == 2:
                         # directory needs to be deleted from DB.
                         self.directory_database.del_folder(tmp_to_freshen[index][0])
@@ -228,8 +230,8 @@ class Scanner(Thread):
                         if folderpath in self.time_cache:
                             scan_time = self.time_cache[folderpath]
                         else:
-                            scan_time = self.directory_database.get_path_time(folderpath)
-                            log("Path not in cache", folderpath)
+                            scan_time = 0.0
+                            #log("Path not in cache", folderpath)
                         self.directories_to_refresh.append(
                             (os.path.join(path, directory), scan_time))
                     for file in files:
