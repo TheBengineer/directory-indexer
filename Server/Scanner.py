@@ -133,6 +133,12 @@ class Scanner(Thread):
         else:
             return False
 
+    def schedule_refresh(self, path, last_scan_time):
+        if path and last_scan_time:
+            self.directories_to_refresh.append((path, last_scan_time))
+        else:
+            log("Trying to schedule a refresh on invalid path/time:", last_scan_time, path)
+
     def run(self):
         # gc.disable()
         gc.set_threshold(10)
@@ -155,7 +161,7 @@ class Scanner(Thread):
                                 tmp_to_freshen.append((l_path, scan_time))
                             elif path[:7] == '/media/':
                                 tmp_to_freshen.append((path, scan_time))  # Already in linux format.
-                                #log("Path seems to be already linux", path)
+                                # log("Path seems to be already linux", path)
                             else:
                                 log("Path could not be converted to linux.", path)
                         else:
@@ -232,9 +238,9 @@ class Scanner(Thread):
                 log("Post scan overhead: ", delta, "Seconds (", round(delta * 300), "~Folders)")
                 t2 = time.time()
             if time.time() - self.last_update > self.update_interval:
-                self.directories_to_refresh = self.directory_database.dump_paths()
+                self.directories_to_refresh += self.directory_database.dump_paths()
                 for root_dir in self.roots:
-                    self.directories_to_refresh += (root_dir, 0.0)
+                    self.schedule_refresh(root_dir, 0.0)
 
     def add_to_roots(self, folder_to_scan):
         if not os.path.isdir(folder_to_scan):  # Make sure the folder exists
