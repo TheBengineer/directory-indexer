@@ -181,14 +181,14 @@ class Scanner(Thread):
                 log("Refreshed ", len(tmp_to_freshen), "in ", delta, "Seconds (", len(tmp_to_freshen) / delta,
                     "Folders/Second)")
                 # log("Fresh results", results_fresh)
-                for index, result in enumerate(results_fresh):
+                for index, (result, mtime) in enumerate(results_fresh):
                     # log("Processing ", result, index, tmp_to_freshen[index][0])
                     if result == 0:
                         # log("Adding", tmp_to_freshen[index][0])
                         self.directories_to_scan.append(tmp_to_freshen[index][0])
+                        self.time_cache[tmp_to_freshen[index][0]] = mtime
                     elif result == 1:
-                        pass  # Directory is up to date
-                        # TODO make this save the new scan time
+                        self.time_cache[tmp_to_freshen[index][0]] = mtime
                     elif result == 2:
                         # directory needs to be deleted from DB.
                         self.directory_database.del_folder(tmp_to_freshen[index][0])
