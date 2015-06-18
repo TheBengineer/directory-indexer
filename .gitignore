@@ -6,3 +6,4 @@ DB.csv.backup
 scandir/
 build/
 dist/
+Client/Scanner/
