@@ -107,8 +107,8 @@ class DirectoryDB(Thread):
         else:
             return 0.0
 
-    def fix_path(self, path):
-        if self.platform == "win32":
+    def fix_path(self, path, destination="normal"):
+        if self.platform == "win32" or destination == "DB":
             if path.startswith("/media/"):
                 path2 = path[7:]  # Slice off the leading "/media/"
                 drive = path2[0]  # Grab the next char
@@ -131,7 +131,7 @@ class DirectoryDB(Thread):
             self.local_lock.acquire()
             if len(self.files_to_add):
                 for path, filename in self.files_to_add:
-                    path = self.fix_path(path)
+                    path = self.fix_path(path, "DB")
                     path_id = self.get_path_id(path, time.time())  # TODO this takes a long time. Fix this.
                     query = "INSERT OR REPLACE INTO files (directory, filename, scan_time) VALUES(\"{path_id}\", " \
                             " \"{filename}\", \"{time}\");".format(path_id=path_id, filename=filename,
