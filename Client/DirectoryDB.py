@@ -23,6 +23,12 @@ def log(*args):
 
 class DirectoryDB(Thread):
     def __init__(self, file_path, GUI=None):
+        """
+
+        :type file_path: String
+        :param GUI:
+        :return:
+        """
         # TODO make this save data more efficiently
         Thread.__init__(self)
         self.lock = Lock()
@@ -107,8 +113,8 @@ class DirectoryDB(Thread):
         else:
             return 0.0
 
-    def fix_path(self, path, destination="normal"):
-        if self.platform == "win32" or destination == "DB":
+    def fix_path(self, path):
+        if self.platform == "win32":
             if path.startswith("/media/"):
                 path2 = path[7:]  # Slice off the leading "/media/"
                 drive = path2[0]  # Grab the next char
@@ -131,7 +137,7 @@ class DirectoryDB(Thread):
             self.local_lock.acquire()
             if len(self.files_to_add):
                 for path, filename in self.files_to_add:
-                    path = self.fix_path(path, "DB")
+                    path = self.fix_path(path)
                     path_id = self.get_path_id(path, time.time())  # TODO this takes a long time. Fix this.
                     query = "INSERT OR REPLACE INTO files (directory, filename, scan_time) VALUES(\"{path_id}\", " \
                             " \"{filename}\", \"{time}\");".format(path_id=path_id, filename=filename,
@@ -189,6 +195,13 @@ class DirectoryDB(Thread):
         return data
 
     def get_folders_limit(self, filename, limit=500):
+        """
+
+        :param filename: String to search. Can include ('%' wildcard) and ('_' wild character)
+        :type filename: str
+        :param limit:
+        :return:
+        """
         query = "SELECT directories.path, f.filename  FROM files f JOIN directories ON f.directory=directories.id WHERE f.filename LIKE '{filename}' LIMIT {limit};".format(
             filename=filename, limit=limit)
         log("Getting results for ", query)
