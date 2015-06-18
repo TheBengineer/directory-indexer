@@ -111,7 +111,7 @@ class Window(Thread):
         if search_text:
             self.multi_list_box.delete(0, tk.END)
             if self.directory_database:
-                local_results = self.directory_database.get_folders_limit(search_text, 1000)
+                local_results = self.directory_database.get_folders_limit("%"+search_text+"%", 1000)
                 for folder_path, filename in local_results:
                     self.multi_list_box.insert(0, (
                     filename, filename[filename.find('.') + 1:].upper(), os.path.join(folder_path, filename)))
