@@ -23,6 +23,12 @@ def log(*args):
 
 class DirectoryDB(Thread):
     def __init__(self, file_path, GUI=None):
+        """
+
+        :type file_path: String
+        :param GUI:
+        :return:
+        """
         # TODO make this save data more efficiently
         Thread.__init__(self)
         self.lock = Lock()
@@ -189,6 +195,13 @@ class DirectoryDB(Thread):
         return data
 
     def get_folders_limit(self, filename, limit=500):
+        """
+
+        :param filename: String to search. Can include ('%' wildcard) and ('_' wild character)
+        :type filename: str
+        :param limit:
+        :return:
+        """
         query = "SELECT directories.path, f.filename  FROM files f JOIN directories ON f.directory=directories.id WHERE f.filename LIKE '{filename}' LIMIT {limit};".format(
             filename=filename, limit=limit)
         log("Getting results for ", query)

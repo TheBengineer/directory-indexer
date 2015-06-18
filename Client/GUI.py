@@ -3,13 +3,13 @@ __author__ = 'boh01'
 from threading import Thread
 import os
 import Tkinter as tk
-import tkFileDialog
 import subprocess
-import Queue
 import socket
 import time
 
 import mhMultiListBox
+import DirectoryDB
+
 
 def log(*args):
     print "[GUI]",
@@ -19,13 +19,15 @@ def log(*args):
         print arg,
     print ""
 
+
 class Window(Thread):
-    def __init__(self):
+    def __init__(self, directory_database):
+        """
+        :type directory_database: DirectoryDB.DirectoryDB
+        :return:
+        """
         Thread.__init__(self)
-
-        self.scanned_paths = Queue.Queue()
-        self.tree = None
-
+        self.directory_database = directory_database
 
         self.version = "Beta"
 
@@ -34,9 +36,6 @@ class Window(Thread):
         self.window.title("Fujifilm Dimatix File Index Database - Ben Holleran April 2015")
         self.window.protocol("WM_DELETE_WINDOW", self.onQuit)
 
-        # self.Directory_index_database = DirectoryDB.DirectoryDB("C:/tmp/Monster.db")
-        # self.Directory_index_database.start()
-        # self.directory_indexer = Directory.Directory()
 
         # ################ Menu
 
@@ -46,9 +45,6 @@ class Window(Thread):
         self.menu.add_cascade(label="File", menu=self.file_menu)
         self.file_menu.add_command(label="Exit", command=self.onQuit)
 
-        # self.edit_menu = tk.Menu(self.menu)
-        # self.menu.add_cascade(label="Edit", menu=self.edit_menu)
-
         self.help_menu = tk.Menu(self.menu)
         self.menu.add_cascade(label="Help", menu=self.help_menu)
         self.help_menu.add_command(label="About", command=self.show_version)
@@ -57,7 +53,6 @@ class Window(Thread):
         # ################ Search
 
         self.search_frame = tk.Frame(self.window)
-        # self.search_frame.config(borderwidth=4, relief=tk.GROOVE) # layout
         self.search_button = tk.Button(self.search_frame, text="Search", command=self.search)
         self.search_text = tk.Entry(self.search_frame, width=300, font="courier 14")
         self.search_text.bind('<Return>', self.search)
@@ -82,29 +77,16 @@ class Window(Thread):
                                                                                ('Type', 70),
                                                                                ('Path', 400)), height=20,
                                                           command=self.open_folder, commandRC=self.open_file)
-        # self.results_options_frame.pack()
 
-        # self.results_label.pack(side=tk.TOP, fill=tk.X)
         self.multi_list_box.pack(expand=tk.YES, fill=tk.BOTH)
 
-        # self.multi_list_box.colmapping['Files'].bind('<Double-Button-1>', self.open_file)
         self.multi_list_box.bind('<Double-Button-1>', self.open_file)
         self.multi_list_box.bind('<Button-3>', self.open_folder)
-        # self.files_listbox.bind('<Button-3>', self.open_folder)
-        # self.folders_listbox.bind('<MouseWheel>', self.on_scroll)
-        # self.files_listbox.bind('<MouseWheel>', self.on_scroll)
-        # self.folders_listbox.bind('<Button-4>', self.scroll_up)
-        # self.files_listbox.bind('<Button-4>', self.scroll_up)
-        # self.folders_listbox.bind('<Button-5>', self.scroll_down)
-        # self.files_listbox.bind('<Button-5>', self.scroll_down)
 
         self.results_frame.pack(fill=tk.BOTH, expand=1)
 
         # Tab order
-
-        # self.tree.start()
         self.search_text.focus()
-
 
     def socket_init(self):
         return socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -121,22 +103,23 @@ class Window(Thread):
         my_socket.connect(address)
         return my_socket
 
-
     def a(self, asdf=0, asdf2=0):
         pass
-
-    def add_scanned_path(self, path):
-        self.scanned_paths.put(path)
-
 
     def search(self, event=""):
         search_text = self.search_text.get()
         if search_text:
+            self.multi_list_box.delete(0, tk.END)
+            if self.directory_database:
+                local_results = self.directory_database.get_folders_limit(search_text, 1000)
+                for folder_path, filename in local_results:
+                    self.multi_list_box.insert(0, (
+                    filename, filename[filename.find('.') + 1:].upper(), os.path.join(folder_path, filename)))
+                print local_results
             s = self.socket_connect(self.socket_init(), ("BOH001", 9091))
-            s.send(search_text) # Need to add some checks here
+            s.send(search_text)  # Need to add some checks here
             result_string = s.recv(100000000)
             num_results = 0
-            self.multi_list_box.delete(0, tk.END)
             while result_string != "":
                 results = result_string.split("\n")
                 i = 0
@@ -177,7 +160,6 @@ class Window(Thread):
         label.pack()
         frmMain.mainloop()
 
-
     def show_help(self):
         frmMain = tk.Tk()
         label = tk.Label(frmMain, text="Version:\n" + self.version)
@@ -194,5 +176,5 @@ class Window(Thread):
 
 
 if __name__ == "__main__":
-    a = Window()
+    a = Window(None)
     a.start()

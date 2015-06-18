@@ -71,7 +71,7 @@ class Scanner(Thread):
         if not FindIt:
             log("Could not create the FindIt directory. Will now crash.")
             quit()
-        database_filename = os.path.join(FindIt, "FindItV2.db")
+        database_filename = os.path.join(FindIt, "Local.db")
         # self.backup_db(database_filename)
         directory_database = DirectoryDB.DirectoryDB(database_filename, self.GUI)
         directory_database.start()
