@@ -17,7 +17,6 @@ import os, time, sys
 import string
 
 import DirectoryDB
-import Directory
 
 import scandir as myScandir
 
@@ -72,7 +71,7 @@ class Scanner(Thread):
         if not FindIt:
             log("Could not create the FindIt directory. Will now crash.")
             quit()
-        database_filename = os.path.join(FindIt, "FindItV2.db")
+        database_filename = os.path.join(FindIt, "Local.db")
         # self.backup_db(database_filename)
         directory_database = DirectoryDB.DirectoryDB(database_filename, self.GUI)
         directory_database.start()
@@ -253,27 +252,4 @@ class Scanner(Thread):
             self.directories_to_refresh.append((folder_to_scan, 0.0))
             self.roots.append(folder_to_scan)
 
-    def scan_dir(self, folder_to_scan):  # TODO Delete this
-        self.add_to_roots(folder_to_scan)
-        if os.path.isdir(folder_to_scan):  # Make sure the folder exists
-            # log("Attempting to scan path ", folder_to_scan) # Not needed
-            if folder_to_scan not in self.directory_dictionary:
-                self.directory_dictionary[folder_to_scan] = Directory.Directory(folder_to_scan, 0.0,
-                                                                                self.directory_dictionary,
-                                                                                self)  # Create Root and reset time.
-            self.update_pool.apply_async(self.directory_dictionary[folder_to_scan].update,
-                                         args=(self.update_pool, self.directory_database,))  # Go. Scan. Be Free.
-            if self.GUI:
-                self.GUI.set_status("Scanning: " + folder_to_scan)
-            else:
-                log("Scanning: ", folder_to_scan)
 
-    def backup_db(self, pathToDB):
-        try:
-            nm = pathToDB + str(datetime.datetime.now()).replace(":", "-") + ".backup"
-            log(nm)
-            if os.path.isfile(pathToDB):
-                shutil.copy(pathToDB, nm)  # Move old database to a backup location
-                log("Output file backed up.")
-        except ValueError:
-            log("Output file not backed up. File may not exist, permissions, etc. This might be a problem later")
