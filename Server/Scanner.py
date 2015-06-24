@@ -203,9 +203,10 @@ class Scanner(Thread):
                     except IndexError:
                         break
                 # log("To Scan", tmp_to_scan)
-                t3 = time.time()
-                delta = t3 - t2
-                log("Post refresh overhead: ", delta, "Seconds (", round(delta * 300), "~Folders)")
+                # t3 = time.time()
+                # delta = t3 - t2
+                # log("Post refresh overhead: ", delta, "Seconds (", round(delta * 300), "~Folders)")
+                # Not needed. This is always super fast.
                 t = time.time()
                 results_scan = self.scan_pool.map(self.scan_folder, tmp_to_scan)
                 t2 = time.time()
