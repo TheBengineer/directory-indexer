@@ -72,17 +72,17 @@ class DirectoryDB(Thread):
 
     def add_fileB(self, path, filename):
         if filename and path:
-            self.local_lock.acquire()
+            #self.local_lock.acquire()
             self.files_to_add.append([path, filename])
-            self.local_lock.release()
+            #self.local_lock.release()
             if self.GUI:
                 self.GUI.add_scanned_path(os.path.join(path, filename))
 
     def del_folder(self, folder_path):
         if folder_path:
-            self.local_lock.acquire()
+            #self.local_lock.acquire()
             self.folders_to_delete.append(folder_path)
-            self.local_lock.release()
+            #self.local_lock.release()
 
     def del_file(self, file_path):
         path, filename = os.path.split(file_path)
