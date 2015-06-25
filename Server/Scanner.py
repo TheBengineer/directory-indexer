@@ -135,10 +135,10 @@ class Scanner(Thread):
             return False
 
     def schedule_refresh(self, path, last_scan_time):
-        if path and last_scan_time:
+        if path and not last_scan_time==None:
             self.directories_to_refresh.append((path, last_scan_time))
         else:
-            log("Trying to schedule a refresh on invalid path/time:", last_scan_time, path)
+            log("Trying to schedule a refresh on invalid path/time:", path/ last_scan_time)
 
     def run(self):
         # gc.disable()
