@@ -166,10 +166,10 @@ class Scanner(Thread):
                                         l_path = l_path.replace("//","/")
                                 tmp_to_freshen.append((l_path, scan_time))
                             elif path[:7] == '/media/':
-                                if "//" in l_path:
-                                    l_path = l_path.replace("//","/")
-                                    while "//" in l_path:
-                                        l_path = l_path.replace("//","/")
+                                if "//" in path:
+                                    path = path.replace("//","/")
+                                    while "//" in path:
+                                        path = path.replace("//","/")
                                 tmp_to_freshen.append((path, scan_time))  # Already in linux format.
                                 # log("Path seems to be already linux", path)
                             else:
