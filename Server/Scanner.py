@@ -246,9 +246,10 @@ class Scanner(Thread):
                             (os.path.join(path, directory), scan_time))
                     for file in files:
                         self.directory_database.add_fileB(path, file)
-                t3 = time.time()
-                delta = t3 - t2
-                log("Post scan overhead:", len(directories), "Dirs,",len(files), "Files in", delta, "Seconds (", (len(directories)+len(files))/delta, "Items/Second)")
+                # Post scan overhead is not needed. Now that writeout is handled separately, this is very fast.
+                #t3 = time.time()
+                #delta = t3 - t2
+                #log("Post scan overhead:", len(directories), "Dirs,",len(files), "Files in", delta, "Seconds (", (len(directories)+len(files))/delta, "Items/Second)")
                 t2 = time.time()
             if time.time() - self.last_update > self.update_interval:
                 self.directories_to_refresh += self.directory_database.dump_paths()
