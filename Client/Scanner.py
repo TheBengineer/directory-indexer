@@ -160,7 +160,7 @@ class Scanner(Thread):
                                 self.directory_database.del_folder(path)
                                 while "//" in l_path:
                                     l_path = l_path.replace("//", "/")
-                                self.directories_to_scan.append(l_path)
+                                self.directories_to_scan.append((l_path, 0.0))
                             if l_path:
                                 tmp_to_freshen.append((l_path, scan_time))
                             elif path[:7] == '/media/':
