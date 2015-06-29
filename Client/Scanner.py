@@ -10,7 +10,6 @@ from threading import Lock
 import Queue
 
 # Needed for backup
-import datetime, shutil
 
 import gc
 import os, time, sys
@@ -63,7 +62,7 @@ class Scanner(Thread):
         self.go = 1
         self.log = ""
         self.last_update = time.time()
-        self.update_interval =  60 * 60 * 12  # Seconds
+        self.update_interval = 60 * 60 * 12  # Seconds
         # TODO make this scan at a time, say 8 PM
 
     def init_database(self):
@@ -157,6 +156,11 @@ class Scanner(Thread):
                         (path, scan_time) = self.directories_to_refresh.pop()
                         if self.linux:
                             l_path = self.linux_path(path)
+                            if "//" in l_path:
+                                self.directory_database.del_folder(path)
+                                while "//" in l_path:
+                                    l_path = l_path.replace("//", "/")
+                                self.directories_to_scan.append(l_path)
                             if l_path:
                                 tmp_to_freshen.append((l_path, scan_time))
                             elif path[:7] == '/media/':
@@ -187,10 +191,10 @@ class Scanner(Thread):
                         # log("Adding", tmp_to_freshen[index][0])
                         self.directories_to_scan.append(path)
                         self.time_cache[path] = mtime
-                        #log("Adding path to cache:", path)
+                        # log("Adding path to cache:", path)
                     elif result == 1:
                         self.time_cache[path] = mtime
-                        #log("Adding path to cache:", path)
+                        # log("Adding path to cache:", path)
                     elif result == 2:
                         # directory needs to be deleted from DB.
                         self.directory_database.del_folder(tmp_to_freshen[index][0])
@@ -230,7 +234,7 @@ class Scanner(Thread):
                             scan_time = self.time_cache[folderpath]
                         else:
                             scan_time = 0.0
-                            #log("Path not in cache", folderpath)
+                            # log("Path not in cache", folderpath)
                         self.directories_to_refresh.append(
                             (os.path.join(path, directory), scan_time))
                     for file in files:
@@ -251,5 +255,3 @@ class Scanner(Thread):
         else:
             self.directories_to_refresh.append((folder_to_scan, 0.0))
             self.roots.append(folder_to_scan)
-
-
