@@ -143,8 +143,33 @@ def main2():
         tt = time.time() - t
         log("Time to scan all folders:", tt, "(", len(paths) / tt, "Folder/ second)")
 
+def main3():
+    t = time.time()
+    a = range(10000000)
+    delta = time.time() - t
+    print delta
+    t = time.time()
+    a += range(10000000)
+    delta = time.time() - t
+    print delta
+    t = time.time()
+    a += range(10000000)
+    delta = time.time() - t
+    print delta
+    t = time.time()
+    for i in a:
+        i = len(a)
+    delta = time.time() - t
+    print delta
+    t = time.time()
+    while len(a):
+        asdf = a.pop()
+    delta = time.time() - t
+    print delta
+
+
 
 
 if __name__ == "__main__":
-    main2()
+    main3()
     exit()
