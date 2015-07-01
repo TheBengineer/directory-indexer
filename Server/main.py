@@ -41,6 +41,7 @@ class FindIt(Thread):
         while self.go:
             command = raw_input()
             if command.upper() == "Q":
+                self.scanner.go = False
                 quit()
             elif command.upper()[0] == "$":
                 try:
