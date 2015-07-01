@@ -44,7 +44,7 @@ class FindIt(Thread):
                 self.scanner.go = False
             elif command.upper() == "X":
                 import os
-                os._exit()
+                os._exit(1)
             elif command.upper()[0] == "$":
                 try:
                     log(eval(command))
