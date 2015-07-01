@@ -44,6 +44,11 @@ class FindIt(Thread):
                 quit()
             elif command.upper() == "A":
                 pass
+            try:
+                exec command
+            except(RuntimeError, TypeError, NameError):
+                print (RuntimeError, TypeError, NameError)
+
 
 
 if __name__ == '__main__':
