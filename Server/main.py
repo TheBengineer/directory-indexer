@@ -42,12 +42,16 @@ class FindIt(Thread):
             command = raw_input()
             if command.upper() == "Q":
                 quit()
-            elif command.upper() == "A":
-                pass
-            try:
-                exec command
-            except(RuntimeError, TypeError, NameError):
-                print (RuntimeError, TypeError, NameError)
+            elif command.upper()[0] == "$":
+                try:
+                    log(eval(command))
+                except(RuntimeError, TypeError, NameError):
+                    log((RuntimeError, TypeError, NameError))
+            elif command.upper()[0] == "#":
+                try:
+                    exec command
+                except(RuntimeError, TypeError, NameError):
+                    log((RuntimeError, TypeError, NameError))
 
 
 
