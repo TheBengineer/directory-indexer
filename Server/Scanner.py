@@ -255,7 +255,7 @@ class Scanner(Thread):
                 self.directories_to_refresh += self.directory_database.dump_paths()
                 for root_dir in self.roots:
                     self.schedule_refresh(root_dir, 0.0)
-        quit() # When loops drops, then exit.
+        sys.exit() # When loops drops, then exit.
 
     def add_to_roots(self, folder_to_scan):
         if not os.path.isdir(folder_to_scan):  # Make sure the folder exists

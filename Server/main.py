@@ -42,7 +42,8 @@ class FindIt(Thread):
             command = raw_input()
             if command.upper() == "Q":
                 self.scanner.go = False
-                quit()
+            elif command.upper() == "X":
+                sys.exit()
             elif command.upper()[0] == "$":
                 try:
                     log(eval(command))
