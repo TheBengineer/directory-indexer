@@ -1,13 +1,13 @@
 __author__ = 'Wild_Doogy'
 
 from threading import Thread
-import socket
 import time
 import sys
 
 import Scanner
 import SearchServer
 import LogServer
+
 
 def log(*args):
     print "[Main]",
@@ -16,7 +16,6 @@ def log(*args):
     for arg in args:
         print arg,
     print ""
-
 
 
 class FindIt(Thread):
@@ -36,7 +35,6 @@ class FindIt(Thread):
         self.log_server = LogServer.LogServer(self.scanner)
         self.log_server.start()
 
-
     def run(self):
         while self.go:
             command = raw_input()
@@ -44,10 +42,12 @@ class FindIt(Thread):
                 self.scanner.go = False
             elif command.upper() == "X":
                 import os
+
                 os._exit(1)
             elif command.upper()[0] == "$":
                 try:
-                    log(command[1:], "$",eval(command[1:]))
+                    result = eval(command[1:])
+                    log(command[1:], "$", result)
                 except(RuntimeError, TypeError, NameError):
                     log((RuntimeError, TypeError, NameError))
             elif command.upper()[0] == "#":
@@ -55,7 +55,6 @@ class FindIt(Thread):
                     exec command[1:]
                 except(RuntimeError, TypeError, NameError):
                     log((RuntimeError, TypeError, NameError))
-
 
 
 if __name__ == '__main__':
@@ -70,7 +69,3 @@ if __name__ == '__main__':
         F.scanner.add_to_roots("M:\\")
         F.scanner.add_to_roots("K:\\")
     F.start()
-
-
-
-
