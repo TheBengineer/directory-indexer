@@ -43,17 +43,18 @@ class FindIt(Thread):
             elif command.upper() == "X":
                 import os
                 os._exit(1)
-            elif command.upper()[0] == "$":
-                try:
-                    result = eval(command[1:])
-                    log(command[1:], "$", result)
-                except:
-                    log(sys.exc_info())
-            elif command.upper()[0] == "#":
-                try:
-                    exec command[1:]
-                except:
-                    log(sys.exc_info())
+            elif len(command):
+                if command.upper()[0] == "$":
+                    try:
+                        result = eval(command[1:])
+                        log(command[1:], "$", result)
+                    except:
+                        log(sys.exc_info())
+                elif command.upper()[0] == "#":
+                    try:
+                        exec command[1:]
+                    except:
+                        log(sys.exc_info())
 
 
 if __name__ == '__main__':
