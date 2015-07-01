@@ -48,13 +48,13 @@ class FindIt(Thread):
                 try:
                     result = literal_eval(command[1:])
                     log(command[1:], "$", result)
-                except SyntaxError:
-                    log(SyntaxError)
+                except:
+                    log(sys.exc_info())
             elif command.upper()[0] == "#":
                 try:
                     exec command[1:]
-                except SyntaxError:
-                    log(SyntaxError)
+                except:
+                    log(sys.exc_info())
 
 
 if __name__ == '__main__':
