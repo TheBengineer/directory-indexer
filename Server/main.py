@@ -44,9 +44,8 @@ class FindIt(Thread):
                 import os
                 os._exit(1)
             elif command.upper()[0] == "$":
-                from ast import literal_eval
                 try:
-                    result = literal_eval(command[1:])
+                    result = eval(command[1:])
                     log(command[1:], "$", result)
                 except:
                     log(sys.exc_info())
