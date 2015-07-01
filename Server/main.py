@@ -42,11 +42,11 @@ class FindIt(Thread):
                 self.scanner.go = False
             elif command.upper() == "X":
                 import os
-
                 os._exit(1)
             elif command.upper()[0] == "$":
+                from ast import literal_eval
                 try:
-                    result = eval(command[1:])
+                    result = literal_eval(command[1:])
                     log(command[1:], "$", result)
                 except(RuntimeError, TypeError, NameError):
                     log((RuntimeError, TypeError, NameError))
