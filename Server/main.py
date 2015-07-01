@@ -47,7 +47,7 @@ class FindIt(Thread):
                 os._exit(1)
             elif command.upper()[0] == "$":
                 try:
-                    log(eval(command[1:]))
+                    log(command[1:], "$",eval(command[1:]))
                 except(RuntimeError, TypeError, NameError):
                     log((RuntimeError, TypeError, NameError))
             elif command.upper()[0] == "#":
