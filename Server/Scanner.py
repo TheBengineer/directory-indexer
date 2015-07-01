@@ -155,27 +155,27 @@ class Scanner(Thread):
                 self.tmp_to_freshen = []
                 for i in xrange(min(len(self.directories_to_refresh), 512)):  # Get the next 512 directories to freshen
                     try:
-                        (path, scan_time) = self.directories_to_refresh.pop()
+                        (self.path, scan_time) = self.directories_to_refresh.pop()
                         if self.linux:
-                            l_path = self.linux_path(path)
-                            if l_path:
-                                if "//" in l_path:
-                                    self.directory_database.del_folder(l_path)
-                                    l_path = l_path.replace("//","/")
-                                    while "//" in l_path:
-                                        l_path = l_path.replace("//","/")
-                                self.tmp_to_freshen.append((l_path, scan_time))
-                            elif path[:7] == '/media/':
-                                if "//" in path:
-                                    path = path.replace("//","/")
-                                    while "//" in path:
-                                        path = path.replace("//","/")
-                                self.tmp_to_freshen.append((path, scan_time))  # Already in linux format.
+                            self.l_path = self.linux_path(self.path)
+                            if self.l_path:
+                                if "//" in self.l_path:
+                                    self.directory_database.del_folder(self.l_path)
+                                    self.l_path = self.l_path.replace("//","/")
+                                    while "//" in self.l_path:
+                                        self.l_path = self.l_path.replace("//","/")
+                                self.tmp_to_freshen.append((self.l_path, scan_time))
+                            elif self.path[:7] == '/media/':
+                                if "//" in self.path:
+                                    self.path = self.path.replace("//","/")
+                                    while "//" in self.path:
+                                        self.path = self.path.replace("//","/")
+                                self.tmp_to_freshen.append((self.path, scan_time))  # Already in linux format.
                                 # log("Path seems to be already linux", path)
                             else:
-                                log("Path could not be converted to linux.", path)
+                                log("Path could not be converted to linux.", self.path)
                         else:
-                            self.tmp_to_freshen.append((path, scan_time))
+                            self.tmp_to_freshen.append((self.path, scan_time))
                     except IndexError:
                         break
                 # log("To freshen", tmp_to_freshen)
