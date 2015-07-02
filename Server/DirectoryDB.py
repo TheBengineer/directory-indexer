@@ -129,41 +129,38 @@ class DirectoryDB(Thread):
 
         while self.go:
             self.local_lock.acquire()
-            if len(self.files_to_add):
-                for path, filename in self.files_to_add:
-                    path = self.fix_path(path, "DB")
-                    path_id = self.get_path_id(path, time.time())  # TODO this takes a long time. Fix this.
-                    query = "INSERT OR REPLACE INTO files (directory, filename, scan_time) VALUES(\"{path_id}\", " \
-                            " \"{filename}\", \"{time}\");".format(path_id=path_id, filename=filename,
-                                                                   time=time.time())
-                    self.lock.acquire()
-                    try:
-                        self.DB_cursor.execute(query)
-                    except lite.OperationalError:
-                        log("ERROR, could not add file: ", query)
-                    self.lock.release()
-            self.files_to_add = []
-            if len(self.files_to_delete):
-                for path, filename in self.files_to_delete:
-                    path = self.fix_path(path)
-                    query = "DELETE FROM files WHERE path ='{path}' AND filename ='{filename}'" \
-                            " ;".format(path=path, filename=filename)
-                    self.lock.acquire()
+            while len(self.files_to_add):
+                path, filename = self.files_to_add.pop()
+                path = self.fix_path(path, "DB")
+                path_id = self.get_path_id(path, time.time())  # TODO this takes a long time. Fix this.
+                query = "INSERT OR REPLACE INTO files (directory, filename, scan_time) VALUES(\"{path_id}\", " \
+                        " \"{filename}\", \"{time}\");".format(path_id=path_id, filename=filename,
+                                                               time=time.time())
+                self.lock.acquire()
+                try:
                     self.DB_cursor.execute(query)
-                    self.lock.release()
-            self.files_to_delete = []
-            if len(self.folders_to_delete):
-                for path in self.folders_to_delete:
-                    path = self.fix_path(path)
-                    path_id = self.get_path_id(path)
-                    query = "DELETE FROM files WHERE directory = {0}".format(path_id)
-                    query2 = "DELETE FROM directories WHERE id = {0}".format(path_id)
-                    log("Deleting path", path, query, query2)
-                    self.lock.acquire()
-                    self.DB_cursor.execute(query)
-                    self.DB_cursor.execute(query2)
-                    self.lock.release()
-            self.folders_to_delete = []
+                except lite.OperationalError:
+                    log("ERROR, could not add file: ", query)
+                self.lock.release()
+            while len(self.files_to_delete):
+                path, filename = self.files_to_delete.pop()
+                path = self.fix_path(path)
+                query = "DELETE FROM files WHERE path ='{path}' AND filename ='{filename}'" \
+                        " ;".format(path=path, filename=filename)
+                self.lock.acquire()
+                self.DB_cursor.execute(query)
+                self.lock.release()
+            while len(self.folders_to_delete):
+                path = self.folders_to_delete.pop()
+                path = self.fix_path(path)
+                path_id = self.get_path_id(path)
+                query = "DELETE FROM files WHERE directory = {0}".format(path_id)
+                query2 = "DELETE FROM directories WHERE id = {0}".format(path_id)
+                log("Deleting path", path, query, query2)
+                self.lock.acquire()
+                self.DB_cursor.execute(query)
+                self.DB_cursor.execute(query2)
+                self.lock.release()
             self.local_lock.release()
             self.writeout()
             # TODO is 30 seconds a good time for the database to be written to?
