@@ -40,6 +40,8 @@ class DirectoryDB(Thread):
         self.GUI = GUI
         self.go = 1
         self.platform = sys.platform
+        self.write_interval = 600
+        self.changed = 0
         """
         :type self.lock: threading.Lock
         :type self.local_lock: threading.Lock
@@ -58,6 +60,7 @@ class DirectoryDB(Thread):
             self.DB_cursor.execute(create_table_files)
         if ("directories",) not in tables:
             self.DB_cursor.execute(create_table_directories)
+        self.changed = 1
         self.lock.release()
 
     def add_file(self, file_path):
@@ -90,6 +93,7 @@ class DirectoryDB(Thread):
         self.DB_cursor.execute(query)
         self.DB_cursor.execute(query2)
         data = self.DB_cursor.fetchall()
+        self.changed = 1
         self.lock.release()
         if len(data):
             return data[0][0]
@@ -126,7 +130,7 @@ class DirectoryDB(Thread):
         """
         :return:
         """
-
+        self.last_write = 0.0
         while self.go:
             self.local_lock.acquire()
             while len(self.files_to_add):
@@ -141,6 +145,7 @@ class DirectoryDB(Thread):
                     self.DB_cursor.execute(query)
                 except lite.OperationalError:
                     log("ERROR, could not add file: ", query)
+                self.changed = 1
                 self.lock.release()
             while len(self.files_to_delete):
                 path, filename = self.files_to_delete.pop()
@@ -149,6 +154,7 @@ class DirectoryDB(Thread):
                         " ;".format(path=path, filename=filename)
                 self.lock.acquire()
                 self.DB_cursor.execute(query)
+                self.changed = 1
                 self.lock.release()
             while len(self.folders_to_delete):
                 path = self.folders_to_delete.pop()
@@ -160,10 +166,15 @@ class DirectoryDB(Thread):
                 self.lock.acquire()
                 self.DB_cursor.execute(query)
                 self.DB_cursor.execute(query2)
+                self.changed = 1
                 self.lock.release()
             self.local_lock.release()
-            self.writeout()
-            # TODO is 30 seconds a good time for the database to be written to?
+            if self.changed:
+                if time.time() - self.last_write > self.write_interval/100:
+                    self.writeout()
+            else:
+                if time.time() - self.last_write > self.write_interval:
+                    self.writeout()
             time.sleep(.1)
 
     def get_folders(self, filename):
@@ -199,6 +210,8 @@ class DirectoryDB(Thread):
         self.lock.acquire()
         self.DB.commit()
         self.lock.release()
+        self.changed = 0
+        self.last_write = time.time()
 
     def dump(self):
         query = "SELECT path, filename, scan_time FROM files;"
@@ -235,4 +248,5 @@ class DirectoryDB(Thread):
         self.DB_cursor.execute(query1)
         self.DB_cursor.execute(query2)
         self.DB_cursor.execute("VACUUM;")
+        self.changed = 1
         self.lock.release()
