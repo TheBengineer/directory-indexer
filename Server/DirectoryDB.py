@@ -137,10 +137,10 @@ class DirectoryDB(Thread):
             while len(self.files_to_add) and loops < 1000:
                 path, filename = self.files_to_add.pop()
                 path = self.fix_path(path, "DB")
-                query = "INSERT OR IGNORE INTO directories(path, scan_time) VALUES('{0}', {1});".format(path,
+                query = "INSERT OR IGNORE INTO directories(path, scan_time) VALUES(\"{0}\", {1});".format(path,
                                                                                                         time.time())
                 query2 = "INSERT OR REPLACE INTO files (directory, filename, scan_time) " \
-                         "VALUES((SELECT directories.id FROM directories WHERE path LIKE '{0}')" \
+                         "VALUES((SELECT directories.id FROM directories WHERE path LIKE \"{0}\")" \
                          ", '{1}', {2});".format(path, filename, time.time())
                 self.lock.acquire()
                 try:
