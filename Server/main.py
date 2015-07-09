@@ -104,5 +104,10 @@ if __name__ == '__main__':
         corrected_path_names.append(d.fix_path(pathname, "DB"))
     log(len(corrected_path_names),"corrected path names, like:", corrected_path_names[0])
 
+    t = time.time()
+    d.funnel_folders(corrected_path_names[:100])
+    log("can add", time.time()-t *100, "Folders / Second")
+
+
 
 
