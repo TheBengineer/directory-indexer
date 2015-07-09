@@ -141,7 +141,7 @@ class DirectoryDB(Thread):
                                                                                                         time.time())
                 query2 = "INSERT OR REPLACE INTO files (directory, filename, scan_time) " \
                          "VALUES((SELECT directories.id FROM directories WHERE path LIKE \"{0}\")" \
-                         ", '{1}', {2});".format(path, filename, time.time())
+                         ", \"{1}\", {2});".format(path, filename, time.time())
                 self.lock.acquire()
                 try:
                     self.DB_cursor.execute(query)
