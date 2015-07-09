@@ -68,7 +68,7 @@ if __name__ == '__main__':
         F.scanner.add_to_roots("O:\\")
         F.scanner.add_to_roots("M:\\")
         F.scanner.add_to_roots("K:\\")
-    F.start()
+    #F.start()
     s = F.scanner
     d = s.directory_database
     import os
