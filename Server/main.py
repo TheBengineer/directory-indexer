@@ -71,31 +71,33 @@ if __name__ == '__main__':
     F.start()
     s = F.scanner
     d = s.directory_database
-    import os
-    if os.path.isfile("/tmp/data"):
-        import csv
-        f = open("/tmp/data", 'rt')
-        try:
-            reader = csv.reader(f)
-            for row in reader:
-                if not len(row) == 2:
-                    log("bad row", row)
-                else:
-                    F.scanner.directory_database.add_fileB(row[0], row[1])
-        finally:
-            f.close()
-    log("Done importing", len(d.files_to_add), "Files")
     data = d.dump_paths_ids()
     log("Done dumping", len(data), "dirs in DB")
     for dir, id in data:
         d.folders[dir] = id
     log("Dict built")
+    del data
+    import os
     folders_to_add = []
-    for index,(path, file) in enumerate(d.files_to_add):
-        if index%100000 == 0:
-            print index
-        if path not in d.folders:
-            folders_to_add.append(path)
+    if os.path.isfile("/tmp/data"):
+        import csv
+        f = open("/tmp/data", 'rt')
+        try:
+            reader = csv.reader(f)
+            index = 0
+            for row in reader:
+                if index%100000 == 0:
+                    print index
+                if not len(row) == 2:
+                    log("bad row", row)
+                else:
+                    if row[0] not in d.folders:
+                        folders_to_add.append(row[0])
+                    F.scanner.directory_database.add_fileB(row[0], row[1])
+                index += 1
+        finally:
+            f.close()
+    log("Done importing", len(d.files_to_add), "Files")
     log("Found", len(folders_to_add), "Folders that need to be added. (wrong path format, so useless)")
 
 

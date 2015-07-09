@@ -247,7 +247,7 @@ class DirectoryDB(Thread):
 
     def dump_paths_ids(self):
         query = "SELECT DISTINCT path, id FROM directories;"
-        log("Starting to dump all stored paths. This may take a while.")
+        log("Starting to dump all stored paths and IDs. This may take a while.")
         self.lock.acquire()
         self.DB_cursor.execute(query)
         data = self.DB_cursor.fetchall()
