@@ -29,7 +29,7 @@ class FindIt(Thread):
         self.go = True
         self.clients = {}
         self.scanner = Scanner.Scanner()
-        self.scanner.start()
+        #self.scanner.start()
         self.search_server = SearchServer.SearchServer(self.scanner)
         self.search_server.start()
         self.log_server = LogServer.LogServer(self.scanner)
@@ -68,7 +68,7 @@ if __name__ == '__main__':
         F.scanner.add_to_roots("O:\\")
         F.scanner.add_to_roots("M:\\")
         F.scanner.add_to_roots("K:\\")
-    #F.start()
+    F.start()
     s = F.scanner
     d = s.directory_database
     import os
@@ -90,6 +90,8 @@ if __name__ == '__main__':
     for dir, id in data:
         d.folders[dir] = id
     log("Dict built")
+    for path, file in d.files_to_add:
+        if path not in
 
 
 
