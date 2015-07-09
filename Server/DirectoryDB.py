@@ -137,15 +137,19 @@ class DirectoryDB(Thread):
             while len(self.files_to_add) and loops < 1000:
                 path, filename = self.files_to_add.pop()
                 path = self.fix_path(path, "DB")
-                path_id = self.get_path_id(path, time.time())  # TODO this takes a long time. Fix this.
-                query = "INSERT OR REPLACE INTO files (directory, filename, scan_time) VALUES(\"{path_id}\", " \
-                        " \"{filename}\", \"{time}\");".format(path_id=path_id, filename=filename,
-                                                               time=time.time())
+                query = "INSERT OR IGNORE INTO directories(path, scan_time) VALUES('{0}', {1});".format(path, time.time())
+                query2 = "INSERT OR REPLACE INTO files (directory, filename, scan_time) " \
+                         "VALUES((SELECT directories.id FROM directories WHERE path LIKE '{0}')" \
+                         ", '{1}', {2});".format(path, filename, time.time())
                 self.lock.acquire()
                 try:
                     self.DB_cursor.execute(query)
                 except lite.OperationalError:
                     log("ERROR, could not add file: ", query)
+                try:
+                    self.DB_cursor.execute(query2)
+                except lite.OperationalError:
+                    log("ERROR, could not add file: ", query2)
                 self.changed = 1
                 self.lock.release()
                 loops += 1
