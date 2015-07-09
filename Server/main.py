@@ -69,7 +69,7 @@ if __name__ == '__main__':
         F.scanner.add_to_roots("M:\\")
         F.scanner.add_to_roots("K:\\")
     F.start()
-    s =F.scanner
+    s = F.scanner
     d = s.directory_database
     len(d.folders_to_delete)
     len(s.directories_to_refresh)

@@ -1,10 +1,10 @@
 __author__ = 'Ben'
 import sqlite3 as lite
-
 from threading import Thread
 from threading import Lock
 import time
-import os, sys
+import os
+import sys
 
 """
 This database will hold all the files and paths that are normally written to a CSV file.
@@ -69,17 +69,17 @@ class DirectoryDB(Thread):
 
     def add_fileB(self, path, filename):
         if filename and path:
-            #self.local_lock.acquire()
+            # self.local_lock.acquire()
             self.files_to_add.append([path, filename])
-            #self.local_lock.release()
+            # self.local_lock.release()
             if self.GUI:
                 self.GUI.add_scanned_path(os.path.join(path, filename))
 
     def del_folder(self, folder_path):
         if folder_path:
-            #self.local_lock.acquire()
+            # self.local_lock.acquire()
             self.folders_to_delete.append(folder_path)
-            #self.local_lock.release()
+            # self.local_lock.release()
 
     def del_file(self, file_path):
         path, filename = os.path.split(file_path)
@@ -119,12 +119,12 @@ class DirectoryDB(Thread):
                 path = drive + ":" + path[8:]  # TODO this is hardcoded to my drive system
             return path.replace("/", "\\")
         elif self.platform == "linux2":
-            if path[1]== ":":
+            if path[1] == ":":
                 drive = path[0].upper()  # Grab the next char
                 path = "/media/" + drive + "/" + path[2:]  # TODO this is hardcoded to my drive system
             return path.replace("\\", "/")
         else:
-            return path # TODO Make a Mac version?
+            return path  # TODO Make a Mac version?
 
     def run(self):
         """
@@ -137,7 +137,8 @@ class DirectoryDB(Thread):
             while len(self.files_to_add) and loops < 1000:
                 path, filename = self.files_to_add.pop()
                 path = self.fix_path(path, "DB")
-                query = "INSERT OR IGNORE INTO directories(path, scan_time) VALUES('{0}', {1});".format(path, time.time())
+                query = "INSERT OR IGNORE INTO directories(path, scan_time) VALUES('{0}', {1});".format(path,
+                                                                                                        time.time())
                 query2 = "INSERT OR REPLACE INTO files (directory, filename, scan_time) " \
                          "VALUES((SELECT directories.id FROM directories WHERE path LIKE '{0}')" \
                          ", '{1}', {2});".format(path, filename, time.time())
@@ -180,7 +181,7 @@ class DirectoryDB(Thread):
                 loops += 1
             self.local_lock.release()
             if self.changed:
-                if time.time() - self.last_write > self.write_interval/100:
+                if time.time() - self.last_write > self.write_interval / 100:
                     self.writeout()
             else:
                 if time.time() - self.last_write > self.write_interval:
