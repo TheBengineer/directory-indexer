@@ -99,6 +99,10 @@ if __name__ == '__main__':
             f.close()
     log("Done importing", len(d.files_to_add), "Files")
     log("Found", len(folders_to_add), "Folders that need to be added. (wrong path format, so useless)")
+    corrected_path_names = []
+    for pathname in folders_to_add:
+        corrected_path_names.append(d.fix_path(pathname, "DB"))
+    log(len(corrected_path_names),"corrected path names, like:", corrected_path_names[0])
 
 
 
