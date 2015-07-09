@@ -87,7 +87,7 @@ if __name__ == '__main__':
             index = 0
             for row in reader:
                 if index%100000 == 0:
-                    print index
+                    log(index, "files scanned")
                 if not len(row) == 2:
                     log("bad row", row)
                 else:
