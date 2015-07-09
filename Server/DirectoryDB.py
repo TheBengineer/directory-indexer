@@ -37,7 +37,7 @@ class DirectoryDB(Thread):
         self.files_to_add = []
         self.files_to_delete = []
         self.folders_to_delete = []
-        self.folders = []
+        self.folders = {}
         self.GUI = GUI
         self.go = 1
         self.platform = sys.platform

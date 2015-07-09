@@ -90,8 +90,13 @@ if __name__ == '__main__':
     for dir, id in data:
         d.folders[dir] = id
     log("Dict built")
-    for path, file in d.files_to_add:
-        if path not in
+    folders_to_add = []
+    for index,(path, file) in enumerate(d.files_to_add):
+        if index%100000 = 0:
+            print index
+        if path not in d.folders:
+            folders_to_add.append(path)
+    log("Found", len(folders_to_add), "Folders that need to be added. (wrong path format, so useless)")
 
 
 
