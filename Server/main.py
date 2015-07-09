@@ -99,10 +99,13 @@ if __name__ == '__main__':
                             folders_to_add[row[0]] = d.fix_path(row[0], "DB")
                             if folders_to_add[row[0]] not in d.folders:
                                 log("Still need to add", row[0])
-                dir_id = d.folders[folders_to_add[row[0]]]
-                query = "INSERT OR REPLACE INTO files (directory, filename, scan_time) VALUES(\"{0}\", " \
-                        " \"{1}\", \"{2}\");".format(folders_to_add[row[0]], row[1], time.time())
-                d.DB_cursor.execute(query)
+                        dir_id = d.folders[folders_to_add[row[0]]]
+                        query = "INSERT OR REPLACE INTO files (directory, filename, scan_time) VALUES(\"{0}\", " \
+                            " \"{1}\", \"{2}\");".format(folders_to_add[row[0]], row[1], time.time())
+                        d.DB_cursor.execute(query)
+                    else:
+                        log("Row exists?", row)
+
                 index += 1
         finally:
             f.close()
