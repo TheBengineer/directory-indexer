@@ -92,20 +92,26 @@ if __name__ == '__main__':
                     log("bad row", row)
                 else:
                     if row[0] not in d.folders:
-                        folders_to_add[row[0]] = index
-                    #F.scanner.directory_database.add_fileB(row[0], row[1])
+                        if row[0] not in folders_to_add:
+                            folders_to_add[row[0]] = d.fix_path(row[0], "DB")
+                            if folders_to_add[row[0]] not in d.folders:
+                                log("Still need to add", row[0])
                 index += 1
         finally:
             f.close()
-    log("Done importing", len(d.files_to_add), "Files")
-    log("Found", len(folders_to_add), "Folders that need to be added. (wrong path format, so useless)")
-    corrected_path_names = []
-    for pathname in folders_to_add:
-        corrected_path_names.append(d.fix_path(pathname, "DB"))
-    log(len(corrected_path_names),"corrected path names, like:", corrected_path_names[0])
 
-    t = time.time()
-    d.funnel_folders(corrected_path_names[:100])
+    #log(len(folders_to_add), "folders still to be added")
+    #log("Found", len(folders_to_add), "Folders that need to be added. (wrong path format, so useless)")
+    #corrected_path_names = []
+    #for pathname in folders_to_add:
+    #    corrected_path_names.append(d.fix_path(pathname, "DB"))
+    #log(len(corrected_path_names),"corrected path names, like:", corrected_path_names[0])
+
+    #t = time.time()
+    #d.funnel_folders(corrected_path_names[:100])
+    #d.funnel_folders(corrected_path_names)
+    #data = d.dump_paths_ids()
+
     log("can add", time.time()-t *100, "Folders / Second")
 
 
