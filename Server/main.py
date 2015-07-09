@@ -92,7 +92,7 @@ if __name__ == '__main__':
     log("Dict built")
     folders_to_add = []
     for index,(path, file) in enumerate(d.files_to_add):
-        if index%100000 = 0:
+        if index%100000 == 0:
             print index
         if path not in d.folders:
             folders_to_add.append(path)
