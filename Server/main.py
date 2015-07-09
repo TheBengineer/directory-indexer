@@ -87,7 +87,7 @@ if __name__ == '__main__':
             index = 0
             for row in reader:
                 if index%100000 == 0:
-                    log(index, "files scanned")
+                    log(index, "files scanned", len(folders_to_add), "unique folders.")
                 if not len(row) == 2:
                     log("bad row", row)
                 else:
