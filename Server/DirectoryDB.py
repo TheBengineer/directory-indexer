@@ -133,7 +133,8 @@ class DirectoryDB(Thread):
         self.last_write = 0.0
         while self.go:
             self.local_lock.acquire()
-            while len(self.files_to_add):
+            loops = 0
+            while len(self.files_to_add) and loops < 1000:
                 path, filename = self.files_to_add.pop()
                 path = self.fix_path(path, "DB")
                 path_id = self.get_path_id(path, time.time())  # TODO this takes a long time. Fix this.
@@ -147,7 +148,9 @@ class DirectoryDB(Thread):
                     log("ERROR, could not add file: ", query)
                 self.changed = 1
                 self.lock.release()
-            while len(self.files_to_delete):
+                loops += 1
+            loops = 0
+            while len(self.files_to_delete) and loops < 1000:
                 path, filename = self.files_to_delete.pop()
                 path = self.fix_path(path)
                 query = "DELETE FROM files WHERE path ='{path}' AND filename ='{filename}'" \
@@ -156,7 +159,9 @@ class DirectoryDB(Thread):
                 self.DB_cursor.execute(query)
                 self.changed = 1
                 self.lock.release()
-            while len(self.folders_to_delete):
+                loops += 1
+            loops = 0
+            while len(self.folders_to_delete) and loops < 1000:
                 path = self.folders_to_delete.pop()
                 path = self.fix_path(path)
                 path_id = self.get_path_id(path)
@@ -168,6 +173,7 @@ class DirectoryDB(Thread):
                 self.DB_cursor.execute(query2)
                 self.changed = 1
                 self.lock.release()
+                loops += 1
             self.local_lock.release()
             if self.changed:
                 if time.time() - self.last_write > self.write_interval/100:
