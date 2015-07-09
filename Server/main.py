@@ -93,7 +93,7 @@ if __name__ == '__main__':
                 else:
                     if row[0] not in d.folders:
                         folders_to_add.append(row[0])
-                    F.scanner.directory_database.add_fileB(row[0], row[1])
+                    #F.scanner.directory_database.add_fileB(row[0], row[1])
                 index += 1
         finally:
             f.close()
