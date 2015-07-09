@@ -96,6 +96,8 @@ if __name__ == '__main__':
                             folders_to_add[row[0]] = d.fix_path(row[0], "DB")
                             if folders_to_add[row[0]] not in d.folders:
                                 log("Still need to add", row[0])
+                dir_id =  d.folders[folders_to_add[row[0]]]
+                d.
                 index += 1
         finally:
             f.close()
@@ -112,7 +114,7 @@ if __name__ == '__main__':
     #d.funnel_folders(corrected_path_names)
     #data = d.dump_paths_ids()
 
-    log("can add", time.time()-t *100, "Folders / Second")
+    #log("can add", time.time()-t *100, "Folders / Second")
 
 
 
