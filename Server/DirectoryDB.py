@@ -186,7 +186,8 @@ class DirectoryDB(Thread):
             else:
                 if time.time() - self.last_write > self.write_interval:
                     self.writeout()
-            time.sleep(.1)
+            if not len(self.files_to_add) and not len(self.folders_to_delete) and not len(self.files_to_delete):
+                time.sleep(.5)
 
     def get_folders(self, filename):
         query = "SELECT directories.path, f.filename FROM files f JOIN directories ON f.directory=directories.id WHERE f.filename LIKE '{filename}';".format(
