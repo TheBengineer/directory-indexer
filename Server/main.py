@@ -85,6 +85,11 @@ if __name__ == '__main__':
         finally:
             f.close()
     log("Done importing", len(d.files_to_add), "Files")
+    data = d.dump_paths_ids()
+    log("Done dumping", len(data), "dirs in DB")
+    for dir, id in data:
+        d.folders[dir] = id
+    log("Dict built")
 
 
 

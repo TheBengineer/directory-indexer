@@ -37,6 +37,7 @@ class DirectoryDB(Thread):
         self.files_to_add = []
         self.files_to_delete = []
         self.folders_to_delete = []
+        self.folders = []
         self.GUI = GUI
         self.go = 1
         self.platform = sys.platform
@@ -236,6 +237,16 @@ class DirectoryDB(Thread):
 
     def dump_paths(self):
         query = "SELECT DISTINCT path, scan_time FROM directories;"
+        log("Starting to dump all stored paths. This may take a while.")
+        self.lock.acquire()
+        self.DB_cursor.execute(query)
+        data = self.DB_cursor.fetchall()
+        self.lock.release()
+        log("Done dumping all paths.")
+        return data
+
+    def dump_paths_ids(self):
+        query = "SELECT DISTINCT path, id FROM directories;"
         log("Starting to dump all stored paths. This may take a while.")
         self.lock.acquire()
         self.DB_cursor.execute(query)
