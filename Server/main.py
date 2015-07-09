@@ -71,5 +71,20 @@ if __name__ == '__main__':
     F.start()
     s = F.scanner
     d = s.directory_database
+    import os
+    if os.path.isfile("/tmp/data"):
+        import csv
+        f = open("/tmp/data", 'rt')
+        try:
+            reader = csv.reader(f)
+            for row in reader:
+                if not len(row) == 2:
+                    log("bad row", row)
+                else:
+                    F.scanner.directory_database.add_fileB(row[0], row[1])
+        finally:
+            f.close()
+    log("Done importing", len(d.files_to_add), "Files")
+
 
 
