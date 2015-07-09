@@ -71,5 +71,5 @@ if __name__ == '__main__':
     F.start()
     s = F.scanner
     d = s.directory_database
-    #$len(d.files_to_add)
-    #len(s.directories_to_refresh)
+
+
