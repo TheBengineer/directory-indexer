@@ -209,6 +209,14 @@ class DirectoryDB(Thread):
         self.lock.release()
         return data
 
+    def funnel_folders(self, folders):
+        for path in folders:
+            query = "INSERT OR IGNORE INTO directories(path, scan_time) VALUES(\"{0}\", {1});".format(path, time.time())
+            self.lock.acquire()
+            self.DB_cursor.execute(query)
+            self.lock.release()
+        return
+
     def get_folders_limit(self, filename, limit=500):
         query = "SELECT directories.path, f.filename  FROM files f JOIN directories ON f.directory=directories.id WHERE f.filename LIKE '{filename}' LIMIT {limit};".format(
             filename=filename, limit=limit)
