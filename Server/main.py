@@ -78,7 +78,7 @@ if __name__ == '__main__':
     log("Dict built")
     del data
     import os
-    folders_to_add = []
+    folders_to_add = {}
     if os.path.isfile("/tmp/data"):
         import csv
         f = open("/tmp/data", 'rt')
@@ -92,7 +92,7 @@ if __name__ == '__main__':
                     log("bad row", row)
                 else:
                     if row[0] not in d.folders:
-                        folders_to_add.append(row[0])
+                        folders_to_add[row[0]] = index
                     #F.scanner.directory_database.add_fileB(row[0], row[1])
                 index += 1
         finally:
