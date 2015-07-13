@@ -161,6 +161,7 @@ class DirectoryDB(Thread):
                 self.tmp_files_to_add[path][1] = fixed_path
                 if fixed_path not in self.folder_ids:
                     add_folders_staging.append((fixed_path, time.time()))
+            self.status = "Batch add {0} folders".format(len(add_folders_staging))
             if len(add_folders_staging):
                 query = "INSERT OR IGNORE INTO directories(path, scan_time) VALUES(?, ?);"
                 self.lock.acquire()
@@ -180,16 +181,17 @@ class DirectoryDB(Thread):
                 self.substatus = "Looping through {0} files".format(len(self.tmp_files_to_add[path][0]))
                 for filename in self.tmp_files_to_add[path][0]: # Loop through files and add them
                     add_files_staging.append((self.folder_ids[fixed_path], fixed_path, filename, time.time()))
+            self.status = "Batch add {0} files".format(len(add_files_staging))
             if len(add_files_staging):
-                    query = "INSERT OR REPLACE INTO files (directory, filename, scan_time) " \
-                            "VALUES(?, ?, ?, ?);"
-                    self.lock.acquire()
-                    try:
-                        self.DB_cursor.executemany(query, add_files_staging)
-                    except lite.OperationalError as e:
-                        log("ERROR, could not add file: ", query, "With data", add_files_staging, e)
-                    self.changed = 1
-                    self.lock.release()
+                query = "INSERT OR REPLACE INTO files (directory, filename, scan_time) " \
+                        "VALUES(?, ?, ?, ?);"
+                self.lock.acquire()
+                try:
+                    self.DB_cursor.executemany(query, add_files_staging)
+                except lite.OperationalError as e:
+                    log("ERROR, could not add file: ", query, "With data", add_files_staging, e)
+                self.changed = 1
+                self.lock.release()
             self.status = "Done adding files, Deleting"
             loops = 0
             while len(self.files_to_delete) and loops < 1000:
