@@ -42,8 +42,31 @@ class FindIt(Thread):
                 self.scanner.go = False
             elif command.upper() == "X":
                 import os
-
                 os._exit(1)
+            elif command.upper() == "S":
+                scanner_attributs = [a for a in dir(self.scanner) if not a.startswith('__')]
+                DB_attributes = [a for a in dir(self.scanner.directory_database) if not a.startswith('__')]
+                message = "Scanner Status:\n"
+                for attribute in scanner_attributs:
+                    real_attribute = getattr(scanner_attributs, attribute)
+                    try:
+                        if len(real_attribute) > 3:
+                            message += "\tLen of {0}:{1}\n".format(attribute, len(real_attribute))
+                        else:
+                            message += "\t{0}:{1}\n".format(attribute, str(real_attribute))
+                    except Exception as e:
+                        log("Error:", e)
+                message += "DB Status:\n"
+                for attribute in DB_attributes:
+                    real_attribute = getattr(DB_attributes, attribute)
+                    try:
+                        if len(real_attribute) > 3:
+                            message += "\tLen of {0}:{1}\n".format(attribute, len(real_attribute))
+                        else:
+                            message += "\t{0}:{1}\n".format(attribute, str(real_attribute))
+                    except Exception as e:
+                        log("Error:", e)
+                log(message)
             elif len(command):
                 if command.upper()[0] == "$":
                     try:
