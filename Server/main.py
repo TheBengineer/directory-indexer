@@ -58,7 +58,7 @@ class FindIt(Thread):
                         break
                     try:
                         max = 5
-                        if type(real_attribute) == 'str':
+                        if type(real_attribute) == str:
                             max = 100
                         if len(real_attribute) > max:
                             message += "\tLen of {0}:{1}\n".format(attribute, len(real_attribute))
@@ -74,7 +74,7 @@ class FindIt(Thread):
                         break
                     try:
                         max = 5
-                        if type(real_attribute) == 'str':
+                        if type(real_attribute) == str:
                             max = 100
                         if len(real_attribute) > max:
                             message += "\tLen of {0}:{1}\n".format(attribute, len(real_attribute))
