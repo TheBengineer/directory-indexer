@@ -180,11 +180,11 @@ class DirectoryDB(Thread):
                 fixed_path = self.tmp_files_to_add[path][1]
                 self.substatus = "Looping through {0} files".format(len(self.tmp_files_to_add[path][0]))
                 for filename in self.tmp_files_to_add[path][0]: # Loop through files and add them
-                    add_files_staging.append((self.folder_ids[fixed_path], fixed_path, filename, time.time()))
+                    add_files_staging.append((self.folder_ids[fixed_path], filename, time.time()))
             self.status = "Batch add {0} files".format(len(add_files_staging))
             if len(add_files_staging):
                 query = "INSERT OR REPLACE INTO files (directory, filename, scan_time) " \
-                        "VALUES(?, ?, ?, ?);"
+                        "VALUES(?, ?, ?);"
                 self.lock.acquire()
                 try:
                     self.DB_cursor.executemany(query, add_files_staging)
