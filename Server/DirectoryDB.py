@@ -37,6 +37,7 @@ class DirectoryDB(Thread):
         self.files_to_add = []
         self.files_to_delete = []
         self.folders_to_delete = []
+        self.tmp_files_to_add = {}
         self.folder_ids = {}
         self.GUI = GUI
         self.go = 1
@@ -139,27 +140,44 @@ class DirectoryDB(Thread):
         self.refresh_ids()
         while self.go:
             self.local_lock.acquire()
-            loops = 0
-            while len(self.files_to_add):
+            self.tmp_files_to_add = {}
+            t = time.time()
+            while len(self.files_to_add) and len(self.tmp_files_to_add) < 10000: # Get 10K files to play with
                 path, filename = self.files_to_add.pop()
-                path = self.fix_path(path, "DB")
-                query = "INSERT OR IGNORE INTO directories(path, scan_time) VALUES(\"{0}\", {1});".format(path,
-                                                                                                          time.time())
-                query2 = "INSERT OR REPLACE INTO files (directory, filename, scan_time) " \
+                if path not in self.tmp_files_to_add:
+                    self.tmp_files_to_add[path] = [[filename],[""]]
+                else:
+                    self.tmp_files_to_add[path][0].append(filename)
+            if len(self.tmp_files_to_add): # Refresh the local id cache
+                self.refresh_ids()
+            for path in self.tmp_files_to_add: # Make a Dict of the files to add
+                fixed_path = self.fix_path(path, "DB")
+                self.tmp_files_to_add[path][1] = fixed_path
+                if fixed_path not in self.folder_ids:
+                    query = "INSERT OR IGNORE INTO directories(path, scan_time) VALUES(\"{0}\", {1});".format(
+                        fixed_path, time.time())
+                    self.lock.acquire()
+                    try:
+                        self.DB_cursor.execute(query)
+                    except lite.OperationalError as e:
+                        log("ERROR, could not add directory: ", query, e)
+                    self.changed = 1
+                    self.lock.release()
+            if len(self.tmp_files_to_add): # Refresh the local id cache
+                self.refresh_ids()
+            for path in self.tmp_files_to_add: # Loop through paths
+                fixed_path = self.tmp_files_to_add[path][1]
+                for filename in self.tmp_files_to_add[path][0]: # Loop through files and add them
+                    query = "INSERT OR REPLACE INTO files (directory, filename, scan_time) " \
                          "VALUES((SELECT directories.id FROM directories WHERE path LIKE \"{0}\")" \
-                         ", \"{1}\", {2});".format(path, filename, time.time())
-                self.lock.acquire()
-                try:
-                    self.DB_cursor.execute(query)
-                except lite.OperationalError:
-                    log("ERROR, could not add file: ", query)
-                try:
-                    self.DB_cursor.execute(query2)
-                except lite.OperationalError:
-                    log("ERROR, could not add file: ", query2)
-                self.changed = 1
-                self.lock.release()
-                loops += 1
+                         ", \"{1}\", {2});".format(fixed_path, filename, time.time())
+                    self.lock.acquire()
+                    try:
+                        self.DB_cursor.execute(query)
+                    except lite.OperationalError as e:
+                        log("ERROR, could not add file: ", query, e)
+                    self.changed = 1
+                    self.lock.release()
             loops = 0
             while len(self.files_to_delete) and loops < 1000:
                 path, filename = self.files_to_delete.pop()
@@ -180,8 +198,14 @@ class DirectoryDB(Thread):
                 query2 = "DELETE FROM directories WHERE id = {0}".format(path_id)
                 log("Deleting path", path)
                 self.lock.acquire()
-                self.DB_cursor.execute(query)
-                self.DB_cursor.execute(query2)
+                try:
+                    self.DB_cursor.execute(query)
+                except lite.OperationalError as e:
+                    log("ERROR, could not delete files: ", query, e)
+                try:
+                    self.DB_cursor.execute(query2)
+                except lite.OperationalError as e:
+                    log("ERROR, could not delete directories: ", query2, e)
                 self.changed = 1
                 self.lock.release()
                 loops += 1
