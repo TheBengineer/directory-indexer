@@ -142,15 +142,20 @@ class DirectoryDB(Thread):
             self.local_lock.acquire()
             self.tmp_files_to_add = {}
             t = time.time()
+            self.status = "Copy to tmp dict"
             while len(self.files_to_add) and len(self.tmp_files_to_add) < 10000: # Get 10K files to play with
                 path, filename = self.files_to_add.pop()
                 if path not in self.tmp_files_to_add:
                     self.tmp_files_to_add[path] = [[filename],[""]]
                 else:
                     self.tmp_files_to_add[path][0].append(filename)
+            self.status = "Refresh ids"
             if len(self.tmp_files_to_add): # Refresh the local id cache
                 self.refresh_ids()
+            self.status = "Add {} paths to DB".format(len(self.tmp_files_to_add))
+            self.substatus = 0
             for path in self.tmp_files_to_add: # Make a Dict of the files to add
+                self.substatus += 1
                 fixed_path = self.fix_path(path, "DB")
                 self.tmp_files_to_add[path][1] = fixed_path
                 if fixed_path not in self.folder_ids:
@@ -163,14 +168,17 @@ class DirectoryDB(Thread):
                         log("ERROR, could not add directory: ", query, e)
                     self.changed = 1
                     self.lock.release()
+            self.status = "Refresh again"
             if len(self.tmp_files_to_add): # Refresh the local id cache
                 self.refresh_ids()
+            self.status = "Looping through {0} paths".format(len(self.tmp_files_to_add))
             for path in self.tmp_files_to_add: # Loop through paths
                 fixed_path = self.tmp_files_to_add[path][1]
+                self.substatus = "Looping through {0} files".format(len(self.tmp_files_to_add[path][0]))
                 for filename in self.tmp_files_to_add[path][0]: # Loop through files and add them
                     query = "INSERT OR REPLACE INTO files (directory, filename, scan_time) " \
-                         "VALUES((SELECT directories.id FROM directories WHERE path LIKE \"{0}\")" \
-                         ", \"{1}\", {2});".format(fixed_path, filename, time.time())
+                            "VALUES((SELECT directories.id FROM directories WHERE path LIKE \"{0}\")" \
+                            ", \"{1}\", {2});".format(fixed_path, filename, time.time())
                     self.lock.acquire()
                     try:
                         self.DB_cursor.execute(query)
@@ -178,6 +186,7 @@ class DirectoryDB(Thread):
                         log("ERROR, could not add file: ", query, e)
                     self.changed = 1
                     self.lock.release()
+            self.status = "Done adding files, Deleting"
             loops = 0
             while len(self.files_to_delete) and loops < 1000:
                 path, filename = self.files_to_delete.pop()
@@ -189,6 +198,7 @@ class DirectoryDB(Thread):
                 self.changed = 1
                 self.lock.release()
                 loops += 1
+            self.status = "Deleting folders"
             loops = 0
             while len(self.folders_to_delete) and loops < 1000:
                 path = self.folders_to_delete.pop()
