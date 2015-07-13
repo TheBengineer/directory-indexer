@@ -57,7 +57,7 @@ class FindIt(Thread):
                         log(e)
                         break
                     try:
-                        max = 3
+                        max = 5
                         if type(real_attribute) == 'str':
                             max = 100
                         if len(real_attribute) > max:
@@ -73,7 +73,7 @@ class FindIt(Thread):
                     except AttributeError:
                         break
                     try:
-                        max = 3
+                        max = 5
                         if type(real_attribute) == 'str':
                             max = 100
                         if len(real_attribute) > max:
