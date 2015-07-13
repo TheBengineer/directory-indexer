@@ -90,9 +90,10 @@ def main2():
     def linux_path(path):
         if ":" in path:
             drive = path[0]
-            path = "/media/"+drive.upper()+path[2:]
+            path = "/media/" + drive.upper() + path[2:]
             path = path.replace("\\", "/")
         return path
+
     import sys
     for times in range(10):
 
@@ -111,7 +112,8 @@ def main2():
         t = time.time()
 
         if path not in directory_dictionary:
-            directory_dictionary[path] = Directory.Directory(path, 0.0, directory_dictionary)  # Create Root and reset time.
+            directory_dictionary[path] = Directory.Directory(path, 0.0,
+                                                             directory_dictionary)  # Create Root and reset time.
         update_pool.apply_async(directory_dictionary[path].update,
                                 args=(update_pool, directory_database,))  # Go. Scan. Be Free.
         time.sleep(.1)
@@ -124,15 +126,15 @@ def main2():
         paths = directory_database.dump_paths()
         if sys.platform == "linux2":
             lpaths = []
-            for path,t in paths:
-                lpaths.append((linux_path(path),t))
+            for path, t in paths:
+                lpaths.append((linux_path(path), t))
             paths = lpaths
         t = time.time()
         for path, scan_time in paths:
             if os.path.getmtime(path) > scan_time:
                 print path
         tt = time.time() - t
-        log("Time to scan all",len(paths),"folders:", tt, "(", len(paths) / tt, "Folder/ second)")
+        log("Time to scan all", len(paths), "folders:", tt, "(", len(paths) / tt, "Folder/ second)")
 
         def get_date(path, scan_time):
             return os.path.getmtime(path) > scan_time
@@ -144,6 +146,7 @@ def main2():
         pool.map(lambda (path, scan_time): os.path.getmtime(path) > scan_time, paths)  # This is very fast.
         tt = time.time() - t
         log("Time to scan all folders:", tt, "(", len(paths) / tt, "Folder/ second)")
+
 
 def main3():
     t = time.time()
@@ -169,35 +172,48 @@ def main3():
     delta = time.time() - t
     print delta
 
+
 def random_string(len):
     tmp = ""
     for i in range(len):
         tmp += random.choice(string.ascii_letters)
     return tmp
 
+
 def main4():
     strings = []
     t = time.time()
     for i in range(10000):
         strings.append(random_string(100))
-    log("Created in", time.time()-t)
+    log("Created in", time.time() - t)
     t = time.time()
     for i in range(1000000):
-        strings.append(strings[int(random.random()*len(strings))])
-    log("Mishmashed", time.time()-t)
+        strings.append(strings[int(random.random() * len(strings))])
+    log("Mishmashed", time.time() - t)
     tmpdict = {}
     t = time.time()
     for s in strings:
         tmpdict[s] = 0
-    log("hashed in ", time.time()-t)
+    log("hashed in ", time.time() - t)
     t = time.time()
     for s in strings:
         if s not in tmpdict:
             tmpdict[s] = s
-    log("hashed in ", time.time()-t)
+    log("hashed in ", time.time() - t)
 
+
+class foo():
+    def __init__(self):
+        self.a = 1
+        self.b = 1
+        self.aa = 1
+        self.ad = 1
+        self.af = 1
 
 
 if __name__ == "__main__":
-    main4()
+    asdf = foo()
+    att = [a for a in dir(asdf) if not a.startswith('__')]
+    log(att)
+    log(getattr(asdf, att[0]))
     exit()
