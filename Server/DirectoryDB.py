@@ -154,36 +154,40 @@ class DirectoryDB(Thread):
                 self.refresh_ids()
             self.status = "Add {} paths to DB".format(len(self.tmp_files_to_add))
             self.substatus = 0
+            add_folders_staging = []
             for path in self.tmp_files_to_add: # Make a Dict of the files to add
                 self.substatus += 1
                 fixed_path = self.fix_path(path, "DB")
                 self.tmp_files_to_add[path][1] = fixed_path
                 if fixed_path not in self.folder_ids:
-                    query = "INSERT OR IGNORE INTO directories(path, scan_time) VALUES(\"{0}\", {1});".format(
-                        fixed_path, time.time())
-                    self.lock.acquire()
-                    try:
-                        self.DB_cursor.execute(query)
-                    except lite.OperationalError as e:
-                        log("ERROR, could not add directory: ", query, e)
-                    self.changed = 1
-                    self.lock.release()
-            self.status = "Refresh again"
+                    add_folders_staging.append((fixed_path, time.time()))
+            if len(add_folders_staging):
+                query = "INSERT OR IGNORE INTO directories(path, scan_time) VALUES(?, ?);"
+                self.lock.acquire()
+                try:
+                    self.DB_cursor.executemany(query, add_folders_staging)
+                except lite.OperationalError as e:
+                    log("ERROR, could not add directory: ", query, "With data", add_folders_staging, e)
+                self.changed = 1
+                self.lock.release()
+                self.status = "Refresh again"
             if len(self.tmp_files_to_add): # Refresh the local id cache
                 self.refresh_ids()
             self.status = "Looping through {0} paths".format(len(self.tmp_files_to_add))
+            add_files_staging = []
             for path in self.tmp_files_to_add: # Loop through paths
                 fixed_path = self.tmp_files_to_add[path][1]
                 self.substatus = "Looping through {0} files".format(len(self.tmp_files_to_add[path][0]))
                 for filename in self.tmp_files_to_add[path][0]: # Loop through files and add them
+                    add_files_staging.append((self.folder_ids[fixed_path], fixed_path, filename, time.time()))
+            if len(add_files_staging):
                     query = "INSERT OR REPLACE INTO files (directory, filename, scan_time) " \
-                            "VALUES((SELECT directories.id FROM directories WHERE path LIKE \"{0}\")" \
-                            ", \"{1}\", {2});".format(fixed_path, filename, time.time())
+                            "VALUES(?, ?, ?, ?);"
                     self.lock.acquire()
                     try:
-                        self.DB_cursor.execute(query)
+                        self.DB_cursor.executemany(query, add_files_staging)
                     except lite.OperationalError as e:
-                        log("ERROR, could not add file: ", query, e)
+                        log("ERROR, could not add file: ", query, "With data", add_files_staging, e)
                     self.changed = 1
                     self.lock.release()
             self.status = "Done adding files, Deleting"
