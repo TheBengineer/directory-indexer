@@ -3,6 +3,8 @@ import os
 import time
 import signal
 import subprocess
+import random
+import string
 
 import scandir as sd
 
@@ -167,9 +169,35 @@ def main3():
     delta = time.time() - t
     print delta
 
+def random_string(len):
+    tmp = ""
+    for i in range(len):
+        tmp += random.choice(string.ascii_letters)
+    return tmp
+
+def main4():
+    strings = []
+    t = time.time()
+    for i in range(10000):
+        strings.append(random_string(100))
+    log("Created in", time.time()-t)
+    t = time.time()
+    for i in range(1000000):
+        strings.append(strings[int(random.random()*len(strings))])
+    log("Mishmashed", time.time()-t)
+    tmpdict = {}
+    t = time.time()
+    for s in strings:
+        tmpdict[s] = 0
+    log("hashed in ", time.time()-t)
+    t = time.time()
+    for s in strings:
+        if s not in tmpdict:
+            tmpdict[s] = s
+    log("hashed in ", time.time()-t)
 
 
 
 if __name__ == "__main__":
-    main3()
+    main4()
     exit()

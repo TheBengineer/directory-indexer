@@ -37,7 +37,7 @@ class DirectoryDB(Thread):
         self.files_to_add = []
         self.files_to_delete = []
         self.folders_to_delete = []
-        self.folders = {}
+        self.folder_ids = {}
         self.GUI = GUI
         self.go = 1
         self.platform = sys.platform
@@ -127,19 +127,24 @@ class DirectoryDB(Thread):
         else:
             return path  # TODO Make a Mac version?
 
+    def refresh_ids(self):
+        for path, path_id in self.dump_paths_ids():
+            self.folder_ids[path] = path_id
+
     def run(self):
         """
         :return:
         """
         self.last_write = 0.0
+        self.refresh_ids()
         while self.go:
             self.local_lock.acquire()
             loops = 0
-            while len(self.files_to_add) and loops < 1000:
+            while len(self.files_to_add):
                 path, filename = self.files_to_add.pop()
                 path = self.fix_path(path, "DB")
                 query = "INSERT OR IGNORE INTO directories(path, scan_time) VALUES(\"{0}\", {1});".format(path,
-                                                                                                        time.time())
+                                                                                                          time.time())
                 query2 = "INSERT OR REPLACE INTO files (directory, filename, scan_time) " \
                          "VALUES((SELECT directories.id FROM directories WHERE path LIKE \"{0}\")" \
                          ", \"{1}\", {2});".format(path, filename, time.time())
