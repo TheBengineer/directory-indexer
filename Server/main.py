@@ -102,13 +102,19 @@ if __name__ == '__main__':
     version = "2.0.0"
     F = FindIt(version)
     if sys.platform == "linux2":
-        F.scanner.add_to_roots("/media/O/")
-        F.scanner.add_to_roots("/media/M/")
+        F.scanner.add_to_roots("/media/I/")
         F.scanner.add_to_roots("/media/K/")
+        F.scanner.add_to_roots("/media/N/")
+        F.scanner.add_to_roots("/media/O/")
+        F.scanner.add_to_roots("/media/W/")
+        F.scanner.add_to_roots("/media/M/")
     elif sys.platform == "win32":
-        F.scanner.add_to_roots("O:\\")
-        F.scanner.add_to_roots("M:\\")
+        F.scanner.add_to_roots("I:\\")
         F.scanner.add_to_roots("K:\\")
+        F.scanner.add_to_roots("N:\\")
+        F.scanner.add_to_roots("O:\\")
+        F.scanner.add_to_roots("W:\\")
+        F.scanner.add_to_roots("M:\\")
     F.start()
     s = F.scanner
     d = s.directory_database
