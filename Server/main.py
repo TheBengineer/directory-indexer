@@ -107,14 +107,14 @@ if __name__ == '__main__':
         F.scanner.add_to_roots("/media/K/")
         F.scanner.add_to_roots("/media/N/")
         F.scanner.add_to_roots("/media/O/")
-        #F.scanner.add_to_roots("/media/W/")
+        F.scanner.add_to_roots("/media/W/")
         F.scanner.add_to_roots("/media/M/")
     elif sys.platform == "win32":
         F.scanner.add_to_roots("I:\\")
         F.scanner.add_to_roots("K:\\")
         F.scanner.add_to_roots("N:\\")
         F.scanner.add_to_roots("O:\\")
-        #F.scanner.add_to_roots("W:\\")
+        F.scanner.add_to_roots("W:\\")
         F.scanner.add_to_roots("M:\\")
     F.start()
     s = F.scanner
