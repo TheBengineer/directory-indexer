@@ -82,7 +82,8 @@ class FindIt(Thread):
                         else:
                             message += "\t{0}:{1}\n".format(attribute, str(real_attribute))
                     except Exception as e:
-                        log("Error:", e)
+                        pass
+                        #log("Error:", e)
                 log(message)
             elif len(command):
                 if command.upper()[0] == "$":
