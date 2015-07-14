@@ -49,7 +49,7 @@ class FindIt(Thread):
                 #log("Scanner variables", scanner_attributes)
                 #log("Scanner variables", type(scanner_attributes[1]))
                 #log("DB variables", DB_attributes)
-                message = "Scanner Status:\n"
+                message = ""
                 for attribute in scanner_attributes:
                     try:
                         real_attribute = getattr(self.scanner, attribute)
@@ -84,7 +84,7 @@ class FindIt(Thread):
                     except Exception as e:
                         pass
                         #log("Error:", e)
-                log(message)
+                log("Scanner Status:\n", message)
             elif len(command):
                 if command.upper()[0] == "$":
                     try:
