@@ -46,9 +46,9 @@ class FindIt(Thread):
             elif command.upper() == "S":
                 scanner_attributes = [a for a in dir(self.scanner) if not a.startswith('_')]
                 DB_attributes = [a for a in dir(self.scanner.directory_database) if not a.startswith('_')]
-                log("Scanner variables", scanner_attributes)
-                log("Scanner variables", type(scanner_attributes[1]))
-                log("DB variables", DB_attributes)
+                #log("Scanner variables", scanner_attributes)
+                #log("Scanner variables", type(scanner_attributes[1]))
+                #log("DB variables", DB_attributes)
                 message = "Scanner Status:\n"
                 for attribute in scanner_attributes:
                     try:
@@ -65,7 +65,8 @@ class FindIt(Thread):
                         else:
                             message += "\t{0}:{1}\n".format(attribute, str(real_attribute))
                     except Exception as e:
-                        log("Error:", e)
+                        pass
+                        #log("Error:", e)
                 message += "DB Status:\n"
                 for attribute in DB_attributes:
                     try:
