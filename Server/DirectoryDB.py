@@ -312,9 +312,10 @@ class DirectoryDB(Thread):
         data = self.dump_paths()
         result = []
         for path, time_ in data:
-            path_fixed = self.fix_path(path)
-            dict[path_fixed] = time_
-            result.append((path_fixed, time_))
+            if path:
+                path_fixed = self.fix_path(path)
+                dict[path_fixed] = time_
+                result.append((path_fixed, time_))
         return result
 
     def nuke(self):
