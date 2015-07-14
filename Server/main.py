@@ -1,13 +1,13 @@
 __author__ = 'Wild_Doogy'
 
 from threading import Thread
-import socket
 import time
 import sys
 
 import Scanner
 import SearchServer
 import LogServer
+
 
 def log(*args):
     print "[Main]",
@@ -16,7 +16,6 @@ def log(*args):
     for arg in args:
         print arg,
     print ""
-
 
 
 class FindIt(Thread):
@@ -36,14 +35,66 @@ class FindIt(Thread):
         self.log_server = LogServer.LogServer(self.scanner)
         self.log_server.start()
 
-
     def run(self):
         while self.go:
             command = raw_input()
             if command.upper() == "Q":
-                quit()
-            elif command.upper() == "A":
-                pass
+                self.scanner.go = False
+            elif command.upper() == "X":
+                import os
+                os._exit(1)
+            elif command.upper() == "S":
+                scanner_attributes = [a for a in dir(self.scanner) if not a.startswith('_')]
+                DB_attributes = [a for a in dir(self.scanner.directory_database) if not a.startswith('_')]
+                log("Scanner variables", scanner_attributes)
+                log("Scanner variables", type(scanner_attributes[1]))
+                log("DB variables", DB_attributes)
+                message = "Scanner Status:\n"
+                for attribute in scanner_attributes:
+                    try:
+                        real_attribute = getattr(self.scanner, attribute)
+                    except AttributeError as e:
+                        log(e)
+                        break
+                    try:
+                        max = 5
+                        if type(real_attribute) == str:
+                            max = 100
+                        if len(real_attribute) > max:
+                            message += "\tLen of {0}:{1}\n".format(attribute, len(real_attribute))
+                        else:
+                            message += "\t{0}:{1}\n".format(attribute, str(real_attribute))
+                    except Exception as e:
+                        log("Error:", e)
+                message += "DB Status:\n"
+                for attribute in DB_attributes:
+                    try:
+                        real_attribute = getattr(self.scanner.directory_database, attribute)
+                    except AttributeError:
+                        break
+                    try:
+                        max = 5
+                        if type(real_attribute) == str:
+                            max = 100
+                        if len(real_attribute) > max:
+                            message += "\tLen of {0}:{1}\n".format(attribute, len(real_attribute))
+                        else:
+                            message += "\t{0}:{1}\n".format(attribute, str(real_attribute))
+                    except Exception as e:
+                        log("Error:", e)
+                log(message)
+            elif len(command):
+                if command.upper()[0] == "$":
+                    try:
+                        result = eval(command[1:])
+                        log(command[1:], "$", result)
+                    except:
+                        log(sys.exc_info())
+                elif command.upper()[0] == "#":
+                    try:
+                        exec command[1:]
+                    except:
+                        log(sys.exc_info())
 
 
 if __name__ == '__main__':
@@ -58,7 +109,6 @@ if __name__ == '__main__':
         F.scanner.add_to_roots("M:\\")
         F.scanner.add_to_roots("K:\\")
     F.start()
-
-
-
+    s = F.scanner
+    d = s.directory_database
 
