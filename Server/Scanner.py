@@ -127,11 +127,14 @@ class Scanner(Thread):
             #    log("Path Seems to not exist:", path)
 
     def linux_path(self, path):
-        if path[1] == ":":
-            drive = path[0].upper()
-            new_path = "/media/" + drive + "/" + string.replace(path[3:], "\\", "/")
-            return new_path
-        else:
+        try:
+            if path[1] == ":":
+                drive = path[0].upper()
+                new_path = "/media/" + drive + "/" + string.replace(path[3:], "\\", "/")
+                return new_path
+            else:
+                return False
+        except:
             return False
 
     def schedule_refresh(self, path, last_scan_time):
