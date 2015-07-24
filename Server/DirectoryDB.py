@@ -189,6 +189,11 @@ class DirectoryDB(Thread):
         self.status = "Done adding files, cleaning up."
 
     def manage_del_files(self):
+        """
+        This function is just to clean the code in the run loop up.
+        This function will delete the next 10K files in the list of files to delete
+        :return: None
+        """
         self.tmp_files_to_del = {}
         t = time.time()
         self.status = "Grabbing a list of files to batch delete"
@@ -201,16 +206,33 @@ class DirectoryDB(Thread):
         self.status = "Refreshing ids"
         if len(self.tmp_files_to_del): # Refresh the local id cache
             self.refresh_ids()
-        self.status = "Deleting files in {} paths to DB".format(len(self.tmp_files_to_del))
+        self.status = "Fixing paths for {} folders".format(len(self.tmp_files_to_del))
         self.substatus = 0
-        add_folders_staging = []
-        for path in self.tmp_files_to_add: # Make a Dict of the files to add
+        for path in self.tmp_files_to_del: # Make a Dict of the files to delete
             self.substatus += 1
             fixed_path = self.fix_path(path, "DB")
-            self.tmp_files_to_add[path][1] = fixed_path
+            self.tmp_files_to_del[path][1] = fixed_path
             if fixed_path not in self.folder_ids:
-                add_folders_staging.append((fixed_path, time.time()))
-        self.status = "Batch add {0} folders".format(len(add_folders_staging))
+                del self.tmp_files_to_del[path]
+        self.status = "Batch delete {0} folders".format(len(self.tmp_files_to_del))
+        for path in self.tmp_files_to_del:
+            fixed_path = self.tmp_files_to_del[path][1]
+            filename_string = ""
+            for filename in self.tmp_files_to_del[path][0]:
+                filename_string += "\"{0}\",".format(filename)
+            filename_string = filename_string[:-1] # Slice off the trailing comma
+            query = "DELETE FROM files WHERE directory = {0} AND filename IN ({1});".format(self.folder_ids[fixed_path], filename_string)
+            self.do(query)
+
+    def do(self, query):
+        self.lock.acquire()
+        try:
+            self.DB_cursor.execute(query)
+        except lite.OperationalError as e:
+            log("ERROR, could not execute query: ", query, e)
+        self.changed = 1
+        self.lock.release()
+
 
     def run(self):
         """
@@ -221,20 +243,7 @@ class DirectoryDB(Thread):
         while self.go:
             self.local_lock.acquire()
             self.manage_add_files()
-            loops = 0
-            #self.manage_del_files()
-            if len(self.files_to_delete) and loops < 1000:
-                while
-                path, filename = self.files_to_delete.pop()
-                path = self.fix_path(path)
-                query = "DELETE FROM files WHERE path ='{path}' AND filename ='{filename}'" \
-                        " ;".format(path=path, filename=filename)
-                self.lock.acquire()
-                self.DB_cursor.execute(query)
-                self.changed = 1
-                self.lock.release()
-                loops += 1
-            self.status = "Deleting folders"
+            self.manage_del_files()
             loops = 0
             while len(self.folders_to_delete) and loops < 1000:
                 path = self.folders_to_delete.pop()
@@ -243,17 +252,8 @@ class DirectoryDB(Thread):
                 query = "DELETE FROM files WHERE directory = {0}".format(path_id)
                 query2 = "DELETE FROM directories WHERE id = {0}".format(path_id)
                 log("Deleting path", path)
-                self.lock.acquire()
-                try:
-                    self.DB_cursor.execute(query)
-                except lite.OperationalError as e:
-                    log("ERROR, could not delete files: ", query, e)
-                try:
-                    self.DB_cursor.execute(query2)
-                except lite.OperationalError as e:
-                    log("ERROR, could not delete directories: ", query2, e)
-                self.changed = 1
-                self.lock.release()
+                self.do(query)
+                self.do(query2)
                 loops += 1
             self.local_lock.release()
             if self.changed:
