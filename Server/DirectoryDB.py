@@ -255,11 +255,13 @@ class DirectoryDB(Thread):
             loops = 0
             while len(self.folders_to_delete) and loops < 1000:
                 path = self.folders_to_delete.pop()
-                path = self.fix_path(path)
-                path_id = self.get_path_id(path)
+                fixed_path = self.fix_path(path)
+                if fixed_path not in self.folder_ids:
+                    path_id = self.get_path_id(fixed_path)
+                else:
+                    path_id = self.folder_ids[fixed_path]
                 query = "DELETE FROM files WHERE directory = {0}".format(path_id)
                 query2 = "DELETE FROM directories WHERE id = {0}".format(path_id)
-                log("Deleting path", path)
                 self.do(query)
                 self.do(query2)
                 loops += 1
