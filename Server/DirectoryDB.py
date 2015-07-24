@@ -137,19 +137,19 @@ class DirectoryDB(Thread):
         self.tmp_files_to_add = {}
         t = time.time()
         self.status = "Starting batch add"
-        while len(self.files_to_add) and len(self.tmp_files_to_add) < 10000: # Get 10K files to play with
+        while len(self.files_to_add) and len(self.tmp_files_to_add) < 10000:  # Get 10K files to play with
             path, filename = self.files_to_add.pop()
             if path not in self.tmp_files_to_add:
-                self.tmp_files_to_add[path] = [[filename],[""]]
+                self.tmp_files_to_add[path] = [[filename], [""]]
             else:
                 self.tmp_files_to_add[path][0].append(filename)
         self.status = "Refreshing ids"
-        if len(self.tmp_files_to_add): # Refresh the local id cache
+        if len(self.tmp_files_to_add):  # Refresh the local id cache
             self.refresh_ids()
         self.status = "Fixing paths for {0} files".format(len(self.tmp_files_to_add))
         self.substatus = 0
         add_folders_staging = []
-        for path in self.tmp_files_to_add: # Make a Dict of the files to add
+        for path in self.tmp_files_to_add:  # Make a Dict of the files to add
             self.substatus += 1
             fixed_path = self.fix_path(path, "DB")
             self.tmp_files_to_add[path][1] = fixed_path
@@ -166,14 +166,14 @@ class DirectoryDB(Thread):
             self.changed = 1
             self.lock.release()
             self.status = "Refresh again"
-        if len(self.tmp_files_to_add): # Refresh the local id cache
+        if len(self.tmp_files_to_add):  # Refresh the local id cache
             self.refresh_ids()
         self.status = "Looping through {0} paths".format(len(self.tmp_files_to_add))
         add_files_staging = []
-        for path in self.tmp_files_to_add: # Loop through paths
+        for path in self.tmp_files_to_add:  # Loop through paths
             fixed_path = self.tmp_files_to_add[path][1]
             self.substatus = "Looping through {0} files".format(len(self.tmp_files_to_add[path][0]))
-            for filename in self.tmp_files_to_add[path][0]: # Loop through files and add them
+            for filename in self.tmp_files_to_add[path][0]:  # Loop through files and add them
                 add_files_staging.append((self.folder_ids[fixed_path], filename, time.time()))
         self.status = "Batch add {0} files at time {1}".format(len(add_files_staging), time.strftime("%c"))
         if len(add_files_staging):
@@ -197,18 +197,18 @@ class DirectoryDB(Thread):
         self.tmp_files_to_del = {}
         t = time.time()
         self.status = "Grabbing a list of files to batch delete"
-        while len(self.files_to_delete) and len(self.tmp_files_to_del) < 10000: # Get 10K files to play with
+        while len(self.files_to_delete) and len(self.tmp_files_to_del) < 10000:  # Get 10K files to play with
             path, filename = self.files_to_delete.pop()
             if path not in self.tmp_files_to_del:
-                self.tmp_files_to_del[path] = [[filename],[""]]
+                self.tmp_files_to_del[path] = [[filename], [""]]
             else:
                 self.tmp_files_to_del[path][0].append(filename)
         self.status = "Refreshing ids"
-        if len(self.tmp_files_to_del): # Refresh the local id cache
+        if len(self.tmp_files_to_del):  # Refresh the local id cache
             self.refresh_ids()
         self.status = "Fixing paths for {} folders".format(len(self.tmp_files_to_del))
         self.substatus = 0
-        for path in self.tmp_files_to_del: # Make a Dict of the files to delete
+        for path in self.tmp_files_to_del:  # Make a Dict of the files to delete
             self.substatus += 1
             fixed_path = self.fix_path(path, "DB")
             self.tmp_files_to_del[path][1] = fixed_path
@@ -220,12 +220,12 @@ class DirectoryDB(Thread):
             filename_string = ""
             for filename in self.tmp_files_to_del[path][0]:
                 filename_string += "\"{0}\",".format(filename)
-            filename_string = filename_string[:-1] # Slice off the trailing comma
-            query = "DELETE FROM files WHERE directory = {0} AND filename IN ({1});".format(self.folder_ids[fixed_path], filename_string)
+            filename_string = filename_string[:-1]  # Slice off the trailing comma
+            query = "DELETE FROM files WHERE directory = {0} AND filename IN ({1});".format(self.folder_ids[fixed_path],
+                                                                                            filename_string)
             self.do(query)
         self.delete_empty_folders()
         self.delete_orphan_files()
-
 
     def do(self, query):
         self.lock.acquire()
@@ -241,7 +241,6 @@ class DirectoryDB(Thread):
 
     def delete_orphan_files(self):
         self.do("DELETE FROM files WHERE directory NOT IN (SELECT id FROM directories);")
-
 
     def run(self):
         """
