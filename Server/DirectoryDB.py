@@ -223,6 +223,9 @@ class DirectoryDB(Thread):
             filename_string = filename_string[:-1] # Slice off the trailing comma
             query = "DELETE FROM files WHERE directory = {0} AND filename IN ({1});".format(self.folder_ids[fixed_path], filename_string)
             self.do(query)
+        self.delete_empty_folders()
+        self.delete_orphan_files()
+
 
     def do(self, query):
         self.lock.acquire()
@@ -232,6 +235,12 @@ class DirectoryDB(Thread):
             log("ERROR, could not execute query: ", query, e)
         self.changed = 1
         self.lock.release()
+
+    def delete_empty_folders(self):
+        self.do("DELETE FROM directories WHERE id NOT IN (SELECT directory FROM files);")
+
+    def delete_orphan_files(self):
+        self.do("DELETE FROM files WHERE directory NOT IN (SELECT id FROM directories);")
 
 
     def run(self):
