@@ -38,6 +38,7 @@ class DirectoryDB(Thread):
         self.files_to_delete = []
         self.folders_to_delete = []
         self.tmp_files_to_add = {}
+        self.tmp_files_to_del = {}
         self.folder_ids = {}
         self.GUI = GUI
         self.go = 1
@@ -132,6 +133,115 @@ class DirectoryDB(Thread):
         for path, path_id in self.dump_paths_ids():
             self.folder_ids[path] = path_id
 
+    def manage_add_files(self):
+        if len(self.files_to_add):
+            self.tmp_files_to_add = {}
+            self.status = "Starting batch add"
+            while len(self.files_to_add) and len(self.tmp_files_to_add) < 10000:  # Get 10K files to play with
+                path, filename = self.files_to_add.pop()
+                if path not in self.tmp_files_to_add:
+                    self.tmp_files_to_add[path] = [[filename], [""]]
+                else:
+                    self.tmp_files_to_add[path][0].append(filename)
+            if len(self.tmp_files_to_add):  # Refresh the local id cache
+                self.status = "Refreshing ids"
+                self.refresh_ids()
+                self.status = "Fixing paths for {0} files".format(len(self.tmp_files_to_add))
+                self.substatus = 0
+                add_folders_staging = []
+                for path in self.tmp_files_to_add:  # Make a Dict of the files to add
+                    self.substatus += 1
+                    fixed_path = self.fix_path(path, "DB")
+                    self.tmp_files_to_add[path][1] = fixed_path
+                    if fixed_path not in self.folder_ids:
+                        add_folders_staging.append((fixed_path, time.time()))
+                self.status = "Batch add {0} folders".format(len(add_folders_staging))
+                if len(add_folders_staging):
+                    query = "INSERT OR IGNORE INTO directories(path, scan_time) VALUES(?, ?);"
+                    self.lock.acquire()
+                    try:
+                        self.DB_cursor.executemany(query, add_folders_staging)
+                    except lite.OperationalError as e:
+                        log("ERROR, could not add directory: ", query, "With data", add_folders_staging, e)
+                    self.changed = 1
+                    self.lock.release()
+                    self.status = "Refresh again"
+                if len(self.tmp_files_to_add):  # Refresh the local id cache
+                    self.refresh_ids()
+                self.status = "Looping through {0} paths".format(len(self.tmp_files_to_add))
+                add_files_staging = []
+                for path in self.tmp_files_to_add:  # Loop through paths
+                    fixed_path = self.tmp_files_to_add[path][1]
+                    self.substatus = "Looping through {0} files".format(len(self.tmp_files_to_add[path][0]))
+                    for filename in self.tmp_files_to_add[path][0]:  # Loop through files and add them
+                        add_files_staging.append((self.folder_ids[fixed_path], filename, time.time()))
+                self.status = "Batch add {0} files at time {1}".format(len(add_files_staging), time.strftime("%c"))
+                if len(add_files_staging):
+                    query = "INSERT OR REPLACE INTO files (directory, filename, scan_time) " \
+                            "VALUES(?, ?, ?);"
+                    self.lock.acquire()
+                    try:
+                        self.DB_cursor.executemany(query, add_files_staging)
+                    except lite.OperationalError as e:
+                        log("ERROR, could not add file: ", query, "With data", add_files_staging, e)
+                    self.changed = 1
+                    self.lock.release()
+                self.status = "Done adding files, cleaning up."
+
+    def manage_del_files(self):
+        """
+        This function is just to clean the code in the run loop up.
+        This function will delete the next 10K files in the list of files to delete
+        :return: None
+        """
+        if len(self.files_to_delete):
+            self.tmp_files_to_del = {}
+            self.status = "Grabbing a list of files to batch delete"
+            while len(self.files_to_delete) and len(self.tmp_files_to_del) < 10000:  # Get 10K files to play with
+                path, filename = self.files_to_delete.pop()
+                if path not in self.tmp_files_to_del:
+                    self.tmp_files_to_del[path] = [[filename], [""]]
+                else:
+                    self.tmp_files_to_del[path][0].append(filename)
+            self.status = "Refreshing ids"
+            if len(self.tmp_files_to_del):  # Refresh the local id cache
+                self.refresh_ids()
+            self.status = "Fixing paths for {} folders".format(len(self.tmp_files_to_del))
+            self.substatus = 0
+            for path in self.tmp_files_to_del:  # Make a Dict of the files to delete
+                self.substatus += 1
+                fixed_path = self.fix_path(path, "DB")
+                self.tmp_files_to_del[path][1] = fixed_path
+                if fixed_path not in self.folder_ids:
+                    del self.tmp_files_to_del[path]
+            self.status = "Batch delete {0} folders".format(len(self.tmp_files_to_del))
+            for path in self.tmp_files_to_del:
+                fixed_path = self.tmp_files_to_del[path][1]
+                filename_string = ""
+                for filename in self.tmp_files_to_del[path][0]:
+                    filename_string += "\"{0}\",".format(filename)
+                filename_string = filename_string[:-1]  # Slice off the trailing comma
+                query = "DELETE FROM files WHERE directory = {0} AND filename IN ({1});".format(self.folder_ids[fixed_path],
+                                                                                                filename_string)
+                self.do(query)
+            self.delete_empty_folders()
+            self.delete_orphan_files()
+
+    def do(self, query):
+        self.lock.acquire()
+        try:
+            self.DB_cursor.execute(query)
+        except lite.OperationalError as e:
+            log("ERROR, could not execute query: ", query, e)
+        self.changed = 1
+        self.lock.release()
+
+    def delete_empty_folders(self):
+        self.do("DELETE FROM directories WHERE id NOT IN (SELECT directory FROM files);")
+
+    def delete_orphan_files(self):
+        self.do("DELETE FROM files WHERE directory NOT IN (SELECT id FROM directories);")
+
     def run(self):
         """
         :return:
@@ -140,90 +250,20 @@ class DirectoryDB(Thread):
         self.refresh_ids()
         while self.go:
             self.local_lock.acquire()
-            self.tmp_files_to_add = {}
-            t = time.time()
-            self.status = "Copy to tmp dict"
-            while len(self.files_to_add) and len(self.tmp_files_to_add) < 10000: # Get 10K files to play with
-                path, filename = self.files_to_add.pop()
-                if path not in self.tmp_files_to_add:
-                    self.tmp_files_to_add[path] = [[filename],[""]]
-                else:
-                    self.tmp_files_to_add[path][0].append(filename)
-            self.status = "Refresh ids"
-            if len(self.tmp_files_to_add): # Refresh the local id cache
-                self.refresh_ids()
-            self.status = "Add {} paths to DB".format(len(self.tmp_files_to_add))
-            self.substatus = 0
-            add_folders_staging = []
-            for path in self.tmp_files_to_add: # Make a Dict of the files to add
-                self.substatus += 1
-                fixed_path = self.fix_path(path, "DB")
-                self.tmp_files_to_add[path][1] = fixed_path
-                if fixed_path not in self.folder_ids:
-                    add_folders_staging.append((fixed_path, time.time()))
-            self.status = "Batch add {0} folders".format(len(add_folders_staging))
-            if len(add_folders_staging):
-                query = "INSERT OR IGNORE INTO directories(path, scan_time) VALUES(?, ?);"
-                self.lock.acquire()
-                try:
-                    self.DB_cursor.executemany(query, add_folders_staging)
-                except lite.OperationalError as e:
-                    log("ERROR, could not add directory: ", query, "With data", add_folders_staging, e)
-                self.changed = 1
-                self.lock.release()
-                self.status = "Refresh again"
-            if len(self.tmp_files_to_add): # Refresh the local id cache
-                self.refresh_ids()
-            self.status = "Looping through {0} paths".format(len(self.tmp_files_to_add))
-            add_files_staging = []
-            for path in self.tmp_files_to_add: # Loop through paths
-                fixed_path = self.tmp_files_to_add[path][1]
-                self.substatus = "Looping through {0} files".format(len(self.tmp_files_to_add[path][0]))
-                for filename in self.tmp_files_to_add[path][0]: # Loop through files and add them
-                    add_files_staging.append((self.folder_ids[fixed_path], filename, time.time()))
-            self.status = "Batch add {0} files".format(len(add_files_staging))
-            if len(add_files_staging):
-                query = "INSERT OR REPLACE INTO files (directory, filename, scan_time) " \
-                        "VALUES(?, ?, ?);"
-                self.lock.acquire()
-                try:
-                    self.DB_cursor.executemany(query, add_files_staging)
-                except lite.OperationalError as e:
-                    log("ERROR, could not add file: ", query, "With data", add_files_staging, e)
-                self.changed = 1
-                self.lock.release()
-            self.status = "Done adding files, Deleting"
-            loops = 0
-            while len(self.files_to_delete) and loops < 1000:
-                path, filename = self.files_to_delete.pop()
-                path = self.fix_path(path)
-                query = "DELETE FROM files WHERE path ='{path}' AND filename ='{filename}'" \
-                        " ;".format(path=path, filename=filename)
-                self.lock.acquire()
-                self.DB_cursor.execute(query)
-                self.changed = 1
-                self.lock.release()
-                loops += 1
-            self.status = "Deleting folders"
+            self.manage_add_files()
+            self.manage_del_files()
             loops = 0
             while len(self.folders_to_delete) and loops < 1000:
                 path = self.folders_to_delete.pop()
-                path = self.fix_path(path)
-                path_id = self.get_path_id(path)
+                fixed_path = self.fix_path(path)
+                if fixed_path not in self.folder_ids:
+                    path_id = self.get_path_id(fixed_path)
+                else:
+                    path_id = self.folder_ids[fixed_path]
                 query = "DELETE FROM files WHERE directory = {0}".format(path_id)
                 query2 = "DELETE FROM directories WHERE id = {0}".format(path_id)
-                log("Deleting path", path)
-                self.lock.acquire()
-                try:
-                    self.DB_cursor.execute(query)
-                except lite.OperationalError as e:
-                    log("ERROR, could not delete files: ", query, e)
-                try:
-                    self.DB_cursor.execute(query2)
-                except lite.OperationalError as e:
-                    log("ERROR, could not delete directories: ", query2, e)
-                self.changed = 1
-                self.lock.release()
+                self.do(query)
+                self.do(query2)
                 loops += 1
             self.local_lock.release()
             if self.changed:

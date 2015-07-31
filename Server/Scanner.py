@@ -127,11 +127,14 @@ class Scanner(Thread):
             #    log("Path Seems to not exist:", path)
 
     def linux_path(self, path):
-        if path[1] == ":":
-            drive = path[0].upper()
-            new_path = "/media/" + drive + "/" + string.replace(path[3:], "\\", "/")
-            return new_path
-        else:
+        try:
+            if path[1] == ":":
+                drive = path[0].upper()
+                new_path = "/media/" + drive + "/" + string.replace(path[3:], "\\", "/")
+                return new_path
+            else:
+                return False
+        except:
             return False
 
     def schedule_refresh(self, path, last_scan_time):
@@ -158,22 +161,25 @@ class Scanner(Thread):
                         (self.path, scan_time) = self.directories_to_refresh.pop()
                         if self.linux:
                             self.l_path = self.linux_path(self.path)
-                            if self.l_path:
-                                if "//" in self.l_path:
-                                    self.directory_database.del_folder(self.l_path)
-                                    self.l_path = self.l_path.replace("//","/")
-                                    while "//" in self.l_path:
+                            try:
+                                if self.l_path:
+                                    if "//" in self.l_path:
+                                        self.directory_database.del_folder(self.l_path)
                                         self.l_path = self.l_path.replace("//","/")
-                                self.tmp_to_freshen.append((self.l_path, scan_time))
-                            elif self.path[:7] == '/media/':
-                                if "//" in self.path:
-                                    self.path = self.path.replace("//","/")
-                                    while "//" in self.path:
+                                        while "//" in self.l_path:
+                                            self.l_path = self.l_path.replace("//","/")
+                                    self.tmp_to_freshen.append((self.l_path, scan_time))
+                                elif self.path[:7] == '/media/':
+                                    if "//" in self.path:
                                         self.path = self.path.replace("//","/")
-                                self.tmp_to_freshen.append((self.path, scan_time))  # Already in linux format.
-                                # log("Path seems to be already linux", path)
-                            else:
-                                log("Path could not be converted to linux.", self.path)
+                                        while "//" in self.path:
+                                            self.path = self.path.replace("//","/")
+                                    self.tmp_to_freshen.append((self.path, scan_time))  # Already in linux format.
+                                    # log("Path seems to be already linux", path)
+                                else:
+                                    log("Path could not be converted to linux.", self.path)
+                            except TypeError:
+                                log("Malformed path", self.path, scan_time)
                         else:
                             self.tmp_to_freshen.append((self.path, scan_time))
                     except IndexError:
