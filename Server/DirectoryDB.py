@@ -194,38 +194,38 @@ class DirectoryDB(Thread):
         This function will delete the next 10K files in the list of files to delete
         :return: None
         """
-        self.tmp_files_to_del = {}
-        t = time.time()
-        self.status = "Grabbing a list of files to batch delete"
-        while len(self.files_to_delete) and len(self.tmp_files_to_del) < 10000:  # Get 10K files to play with
-            path, filename = self.files_to_delete.pop()
-            if path not in self.tmp_files_to_del:
-                self.tmp_files_to_del[path] = [[filename], [""]]
-            else:
-                self.tmp_files_to_del[path][0].append(filename)
-        self.status = "Refreshing ids"
-        if len(self.tmp_files_to_del):  # Refresh the local id cache
-            self.refresh_ids()
-        self.status = "Fixing paths for {} folders".format(len(self.tmp_files_to_del))
-        self.substatus = 0
-        for path in self.tmp_files_to_del:  # Make a Dict of the files to delete
-            self.substatus += 1
-            fixed_path = self.fix_path(path, "DB")
-            self.tmp_files_to_del[path][1] = fixed_path
-            if fixed_path not in self.folder_ids:
-                del self.tmp_files_to_del[path]
-        self.status = "Batch delete {0} folders".format(len(self.tmp_files_to_del))
-        for path in self.tmp_files_to_del:
-            fixed_path = self.tmp_files_to_del[path][1]
-            filename_string = ""
-            for filename in self.tmp_files_to_del[path][0]:
-                filename_string += "\"{0}\",".format(filename)
-            filename_string = filename_string[:-1]  # Slice off the trailing comma
-            query = "DELETE FROM files WHERE directory = {0} AND filename IN ({1});".format(self.folder_ids[fixed_path],
-                                                                                            filename_string)
-            self.do(query)
-        self.delete_empty_folders()
-        self.delete_orphan_files()
+        if len(self.files_to_delete):
+            self.tmp_files_to_del = {}
+            self.status = "Grabbing a list of files to batch delete"
+            while len(self.files_to_delete) and len(self.tmp_files_to_del) < 10000:  # Get 10K files to play with
+                path, filename = self.files_to_delete.pop()
+                if path not in self.tmp_files_to_del:
+                    self.tmp_files_to_del[path] = [[filename], [""]]
+                else:
+                    self.tmp_files_to_del[path][0].append(filename)
+            self.status = "Refreshing ids"
+            if len(self.tmp_files_to_del):  # Refresh the local id cache
+                self.refresh_ids()
+            self.status = "Fixing paths for {} folders".format(len(self.tmp_files_to_del))
+            self.substatus = 0
+            for path in self.tmp_files_to_del:  # Make a Dict of the files to delete
+                self.substatus += 1
+                fixed_path = self.fix_path(path, "DB")
+                self.tmp_files_to_del[path][1] = fixed_path
+                if fixed_path not in self.folder_ids:
+                    del self.tmp_files_to_del[path]
+            self.status = "Batch delete {0} folders".format(len(self.tmp_files_to_del))
+            for path in self.tmp_files_to_del:
+                fixed_path = self.tmp_files_to_del[path][1]
+                filename_string = ""
+                for filename in self.tmp_files_to_del[path][0]:
+                    filename_string += "\"{0}\",".format(filename)
+                filename_string = filename_string[:-1]  # Slice off the trailing comma
+                query = "DELETE FROM files WHERE directory = {0} AND filename IN ({1});".format(self.folder_ids[fixed_path],
+                                                                                                filename_string)
+                self.do(query)
+            self.delete_empty_folders()
+            self.delete_orphan_files()
 
     def do(self, query):
         self.lock.acquire()
