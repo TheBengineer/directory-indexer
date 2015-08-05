@@ -330,12 +330,12 @@ class DirectoryDB(Thread):
 
     def dump_paths(self):
         query = "SELECT DISTINCT path, scan_time FROM directories;"
-        log("Starting to dump all stored paths. This may take a while.")
+        #log("Starting to dump all stored paths. This may take a while.")
         self.lock.acquire()
         self.DB_cursor.execute(query)
         data = self.DB_cursor.fetchall()
         self.lock.release()
-        log("Done dumping all paths.")
+        #log("Done dumping all paths.")
         return data
 
     def dump_paths_ids(self):

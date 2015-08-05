@@ -187,14 +187,14 @@ class Scanner(Thread):
                 # log("To freshen", tmp_to_freshen)
                 t3 = time.time()
                 delta = t3 - t2
-                log("Refresh prep overhead: ", delta, "Seconds (", round(delta * 300), "~Folders)")
+                #log("Refresh prep overhead: ", delta, "Seconds (", round(delta * 300), "~Folders)")
                 t = time.time()
                 results_fresh = self.scan_pool.map(
                     lambda (path_scan_time): self.refresh_folder(path_scan_time), self.tmp_to_freshen)
                 t2 = time.time()
                 delta = max(t2 - t, .001)
-                log("Refreshed ", len(self.tmp_to_freshen), "in ", delta, "Seconds (", len(self.tmp_to_freshen) / delta,
-                    "Folders/Second)")
+                #log("Refreshed ", len(self.tmp_to_freshen), "in ", delta, "Seconds (", len(self.tmp_to_freshen) / delta,
+                #    "Folders/Second)")
                 # log("Fresh results", results_fresh)
                 for index, (result, mtime) in enumerate(results_fresh):
                     path = self.tmp_to_freshen[index][0]
@@ -226,8 +226,8 @@ class Scanner(Thread):
                 results_scan = self.scan_pool.map(self.scan_folder, self.tmp_to_scan)
                 t2 = time.time()
                 delta = max(t2 - t, .001)
-                log("Scanned ", len(self.tmp_to_scan), "in ", delta, "Seconds (", len(self.tmp_to_scan) / delta,
-                    "Folders/Second)")
+                #log("Scanned ", len(self.tmp_to_scan), "in ", delta, "Seconds (", len(self.tmp_to_scan) / delta,
+                #    "Folders/Second)")
                 # log("Scan results", results_scan)
                 for (path, directories, files) in results_scan:
                     for directory in directories:
