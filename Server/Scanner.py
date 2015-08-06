@@ -138,10 +138,10 @@ class Scanner(Thread):
             return False
 
     def schedule_refresh(self, path, last_scan_time):
-        if path and not last_scan_time==None:
+        if path and not last_scan_time == None:
             self.directories_to_refresh.append((path, last_scan_time))
         else:
-            log("Trying to schedule a refresh on invalid path/time:", path/ last_scan_time)
+            log("Trying to schedule a refresh on invalid path/time:", path / last_scan_time)
 
     def run(self):
         # gc.disable()
@@ -151,12 +151,22 @@ class Scanner(Thread):
         log("Roots:", self.roots)
         self.directories_to_refresh += self.directory_database.dump_paths_dict(self.time_cache)
         t2 = time.time()
+        self.last_to_scan = len(self.directories_to_scan)
+        self.average_time = 0
         while self.go:
             if not len(self.directories_to_refresh) and not len(self.directories_to_scan):
                 time.sleep(1)
             else:
                 self.tmp_to_freshen = []
-                log("Dirs left to refresh:", len(self.directories_to_refresh), "Dirs to scan:", len(self.directories_to_scan))
+
+                log("Dirs left to refresh:", len(self.directories_to_refresh), "(",
+                    (self.last_to_scan - len(self.directories_to_scan)) / (time.time() - t2), "Dirs/Sec) Dirs to scan:",
+                    len(self.directories_to_scan), "Should be done in",
+                    len(self.directories_to_refresh)/(self.average_time*512*60), "Minutes")
+                self.last_to_scan = len(self.directories_to_scan)
+                self.average_time = (self.average_time / 2) + (self.last_to_scan - len(self.directories_to_scan))
+                t2 = time.time()
+
                 for i in xrange(min(len(self.directories_to_refresh), 512)):  # Get the next 512 directories to freshen
                     try:
                         (self.path, scan_time) = self.directories_to_refresh.pop()
@@ -166,15 +176,15 @@ class Scanner(Thread):
                                 if self.l_path:
                                     if "//" in self.l_path:
                                         self.directory_database.del_folder(self.l_path)
-                                        self.l_path = self.l_path.replace("//","/")
+                                        self.l_path = self.l_path.replace("//", "/")
                                         while "//" in self.l_path:
-                                            self.l_path = self.l_path.replace("//","/")
+                                            self.l_path = self.l_path.replace("//", "/")
                                     self.tmp_to_freshen.append((self.l_path, scan_time))
                                 elif self.path[:7] == '/media/':
                                     if "//" in self.path:
-                                        self.path = self.path.replace("//","/")
+                                        self.path = self.path.replace("//", "/")
                                         while "//" in self.path:
-                                            self.path = self.path.replace("//","/")
+                                            self.path = self.path.replace("//", "/")
                                     self.tmp_to_freshen.append((self.path, scan_time))  # Already in linux format.
                                     # log("Path seems to be already linux", path)
                                 else:
@@ -186,15 +196,15 @@ class Scanner(Thread):
                     except IndexError:
                         break
                 # log("To freshen", tmp_to_freshen)
-                #t3 = time.time()
-                #delta = t3 - t2
-                #log("Refresh prep overhead: ", delta, "Seconds (", round(delta * 300), "~Folders)")
-                #t = time.time()
+                # t3 = time.time()
+                # delta = t3 - t2
+                # log("Refresh prep overhead: ", delta, "Seconds (", round(delta * 300), "~Folders)")
+                # t = time.time()
                 results_fresh = self.scan_pool.map(
                     lambda (path_scan_time): self.refresh_folder(path_scan_time), self.tmp_to_freshen)
-                #t2 = time.time()
-                #delta = max(t2 - t, .001)
-                #log("Refreshed ", len(self.tmp_to_freshen), "in ", delta, "Seconds (", len(self.tmp_to_freshen) / delta,
+                # t2 = time.time()
+                # delta = max(t2 - t, .001)
+                # log("Refreshed ", len(self.tmp_to_freshen), "in ", delta, "Seconds (", len(self.tmp_to_freshen) / delta,
                 #    "Folders/Second)")
                 # log("Fresh results", results_fresh)
                 for index, (result, mtime) in enumerate(results_fresh):
@@ -204,10 +214,10 @@ class Scanner(Thread):
                         # log("Adding", tmp_to_freshen[index][0])
                         self.directories_to_scan.append(path)
                         self.time_cache[path] = mtime
-                        #log("Adding path to cache:", path)
+                        # log("Adding path to cache:", path)
                     elif result == 1:
                         self.time_cache[path] = mtime
-                        #log("Adding path to cache:", path)
+                        # log("Adding path to cache:", path)
                     elif result == 2:
                         # directory needs to be deleted from DB.
                         self.directory_database.del_folder(self.tmp_to_freshen[index][0])
@@ -223,11 +233,11 @@ class Scanner(Thread):
                 # delta = t3 - t2
                 # log("Post refresh overhead: ", delta, "Seconds (", round(delta * 300), "~Folders)")
                 # Not needed. This is always super fast.
-                #t = time.time()
+                # t = time.time()
                 results_scan = self.scan_pool.map(self.scan_folder, self.tmp_to_scan)
-                #t2 = time.time()
-                #delta = max(t2 - t, .001)
-                #log("Scanned ", len(self.tmp_to_scan), "in ", delta, "Seconds (", len(self.tmp_to_scan) / delta,
+                # t2 = time.time()
+                # delta = max(t2 - t, .001)
+                # log("Scanned ", len(self.tmp_to_scan), "in ", delta, "Seconds (", len(self.tmp_to_scan) / delta,
                 #    "Folders/Second)")
                 # log("Scan results", results_scan)
                 for (path, directories, files) in results_scan:
@@ -248,24 +258,26 @@ class Scanner(Thread):
                             scan_time = self.time_cache[folderpath]
                         else:
                             scan_time = 0.0
-                            #log("Path not in cache", folderpath)
+                            # log("Path not in cache", folderpath)
                         self.directories_to_refresh.append(
                             (os.path.join(path, directory), scan_time))
                     for file in files:
                         self.directory_database.add_fileB(path, file)
-                # Post scan overhead is not needed. Now that writeout is handled separately, this is very fast.
-                #t3 = time.time()
-                #delta = t3 - t2
-                #log("Post scan overhead:", len(directories), "Dirs,",len(files), "Files in", delta, "Seconds (", (len(directories)+len(files))/delta, "Items/Second)")
-                #t2 = time.time()
+                        # Post scan overhead is not needed. Now that writeout is handled separately, this is very fast.
+                        # t3 = time.time()
+                        # delta = t3 - t2
+                        # log("Post scan overhead:", len(directories), "Dirs,",len(files), "Files in", delta, "Seconds (", (len(directories)+len(files))/delta, "Items/Second)")
+                        # t2 = time.time()
             current_time = str(datetime.datetime.now())
-            if time.time() - self.last_update > self.update_interval and current_time[current_time.find(" ")+1:current_time.find(":")] == "18" :
+            if time.time() - self.last_update > self.update_interval and current_time[
+                                                                         current_time.find(" ") + 1:current_time.find(
+                                                                                 ":")] == "18":
                 self.last_update = time.time()
                 self.directories_to_refresh += self.directory_database.dump_paths()
                 for root_dir in self.roots:
                     self.schedule_refresh(root_dir, 0.0)
             time.sleep(.1)
-        os._exit(1) # When loops drops, then exit.
+        os._exit(1)  # When loops drops, then exit.
 
     def add_to_roots(self, folder_to_scan):
         if not os.path.isdir(folder_to_scan):  # Make sure the folder exists
