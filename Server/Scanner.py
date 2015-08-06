@@ -152,7 +152,7 @@ class Scanner(Thread):
         self.directories_to_refresh += self.directory_database.dump_paths_dict(self.time_cache)
         t2 = time.time()
         self.last_to_scan = len(self.directories_to_scan)
-        self.average_time = 0
+        self.average_time = 1
         while self.go:
             if not len(self.directories_to_refresh) and not len(self.directories_to_scan):
                 time.sleep(1)
