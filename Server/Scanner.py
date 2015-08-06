@@ -58,7 +58,7 @@ class Scanner(Thread):
         self.directories_to_scan = []
         self.scan_results = [[], [], []]
         self.time_cache = {}
-        self.last_to_scan = 0
+        self.last_to_refresh = 0
         self.average_time = 1.0
 
         self.scan_pool = Pool_for_map(128)
@@ -153,7 +153,7 @@ class Scanner(Thread):
         log("Roots:", self.roots)
         self.directories_to_refresh += self.directory_database.dump_paths_dict(self.time_cache)
         t2 = time.time()
-        self.last_to_scan = len(self.directories_to_scan)
+        self.last_to_refresh = len(self.directories_to_refresh)
         self.average_time = 1.0
         while self.go:
             if not len(self.directories_to_refresh) and not len(self.directories_to_scan):
@@ -162,11 +162,11 @@ class Scanner(Thread):
                 self.tmp_to_freshen = []
 
                 log("Dirs left to refresh:", len(self.directories_to_refresh), "(",
-                    (self.last_to_scan - len(self.directories_to_scan)) / (time.time() - t2 + .000001),
+                    (self.last_to_refresh - len(self.directories_to_refresh)) / (time.time() - t2 + .000001),
                     "Dirs/Sec) Dirs to scan:", len(self.directories_to_scan), "Should be done in",
                     len(self.directories_to_refresh) / (self.average_time * 512.0 * 60), "Minutes")
-                self.last_to_scan = len(self.directories_to_scan)
-                self.average_time = (self.average_time / 2.0) + (self.last_to_scan - len(self.directories_to_scan))
+                self.last_to_refresh = len(self.directories_to_refresh)
+                self.average_time = (self.average_time / 2.0) + (self.last_to_refresh - len(self.directories_to_refresh))
                 t2 = time.time()
 
                 for i in xrange(min(len(self.directories_to_refresh), 512)):  # Get the next 512 directories to freshen
