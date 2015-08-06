@@ -58,6 +58,8 @@ class Scanner(Thread):
         self.directories_to_scan = []
         self.scan_results = [[], [], []]
         self.time_cache = {}
+        self.last_to_scan = 0
+        self.average_time = 1.0
 
         self.scan_pool = Pool_for_map(128)
 
