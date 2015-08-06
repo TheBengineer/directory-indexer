@@ -156,7 +156,7 @@ class Scanner(Thread):
                 time.sleep(1)
             else:
                 self.tmp_to_freshen = []
-                log("Dirs left to refresh:", self.directories_to_refresh, "Dirs to scan:", self.directories_to_scan)
+                log("Dirs left to refresh:", len(self.directories_to_refresh), "Dirs to scan:", len(self.directories_to_scan))
                 for i in xrange(min(len(self.directories_to_refresh), 512)):  # Get the next 512 directories to freshen
                     try:
                         (self.path, scan_time) = self.directories_to_refresh.pop()
