@@ -164,7 +164,7 @@ class Scanner(Thread):
                 log("Dirs left to refresh:", len(self.directories_to_refresh), "(",
                     (self.last_to_refresh - len(self.directories_to_refresh)) / (time.time() - t2 + .000001),
                     "Dirs/Sec) Dirs to scan:", len(self.directories_to_scan), "Should be done in",
-                    len(self.directories_to_refresh) / (self.average_time * 512.0 * 60), "Minutes")
+                    (len(self.directories_to_refresh)*self.average_time) / (512.0 * 60), "Minutes")
                 self.last_to_refresh = len(self.directories_to_refresh)
                 self.average_time = (self.average_time / 2.0) + (time.time() - t2)
                 t2 = time.time()
