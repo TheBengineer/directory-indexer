@@ -160,9 +160,9 @@ class Scanner(Thread):
                 self.tmp_to_freshen = []
 
                 log("Dirs left to refresh:", len(self.directories_to_refresh), "(",
-                    (self.last_to_scan - len(self.directories_to_scan)) / (time.time() - t2), "Dirs/Sec) Dirs to scan:",
-                    len(self.directories_to_scan), "Should be done in",
-                    len(self.directories_to_refresh)/(self.average_time*512.0*60), "Minutes")
+                    (self.last_to_scan - len(self.directories_to_scan)) / (time.time() - t2 + .000001),
+                    "Dirs/Sec) Dirs to scan:", len(self.directories_to_scan), "Should be done in",
+                    len(self.directories_to_refresh) / (self.average_time * 512.0 * 60), "Minutes")
                 self.last_to_scan = len(self.directories_to_scan)
                 self.average_time = (self.average_time / 2.0) + (self.last_to_scan - len(self.directories_to_scan))
                 t2 = time.time()
@@ -271,7 +271,7 @@ class Scanner(Thread):
             current_time = str(datetime.datetime.now())
             if time.time() - self.last_update > self.update_interval and current_time[
                                                                          current_time.find(" ") + 1:current_time.find(
-                                                                                 ":")] == "18":
+                                                                             ":")] == "18":
                 self.last_update = time.time()
                 self.directories_to_refresh += self.directory_database.dump_paths()
                 for root_dir in self.roots:
