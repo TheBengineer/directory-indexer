@@ -166,7 +166,7 @@ class Scanner(Thread):
                     "Dirs/Sec) Dirs to scan:", len(self.directories_to_scan), "Should be done in",
                     len(self.directories_to_refresh) / (self.average_time * 512.0 * 60), "Minutes")
                 self.last_to_refresh = len(self.directories_to_refresh)
-                self.average_time = (self.average_time / 2.0) + (self.last_to_refresh - len(self.directories_to_refresh))
+                self.average_time = (self.average_time / 2.0) + (time.time() - t2)
                 t2 = time.time()
 
                 for i in xrange(min(len(self.directories_to_refresh), 512)):  # Get the next 512 directories to freshen
