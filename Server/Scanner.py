@@ -61,7 +61,7 @@ class Scanner(Thread):
         self.last_to_refresh = 0
         self.average_time = 1.0
 
-        self.scan_pool = Pool_for_map(128)
+        self.scan_pool = Pool_for_map(16)
 
         self.go = 1
         self.log = ""
