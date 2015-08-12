@@ -32,8 +32,8 @@ class FindIt(Thread):
         self.scanner.start()
         self.search_server = SearchServer.SearchServer(self.scanner)
         self.search_server.start()
-        self.log_server = LogServer.LogServer(self.scanner)
-        self.log_server.start()
+        #self.log_server = LogServer.LogServer(self.scanner)
+        #self.log_server.start()
 
     def run(self):
         while self.go:
