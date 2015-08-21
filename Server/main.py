@@ -43,6 +43,9 @@ class FindIt(Thread):
             elif command.upper() == "X":
                 import os
                 os._exit(1)
+            elif command.upper() == "K":
+                log("Resetting directories to scan")
+                self.scanner.directories_to_refresh = []
             elif command.upper() == "S":
                 scanner_attributes = [a for a in dir(self.scanner) if not a.startswith('_')]
                 DB_attributes = [a for a in dir(self.scanner.directory_database) if not a.startswith('_')]
