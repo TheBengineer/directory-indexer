@@ -87,7 +87,7 @@ class SearchServer(Thread):
                     except:
                         break
                     if data:
-                        result = self.scanner.directory_database.get_folders_limit("%" + data + "%", 2000)
+                        result = self.scanner.directory_database.get_folders_limit(data + "%", 2000)
                         data_to_send = ""
                         i = 0
                         message_length = 0
