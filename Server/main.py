@@ -113,12 +113,9 @@ if __name__ == '__main__':
         #F.scanner.add_to_roots("/media/W/")
         F.scanner.add_to_roots("/media/M/")
     elif sys.platform == "win32":
-        F.scanner.add_to_roots("I:\\")
-        F.scanner.add_to_roots("K:\\")
-        F.scanner.add_to_roots("N:\\")
-        F.scanner.add_to_roots("O:\\")
-        #F.scanner.add_to_roots("W:\\")
-        F.scanner.add_to_roots("M:\\")
+        F.scanner.add_to_roots("\\\\cdcsrvr1\\depts\\PMD\\common\\SWAT")
+        F.scanner.add_to_roots("\\\\cdcsrvr1\\Depts\\PMD\\PRODUCT_DATA\\WORK\\6100-61111 IBG")
+
     F.start()
     s = F.scanner
     d = s.directory_database

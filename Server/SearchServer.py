@@ -45,7 +45,8 @@ class SearchServer(Thread):
         """
         :type self.socket: socket.socket
         """
-        self.socket_start(self.socket, (getlocalip(), 9091))
+        print getlocalip()
+        self.socket_start(self.socket, (getlocalip(), 9092))
         self.go = 1
 
 

@@ -116,7 +116,7 @@ class Window(Thread):
                     self.multi_list_box.insert(0, (
                     filename, filename[filename.find('.') + 1:].upper(), os.path.join(folder_path, filename)))
                 print local_results
-            s = self.socket_connect(self.socket_init(), ("BOH001", 9091))
+            s = self.socket_connect(self.socket_init(), ("localhost", 9092))
             s.send(search_text)  # Need to add some checks here
             result_string = s.recv(100000000)
             num_results = 0
