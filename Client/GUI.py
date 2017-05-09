@@ -33,7 +33,7 @@ class Window(Thread):
 
         self.window = tk.Tk()  # Init
         self.window.geometry("800x500+300+300")
-        self.window.title("Fujifilm Dimatix File Index Database - Ben Holleran April 2015")
+        self.window.title("File Index Database - Ben Holleran April 2015")
         self.window.protocol("WM_DELETE_WINDOW", self.onQuit)
 
 

@@ -4,7 +4,7 @@ import GUI
 import Scanner
 
 if __name__ == '__main__':
-    version = "2.1.0"
+    version = "3.0.0"
     localScan = Scanner.Scanner()
     localScan.add_to_roots("H:\\")
     localScan.start()
