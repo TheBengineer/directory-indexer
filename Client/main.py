@@ -6,7 +6,7 @@ import Scanner
 if __name__ == '__main__':
     version = "3.0.0"
     localScan = Scanner.Scanner()
-    localScan.add_to_roots("H:\\")
+    localScan.load_roots()
     localScan.start()
     gui = GUI.Window(localScan.directory_database)
     gui.version = version

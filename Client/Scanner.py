@@ -103,6 +103,24 @@ class Scanner(Thread):
         # TODO need to create a config file
         pass
 
+    def load_roots(self):
+        import ConfigParser
+        try:
+            config = ConfigParser.ConfigParser()
+            config.readfp(open('defaults.cfg'))
+            config.read(['site.cfg', os.path.expanduser('~/.myapp.cfg')])
+        except IOError:
+            self.create_ini()
+
+    def create_ini(self):
+        import ConfigParser
+        try:
+            config = ConfigParser.ConfigParser()
+            config.readfp(open('defaults.cfg'))
+            config.read(['site.cfg', os.path.expanduser('~/.myapp.cfg')])
+        except IOError:
+            self.create_ini()
+
     def refresh_folder(self, (path, scan_time)):
         try:
             mtime = os.path.getmtime(path)
@@ -249,7 +267,6 @@ class Scanner(Thread):
                 for root_dir in self.roots:
                     self.schedule_refresh(root_dir, 0.0)
             time.sleep(.1)
-
 
     def add_to_roots(self, folder_to_scan):
         if not os.path.isdir(folder_to_scan):  # Make sure the folder exists
